@@ -1,0 +1,857 @@
+import React, { useState, useEffect } from 'react';
+import menuIcon from '../assets/menuIcon.png';
+import xIcon from '../assets/xIconGray2.png';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { valueAtTime } from '../helpers/growthPercentage';
+import { saveNewDeposit, } from '../helpers/saveNewDeposit';
+import { requestNewSolanaTransaction } from '../helpers/web3Manager';
+import { useDispatch } from 'react-redux';
+import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, setinitialInvestmentDate, setinitialPrincipal, 
+  settotalInvestingValue } from '../redux/userWalletData';
+import LoadingAnimation from '../components/loadingAnimation';
+import backButton from '../assets/backButton3.png';
+import solIcon from '../assets/solIcon.png';
+import ethlogo from '../assets/ethlogo.png';
+import usdcSol from '../assets/usdcSol.png';
+import usdtSol from '../assets/usdtSol.png';
+import busdSol from '../assets/busdSol.png';
+import busdEth from '../assets/busdEth.png';
+import usdtEth from '../assets/usdtEth.png';
+import usdcEth from '../assets/usdcEth.png';
+import wallet from '../helpers/walletDataType';
+import { RequestNewEthereumTransaction } from '../dynamichelpers/RequestNewEthereumTransaction';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+
+function Deposit() {
+
+    const functions = getFunctions();
+    const [showMenu, setShowMenu] = useState(false);
+
+    const { primaryWallet, user } = useDynamicContext();
+
+    const [networkSelected, setNetworkSelected] = useState('solana'); 
+    const [currencySelected, setcurrencySelected] = useState('');
+    const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
+
+    const [menuPosition, setMenuPosition] = useState('-100vh'); 
+
+    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
+    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const busdSolBalance = useSelector((state: any) => state.userWalletData.busdSolBalance);
+    const usdcEthBalance = useSelector((state: any) => state.userWalletData.usdcEthBalance);
+    const usdtEthBalance = useSelector((state: any) => state.userWalletData.usdtEthBalance);
+    const busdEthBalance = useSelector((state: any) => state.userWalletData.busdEthBalance);
+
+    const walletName = useSelector((state: any) => state.userWalletData.type);
+
+    const [animateShowAddressUsdcSol, setanimateShowAddressUsdcSol] = useState(false); 
+    const [animateShowAddressUsdtSol, setanimateShowAddressUsdtSol] = useState(false); 
+
+    const [solanaWalletConnected, setsolanaWalletConnected] = useState(false); 
+    const [ethereumWalletConnected, setethereumWalletConnected] = useState(false); 
+
+    const dispatch = useDispatch();
+    const [depositButtonActive, setDepositButtonActive] = useState(false);
+    const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
+    const [deposit, setDeposit] = useState('');
+    const [selectedDepositPortion, setselectedDepositPortion] = useState('');
+    const cryptoList = useSelector((state: any) => state.userWalletData.cryptoList)
+    const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
+    const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
+    const initialPrincipal = useSelector((state: any) => state.userWalletData.initialPrincipal);
+    const initialInvestmentDate = useSelector((state: any) => state.userWalletData.initialInvestmentDate);
+    const principalHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
+    const principalInvested = useSelector((state: any) => state.userWalletData.principalInvested);
+    const [errorMessageOpacity, setErrorMessageOpacity] = useState(0);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessageColor, setErrorMessageColor] = useState('#FF3B30');
+    const [depositInProgress, setDepositInProgress] = useState(false);
+    const navigate = useNavigate();
+    const currentTimeInSeconds = Date.now()/1000;
+    const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
+      initialInvestmentDate, principalHistory)
+    const [shouldNotify, setShouldNotify] = useState(false);
+    const [newDepositAmount, setnewDepositAmount] = useState(0);
+
+
+    useEffect(() => {
+      if (showMenu) {
+        setMenuPosition('0'); // Bring the menu into view
+      } else {
+        setMenuPosition('-100vh'); // Move the menu off-screen
+
+        setcurrencySelected('');
+      }
+    }, [showMenu]);
+  
+    const handleMenuClick = () => {
+      // Add your logic here for what happens when the menu is clicked
+      console.log('Selected currency: ', currencySelected)
+
+        if (usdcSolBalance && !usdtSolBalance) {
+          handleCurrencySelection('usdcSol')
+        } else if (!usdcSolBalance && usdtSolBalance){
+          handleCurrencySelection('usdtSol')
+        } else {
+          if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
+            handleCurrencySelection('usdcSol')
+          } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
+            handleCurrencySelection('usdtSol')
+          }
+        }
+
+      if (!showMenu) {
+        setShowMenu(!showMenu);
+      } else {
+        if (depositInProgress) {
+          // Do nothing
+        } else {
+          setShowMenu(!showMenu);
+        }
+      }
+    };
+    
+    useEffect(() => {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        if (shouldNotify) {
+          const message = 'Hold on! We are almost done.';
+          e.returnValue = message; // Legacy method for cross browser support
+          return message; // For modern browsers
+        }
+      };
+  
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }, [shouldNotify]);
+
+    useEffect(() => {
+      let connectedWallet: wallet
+      for (connectedWallet of connectedWallets) {
+        if (connectedWallet.chain == 'solana') {
+          setsolanaWalletConnected(true)
+        }
+        if (connectedWallet.chain == 'eip155') {
+          setethereumWalletConnected(true)
+        }
+      }
+    }, [connectedWallets]);
+
+
+    useEffect(() => {
+      if (transactionStatus === 'Signed') {
+        setErrorMessage('Sending transaction')
+        setErrorMessageColor('#60A05B')
+      }
+      if (transactionStatus === 'Success') {
+        setErrorMessage('Success!')
+        setErrorMessageColor('#60A05B')
+        updateUserBalance()
+        setDepositInProgress(false)
+        setShouldNotify(false)
+        setTimeout(() => {
+          setErrorMessage('')
+          setShowMenu(false);
+        }, 2000);
+      } else if (transactionStatus === 'Fail') {
+        setErrorMessage('Could not confirm transaction, please try again')
+        setErrorMessageColor('#FF3B30')
+        setDepositInProgress(false)
+        setShouldNotify(false)
+      }
+    }, [transactionStatus]);
+
+
+    /*
+    useEffect(() => {
+
+      console.log('usdcSolBalance: ', usdcSolBalance)
+      console.log('usdtSolBalance: ', usdtSolBalance)
+
+      if (usdcSolBalance && !usdtSolBalance) {
+        setcurrencySelected('usdcSol')
+      } else if (!usdcSolBalance && usdtSolBalance){
+        setcurrencySelected('usdtSol')
+      } else {
+        if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
+          setcurrencySelected('usdcSol')
+        } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
+          setcurrencySelected('usdtSol')
+        }
+      }
+      
+
+    }, [usdcSolBalance, usdtSolBalance]);
+    */
+
+    const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newDeposit = event.target.value;
+        if (newDeposit.length == 1 && (newDeposit[0] != '$')) {
+          setDeposit("$ " + newDeposit);
+        } else {
+          setDeposit(newDeposit);
+        }
+        setselectedDepositPortion('');
+        checkForDepositFieldComplete(newDeposit);
+      };
+
+      const checkForDepositFieldComplete = (newDeposit: string) => {
+        const cleanedDeposit = newDeposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
+        const depositToNumber = Number(cleanedDeposit);
+      
+        if (!isNaN(depositToNumber) && depositToNumber > 0.9 && 
+        (depositToNumber <= balanceSelectedInUSD)) {
+          setDepositButtonActive(true);
+        } else {
+          setDepositButtonActive(false);
+        }
+      };
+
+      const handleQuarterButtonClick = () => {
+        console.log("Handling quarter button click", balanceSelectedInUSD);
+        if (balanceSelectedInUSD>0.0001) {
+          const newDeposit = (0.25 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newDeposit); // Added logging
+        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        checkForDepositFieldComplete(String(newDeposit));
+        }
+        setselectedDepositPortion('25%');
+      };
+      
+      const handleHalfButtonClick = () => {
+        console.log("Handling quarter button click", balanceSelectedInUSD);
+        if (balanceSelectedInUSD>0.0001) {
+          const newDeposit = (0.5 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newDeposit); // Added logging
+        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        checkForDepositFieldComplete(String(newDeposit));
+        }
+        setselectedDepositPortion('50%');
+      };
+      
+      const handleTwoThirdsButtonClick = () => {
+        console.log("Handling quarter button click", balanceSelectedInUSD);
+        if (balanceSelectedInUSD>0.0001) {
+          const newDeposit = (0.75 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newDeposit); // Added logging
+        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        checkForDepositFieldComplete(String(newDeposit));
+        }
+        setselectedDepositPortion('75%');
+      };
+      
+      const handleAllButtonClick = () => {
+        console.log("Handling quarter button click", balanceSelectedInUSD);
+        if (balanceSelectedInUSD>0.0001) {
+          const newDeposit = (1.0 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newDeposit); // Added logging
+        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        checkForDepositFieldComplete(String(newDeposit));
+        }
+        setselectedDepositPortion('100%');
+      };
+
+
+      const handleCurrencySelection = (currency: string) => {
+
+          switch (currency) {
+            case 'usdcSol':
+                if (usdcSolBalance < 0.9) {
+                  copyAddressFor(usdcSol);
+                  document.getElementById('usdcSol')?.classList.add('animate-close-open');
+                  document.getElementById('usdcSolLabel')?.classList.add('animate-fade-in-out');
+                  setTimeout(() => {
+                    setanimateShowAddressUsdcSol(true);
+                  }, 1000);
+
+                  setTimeout(() => {
+                  document.getElementById('usdcSol')?.classList.remove('animate-close-open');
+                  document.getElementById('usdcSolLabel')?.classList.remove('animate-fade-in-out');
+                    setanimateShowAddressUsdcSol(false);
+                  }, 5000);
+                  
+                  
+                } else {
+                  setbalanceSelectedInUSD(usdcSolBalance);
+                  setcurrencySelected(currency)
+                }
+              break;
+            case 'usdtSol':
+                if (usdtSolBalance < 0.9) {
+                  copyAddressFor(usdtEth);
+                  document.getElementById('usdtSol')?.classList.add('animate-close-open');
+                  document.getElementById('usdtSolLabel')?.classList.add('animate-fade-in-out');
+                  setTimeout(() => {
+                    setanimateShowAddressUsdtSol(true);
+                  }, 1000);
+
+                  setTimeout(() => {
+                  document.getElementById('usdtSol')?.classList.remove('animate-close-open');
+                  document.getElementById('usdtSolLabel')?.classList.remove('animate-fade-in-out');
+                    setanimateShowAddressUsdtSol(false);
+                  }, 5000);
+
+                } else {
+                  setbalanceSelectedInUSD(usdtSolBalance);
+                  setcurrencySelected(currency)
+                }
+              break;
+            default:
+              console.log('Unknown currency selected');
+          }
+      }
+
+      const copyAddressFor = (currency: string) => {
+          navigator.clipboard.writeText(publicKey).then(() => {
+            console.log('Text copied to clipboard');
+          }).catch(err => {
+            console.error('Failed to copy text to clipboard', err);
+          });
+        
+      }
+
+      const handleNetworkSelection = (network: string) => {
+        setNetworkSelected(network);
+      };
+
+      const handleDepositButtonClick = async () => {
+        if (depositButtonActive) {
+          const cleanedDeposit = deposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
+          const depositToNumber = Number(cleanedDeposit);
+          setnewDepositAmount(depositToNumber)
+          if (isNaN(depositToNumber)) {
+            setErrorMessage('Invalid amount');
+            setErrorMessageColor('#FF3B30')
+          } else if (depositToNumber > balanceSelectedInUSD) {
+            setErrorMessage('Insufficient balance');
+            setErrorMessageColor('#FF3B30')
+          } else if (depositToNumber < 0.9) {
+            setErrorMessage('Minimum: $1');
+            setErrorMessageColor('#FF3B30')
+          } else {
+            setDeposit('');
+            setDepositInProgress(true);
+            setErrorMessageColor('#60A05B')
+            setErrorMessage('Check your wallet');
+            const convertToSmallestDenomination = depositToNumber* 10 *10 *10 *10 *10 *10;
+            setDepositButtonActive(false); // Deactivate button here
+
+            console.log('connectedWallets', connectedWallets)
+            console.log('walletName: ', walletName)
+
+            console.log('Requesting new transaction')
+            
+
+            setShouldNotify(true)
+            const signDepositSuccess = await requestNewSolanaTransaction(publicKey, 
+                convertToSmallestDenomination, currencySelected, primaryWallet, 
+                currentValue, principalHistory, dispatch, walletName, true);
+            
+            console.log('Got signDepositSuccess: ', signDepositSuccess)
+
+            
+            if (signDepositSuccess) {
+              
+
+              /*
+              if (connectedWallets[0].chain == 'solana' || connectedWallets[0].chain == 'Solana' ||
+              connectedWallets[0].chain == 'SOL') {
+                const swapDepositorSolanaStableCoinWithUsdy = httpsCallable(functions, 
+                  'swapDepositorSolanaStableCoinWithUsdy');
+                  swapDepositorSolanaStableCoinWithUsdy({ depositorPubKey: publicKey, 
+                    amountInUSD: depositToNumber, currencyType: currencySelected })
+                  .then((result) => {
+                      // Read result of the Cloud Function.
+                      console.log(result);
+                  })
+                  .catch((error) => {
+                      // Getting the Error details.
+                      console.log(error);
+                  });
+              }*/
+
+              /*
+              await saveNewDeposit(publicKey, depositToNumber, currentValue, dispatch);
+              setDepositInProgress(false);
+              setErrorMessage('');
+              */
+ 
+
+
+              //dispatch(mergePrincipalInvestedHistory()) We are just rerouting instead now below
+              
+              /*
+              setDepositInProgress(false);
+              setErrorMessage('');
+              */
+
+              // this is a rough workaround to save the change to redux and reload the page
+              /*
+              const currentPath = `/en/app`;
+              navigate("/temporary-route"); // Some non-existent route
+              setTimeout(() => navigate(currentPath), 10);
+              */
+
+              
+
+            } else {
+              setDepositInProgress(false);
+              setErrorMessage('Please sign the transaction with your wallet or keychain')
+              setErrorMessageColor('#FF3B30')
+              setShouldNotify(false)
+            }
+            
+          } 
+        }
+      };
+
+      const updateUserBalance = () => {
+        const newUSDBalance = balanceSelectedInUSD-newDepositAmount
+
+        console.log("setting new usdc balance", newUSDBalance)
+
+        if (currencySelected == "usdcSol") {
+          dispatch(setusdcSolValue(newUSDBalance));
+        } else if (currencySelected == "usdtSol") {
+          dispatch(setusdtSolValue(newUSDBalance));
+        }
+        
+        console.log('setPrincipalInvested', currentValue+newDepositAmount)
+        dispatch(setPrincipalInvested(currentValue+newDepositAmount));  
+
+        if (!initialInvestmentDate) {
+          dispatch(setinitialInvestmentDate(Date.now()/1000));
+          dispatch(setinitialPrincipal(newDepositAmount));
+        } else {
+          const newAmount = currentValue + newDepositAmount;
+          const timestampInSeconds = Math.floor(Date.now() / 1000).toString(); // Convert to seconds and then to string
+          
+          // Use computed property name to set the key
+          dispatch(mergePrincipalInvestedHistory({ [timestampInSeconds]: newAmount }));
+        }
+      }
+
+
+      const errorLabelText = () => {
+        if (errorMessage) {
+          
+          return (
+            <div>
+            <label
+              style={{display: 'flex',justifyContent: 'center',
+              alignItems: 'center',margin: '0 auto',marginTop: '15px',
+              fontSize: '18px',color: errorMessageColor,textAlign: 'center',
+              }}
+            >
+              {errorMessage}
+            </label>
+            </div>
+          );
+        } else {
+          return (
+            <div style={{ visibility: 'hidden' }}>
+              <label style={{display: 'flex', justifyContent: 'center', 
+              alignItems: 'center', margin: '0 auto', marginTop: '15px', fontSize: '18px',
+                }}
+              >
+                $
+              </label>
+            </div>
+          );
+        }
+      };
+
+      const styles = {
+        tradeTimeframeButtonRow: {display: 'flex',justifyContent: 'space-between',
+        alignItems: 'center',padding: '0 10px',gap: '10px',
+        },
+        button: {flex: 1,padding: '5px',paddingTop: '12px',
+        paddingBottom: '12px',backgroundColor: 'white',
+        color: '#333333',border: '1px solid #333333',borderRadius: '4px',
+        fontSize: '14px',cursor: 'pointer',
+        },
+        selectedButton: {flex: 1,padding: '5px',paddingTop: '12px',
+        paddingBottom: '12px',backgroundColor: '#333333',color: 'white',
+        border: 'none',borderRadius: '4px',fontSize: '16px',
+        },
+      };
+
+
+
+    return (
+        <div style={{ backgroundColor: 'white', overflowX: 'hidden' }}>
+
+{ showMenu && (
+<div style={{ 
+      position: 'absolute', // Position it relative to the viewport
+      top: 0,              // Align to the top of the viewport
+      left: 0,            // Align to the right of the viewport
+      marginTop: '15px',
+      marginLeft: '15px',
+      cursor: 'pointer',
+      zIndex: 3,
+      overflowX: 'hidden'     // Add some padding for spacing from the edges
+    }}>
+        
+
+        {!depositInProgress ? (
+  <img 
+    style={{ width: 'auto', height: '45px', background: 'white' }} 
+    src={showMenu ? (currencySelected ? backButton : xIcon) : menuIcon}
+    onClick={handleMenuClick} 
+    alt="Exit" 
+  />
+) : (
+  <div 
+    style={{ 
+      width: '45px', 
+      height: '45px', 
+      backgroundColor: 'white', 
+      zIndex: 10000, 
+      border: 'none'
+    }}
+  />
+)}
+
+            </div>)}
+
+            <div style={{
+                            color: 'white', 
+                            background: '#60A05B', 
+                            fontWeight: 'bold',
+                            borderRadius: '10px', 
+                            border: 'none', 
+                            height: '40px', 
+                            width: '220px',
+                            display: 'flex',        // Makes this div also a flex container
+                            justifyContent: 'center', // Centers the text horizontally inside the button
+                            alignItems: 'center',// Centers the text vertically inside the button
+                            cursor: 'pointer',
+                            fontSize: '20px'     
+                        }} onClick={handleMenuClick}>
+                            Deposit
+                        </div>
+
+      <div style={{
+        position: 'absolute',
+        top: menuPosition,
+        left: 0, // Use state variable for position
+        padding: '15px',
+        height: '90vh',
+        backgroundColor: 'white',
+        width: '92vw',
+        transition: 'top 0.5s ease' // Animate the left property
+      }}>
+
+<div style={{ width: '80vw', marginTop: '100px'}}>
+
+<div style={{marginTop: '10px', fontSize: '45px', color: '#222222'}}>Deposit</div>
+
+
+    {principalInvested >= 0.01 ? (
+      <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>Increase your return</div>
+    ) : (
+      <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>Start saving... safely</div>
+    )}
+
+
+ { currencySelected ? (
+
+    <div>
+
+
+{depositInProgress ? (
+      <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '-20px' }}>
+        <LoadingAnimation/>
+
+      </div>
+    ) : (
+      <div>
+
+<div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
+
+<label htmlFor="deposit" style={{ fontSize: '20px', color: '#444444', 
+marginBottom: '15px', display: 'flex', alignItems: 'center', }}>
+$ <span style={{ fontSize: '35px' }}>
+    {currencySelected == 'usdcSol' && usdcSolBalance}
+    {currencySelected == 'usdtSol' && usdtSolBalance}
+    {currencySelected == 'busdSol' && busdSolBalance}
+
+    {currencySelected == 'usdcEth' && usdcEthBalance}
+    {currencySelected == 'usdtEth' && usdtEthBalance}
+    {currencySelected == 'busdEth' && busdEthBalance}
+  </span>   
+
+{currencySelected == 'usdcSol' && (<>USDC</>)}
+{currencySelected == 'usdtSol' && (<>USDT</>)}
+{currencySelected == 'busdSol' && (<>BUSD</>)}
+
+{currencySelected == 'usdcEth' && (<>USDC</>)}
+{currencySelected == 'usdtEth' && (<>USDT</>)}
+{currencySelected == 'busdEth' && (<>BUSD</>)}
+
+<img 
+  src={networkSelected === 'ethereum' ? ethlogo : networkSelected === 'solana' ? solIcon : solIcon} 
+  alt={networkSelected === 'ethereum' ? "Ethereum Logo" : "Solana Logo"}
+  style={{ 
+    height: '20px', 
+    width: 'auto', 
+    marginLeft: '-5px', 
+    padding: '10px 7px', 
+    borderRadius: '5px', 
+    marginRight: '3px' 
+  }} 
+/>
+</label>
+<input
+  id="deposit"
+  type="text"
+  inputMode="decimal"  // or 'numeric'
+  autoComplete="off"
+  value={deposit}
+  onChange={handleDepositChange}
+  onInput={handleDepositChange}
+  style={{
+    backgroundColor: '#EEEEEE', // Slightly lighter gray
+    color: '#444444',
+    fontSize: '20px',
+    border: 'none', // Remove the border
+    borderRadius: '5px', // Rounded edges
+    padding: '10px 10px', // Adjust padding as needed
+  }}
+  placeholder="0 USDC"
+/>
+</div>
+
+
+<div style={styles.tradeTimeframeButtonRow} >
+        <button style={selectedDepositPortion === '25%' ? styles.selectedButton : styles.button} onClick={handleQuarterButtonClick}>25%</button>
+        <button style={selectedDepositPortion === '50%' ? styles.selectedButton : styles.button} onClick={handleHalfButtonClick}>50%</button>
+        <button style={selectedDepositPortion === '75%' ? styles.selectedButton : styles.button} onClick={handleTwoThirdsButtonClick}>75%</button>
+        <button style={selectedDepositPortion === '100%' ? styles.selectedButton : styles.button} onClick={handleAllButtonClick}>100%</button>
+      </div>
+      </div>
+    )}
+
+          {errorLabelText()}
+
+          {!depositInProgress ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <button
+                style={{
+                backgroundColor: depositButtonActive ? '#03A9F4' : '#D1E5F4',
+                color: depositButtonActive ? 'white': '#CCCCCC',
+                padding: '10px 20px',
+                fontSize: '25px',
+                marginTop: '40px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                borderRadius: '10px',
+                border: '1px solid transparent',
+                cursor: 'pointer',
+                width: '100%',
+                }}
+                onClick={handleDepositButtonClick}
+            >
+                Invest
+            </button>
+            </div>
+            ) : (
+
+              <div>
+
+              </div>
+            )}
+
+
+
+    </div>
+ ) : (
+
+    <div>
+        <div>
+
+            <div style={{display: 'flex', 
+            flexDirection: 'row', 
+            justifyContent: 'space-evenly',
+            marginTop: '25px',
+            fontSize: '25px',
+            cursor: 'pointer',
+            }}>
+
+              <div>
+
+
+              </div>
+
+            </div>
+
+        <div style={{marginTop: '25px'}}>
+        {networkSelected == 'solana' && (
+            <div>
+
+            {(animateShowAddressUsdcSol && !solanaWalletConnected) ? (
+              <>
+                <div id="usdcSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('usdcSol')}
+                >
+
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>USDC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="usdcSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
+                  Add a Solana Wallet
+                </div>
+                </div>
+                </>
+            ) : (
+              <>
+                <div id="usdcSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('usdcSol')}
+                >
+
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>USDC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="usdcSolLabel">
+                  {animateShowAddressUsdcSol ? (<div>
+                    <div style = {{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'center'}}>
+                      <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
+                      <div style={{fontWeight: 'bold'}}>
+                        {publicKey.length >= 6
+                          ? `${publicKey.substring(0, 3)}...${publicKey.substring(publicKey.length - 3)}`
+                          : publicKey}
+                      </div>
+                      </div>
+                  </div>) : (
+                      <div style = {{marginRight: '15px'}}>${usdcSolBalance}</div>)}
+                </div>
+                </div>
+                </>
+            ) }
+
+
+
+{(animateShowAddressUsdtSol && !solanaWalletConnected) ? (
+              <>
+                <div id="usdtSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('usdtSol')}
+                >
+
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="usdtSolIcon" src={usdtSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="usdtSolTicker" style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="usdtSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
+                  Add a Solana Wallet
+                </div>
+                </div>
+                </>
+            ) : (
+              <>
+                <div id="usdtSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('usdtSol')}
+                >
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="usdtSolIcon" src={usdtSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="usdtSolTicker" style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="usdtSolLabel">
+                  {animateShowAddressUsdtSol ? (<div>
+                    <div style = {{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'center'}}>
+                      <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
+                      <div style={{fontWeight: 'bold'}}>
+                        {publicKey.length >= 6
+                          ? `${publicKey.substring(0, 3)}...${publicKey.substring(publicKey.length - 3)}`
+                          : publicKey}
+                      </div>
+                      </div>
+                  </div>) : (
+                      <div style = {{marginRight: '15px'}}>${usdtSolBalance}</div>)}
+                </div>
+                </div>
+                </>
+)}
+
+
+                </div>
+
+        )}
+
+</div>
+        </div>
+    </div>
+ ) }
+
+
+
+    </div>
+
+
+                  </div> 
+
+
+        </div>
+    )
+}
+
+export default Deposit;
+

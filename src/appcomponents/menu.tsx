@@ -1,0 +1,121 @@
+import React, { useState, useEffect } from 'react';
+import menuIcon from '../assets/menuIcon.png';
+import xIcon from '../assets/xIconGray2.png';
+import { DynamicContextProvider, DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useSelector } from 'react-redux';
+import AccountHistory from './accountHistory';
+import Support from './support';
+import MyWallet from './myWallet';
+
+function Menu() {
+
+    const [showMenu, setShowMenu] = useState(false);
+    const [menuPosition, setMenuPosition] = useState('-70vw'); 
+    const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+    const currentUserLastName = useSelector((state: any) => state.userWalletData.currentUserLastName);
+    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
+
+    useEffect(() => {
+        if (showMenu) {
+          setMenuPosition('0'); // Bring the menu into view
+        } else {
+          setMenuPosition('-100vw'); // Move the menu off-screen
+        }
+      }, [showMenu]);
+    
+      const handleMenuClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+        setShowMenu(!showMenu);
+        
+      };
+
+    return (
+        <div style={{ backgroundColor: 'white' }}>
+<div style={{ 
+      position: 'absolute', // Position it relative to the viewport
+      top: 0,              // Align to the top of the viewport
+      left: 0,            // Align to the right of the viewport
+      padding: '15px',
+      cursor: 'pointer',
+      zIndex: 3     // Add some padding for spacing from the edges
+    }}>
+
+<div style={{
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  height: '100vh',
+  width: showMenu ? '40vw' : '0', // Cover the right side when the menu is open
+  backgroundColor: 'transparent',
+  zIndex: 11
+}} onClick={() => setShowMenu(false)} />
+
+      
+            <img style={{width: '45px', height: '45px'}} src={ showMenu ? xIcon : menuIcon }
+            onClick={handleMenuClick} alt="Menu" />
+            </div>
+
+            {menuPosition == '0' && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            right: 0, 
+            height: '100%',
+            backgroundColor: 'white',
+            width: '40vw',
+            background: 'transparent'
+          }} onClick={handleMenuClick}>
+
+          </div>
+        )}
+
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: menuPosition, // Use state variable for position
+        padding: '15px',
+        backgroundColor: 'white',
+        width: '60vw',
+        transition: 'left 0.5s ease' // Animate the left property
+      }}>
+
+
+
+<div style={{ display: 'flex', alignItems: 'center', 
+      flexDirection: 'column', justifyContent: 'center', 
+       }}>
+
+        <div style={{fontWeight: 'bold', fontSize: '18px', marginTop: '150px' }}>{currentUserFirstName} {currentUserLastName}</div>
+        
+
+        <div style={{ fontSize: '13px'}}>{currentUserEmail}</div>
+
+        <div style={{marginTop: '50px'}}>
+        <DynamicWidget />
+        </div>
+
+        </div>
+
+
+        <div style={{ marginTop: 'calc(80vh - 425px)' }}>
+          <div>
+        <MyWallet/>
+        </div>
+        <div style = {{marginTop: '20px'}}>
+        <AccountHistory/>
+        </div>
+        <div style = {{marginTop: '20px'}}>
+        <Support/>
+        </div>
+        </div>
+
+
+
+                  </div> 
+
+
+        </div>
+    )
+}
+
+export default Menu;

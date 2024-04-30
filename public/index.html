@@ -7,8 +7,17 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="MyFye: invest in US treasuries with crypto."
     />
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    script-src 'self' blob: filesystem: https://phantom.app https://www.googletagmanager.com https://apis.google.com dynamicauth.com dynamic-static-assets.com https://cdn.withpersona.com; 
+    style-src 'self' 'unsafe-inline'; 
+    img-src 'self' data: https://iconic.dynamic-static-assets.com https://registry.walletconnect.org https://app.dynamic.xyz; 
+    font-src 'self' https://cdn.jsdelivr.net; 
+    connect-src 'self' wss://relay.walletconnect.org/ https://us-central1-ependesi-72990.cloudfunctions.net/confirmAndHandleTransaction https://us-central1-ependesi-72990.cloudfunctions.net/sendSolanaToUser https://api.turnkey.com/public/v1/submit/sign_raw_payload https://us-central1-ependesi-72990.cloudfunctions.net/handleWithdrawal https://api.mainnet-beta.solana.com/ https://us-central1-ependesi-72990.cloudfunctions.net/swapDepositorSolanaStableCoinWithUsdy wss://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro https://quote-api.jup.ag https://verify.walletconnect.org https://firebase.googleapis.com https://firestore.googleapis.com https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro https://www.google-analytics.com https://app.dynamicauth.com https://dynamic-static-assets.com wss://relay.walletconnect.com https://solana-mainnet.g.alchemy.com https://firebaseinstallations.googleapis.com https://rpc.ankr.com https://mainnet.infura.io;
+    frame-src 'self' https://dynamic.banxa.com/ https://verify.walletconnect.org https://verify.walletconnect.com https://ependesi-72990.firebaseapp.com https://inquiry.withpersona.com https://cdn.withpersona.com https://export.turnkey.com https://recovery.turnkey.com;
+">
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -24,7 +33,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>MyFye</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
