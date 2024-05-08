@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setLanguage } from '../helpers/languageManager';
 import { LanguageCodeProps } from '../helpers/languageManager';
-import xIconGray from '../assets/xIconGray.png';
 import solIcon from '../assets/solIcon.png';
 import { useSelector } from 'react-redux';
 import { valueAtTime } from '../helpers/growthPercentage';
@@ -10,7 +9,6 @@ import checkMarkImage from '../assets/checkmarkImage.png';
 import { saveNewWithdrawal } from '../helpers/saveNewWithdrawal';
 import { useDispatch } from 'react-redux';
 import { updateUSDCBalance, setPrincipalInvested, mergePrincipalInvestedHistory } from '../redux/userWalletData';
-import xIconGray2 from '../assets/xIconGray2.png';
 
 export default function WithdrawMenu(props: LanguageCodeProps) {
 
@@ -322,7 +320,6 @@ export default function WithdrawMenu(props: LanguageCodeProps) {
         transform: 'translateY(-50%)' 
     }} onClick={toggleWithdrawMenu}>
         <img
-            src={xIconGray2}
             alt=""
             style={{
                 width: '45px', // Set the desired width
@@ -550,7 +547,6 @@ marginTop: '0px'
           <div style={{ flex: 1 }}></div>
           <span onClick={toggleWithdrawMenu} style={{ cursor:'pointer', paddingRight: '50px'}}>
             <img
-              src={xIconGray}
               alt="Close Menu"
               style={{
               width: '40px', // Set the desired width

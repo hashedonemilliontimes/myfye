@@ -5,9 +5,6 @@ import { useSelector } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
-import solanaLogo from '../../assets/solanaLogo.png';
-import copy from '../../assets/copy.png';
-import { requestNewSolanaTransaction } from '../../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
 

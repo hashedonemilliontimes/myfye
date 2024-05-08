@@ -5,7 +5,6 @@ import Footer from '../components/footer';
 import { LanguageCodeProps } from '../helpers/languageManager';
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, addDoc, setDoc, doc, getDocs } from 'firebase/firestore';
-import Header from '../components/header';
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useSelector } from 'react-redux';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
@@ -104,8 +103,6 @@ if (principalInvested >= 0.10) {
       <div className={"dashboard-animation-square-five opaque-square"} style = {{overflowX: 'hidden'}}></div>
       <div className={"dashboard-animation-square-six opaque-square"} style = {{overflowX: 'hidden'}}></div>
       </div>
-      <Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'dashboard'}} />
-
       <div style={{height: '60vh', }}>
         <div style={{ 
           fontSize: '25px', fontWeight: 'bold', textAlign: 'center', 
@@ -140,8 +137,6 @@ if (principalInvested >= 0.10) {
                     )}
 
         <div style={{ fontSize: '40px' }}>
-          <Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'dashboard'}}/>
-        
         <div style={{paddingTop: window.innerWidth < 768 ? '85px' : '100px'}}>
 
         <div style={{display: 'flex', flexDirection: 'column', marginLeft: '40px', marginRight: '40px',
@@ -220,8 +215,6 @@ if (principalInvested >= 0.10) {
         <div className={"dashboard-animation-square-five opaque-square"} style = {{overflowX: 'hidden'}}></div>
         <div className={"dashboard-animation-square-six opaque-square"} style = {{overflowX: 'hidden'}}></div>
         </div>
-        <Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'dashboard'}} />
-
         <div style={{height: '60vh', }}>
           <div style={{ 
             fontSize: '55px', fontWeight: 'bold', textAlign: 'center', 
@@ -263,8 +256,6 @@ if (principalInvested >= 0.10) {
         <div className={"dashboard-animation-square-five opaque-square"} style = {{overflowX: 'hidden'}}></div>
         <div className={"dashboard-animation-square-six opaque-square"} style = {{overflowX: 'hidden'}}></div>
         </div>
-        <Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'dashboard'}} />
-
         <div style={{height: '60vh', }}>
           <div style={{ 
             fontSize: '55px', fontWeight: 'bold', textAlign: 'center', 
@@ -329,8 +320,6 @@ if (principalInvested >= 0.10) {
 
 
             <div style={{ fontSize: '40px' }}>
-            <Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'dashboard'}}/>
-          
           <div style={{paddingTop: (principalInvested >= 0.0000001) ? '70px' : '100px'}}>
 
 

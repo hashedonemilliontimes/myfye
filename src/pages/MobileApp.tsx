@@ -18,7 +18,6 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setcurrentUserEmail, setusdySolValue} from '../redux/userWalletData';
 import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
 import wallet from '../helpers/walletDataType';
-import PersonaIntegration from '../appcomponents/personaAuth';
 import { useSelector } from 'react-redux';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';

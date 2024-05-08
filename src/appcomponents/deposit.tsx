@@ -12,15 +12,9 @@ import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalI
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
-import ethlogo from '../assets/ethlogo.png';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
-import busdSol from '../assets/busdSol.png';
-import busdEth from '../assets/busdEth.png';
-import usdtEth from '../assets/usdtEth.png';
-import usdcEth from '../assets/usdcEth.png';
 import wallet from '../helpers/walletDataType';
-import { RequestNewEthereumTransaction } from '../dynamichelpers/RequestNewEthereumTransaction';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
@@ -282,7 +276,7 @@ function Deposit() {
               break;
             case 'usdtSol':
                 if (usdtSolBalance < 0.9) {
-                  copyAddressFor(usdtEth);
+                  copyAddressFor(usdtSol);
                   document.getElementById('usdtSol')?.classList.add('animate-close-open');
                   document.getElementById('usdtSolLabel')?.classList.add('animate-fade-in-out');
                   setTimeout(() => {
@@ -595,7 +589,7 @@ $ <span style={{ fontSize: '35px' }}>
 {currencySelected == 'busdEth' && (<>BUSD</>)}
 
 <img 
-  src={networkSelected === 'ethereum' ? ethlogo : networkSelected === 'solana' ? solIcon : solIcon} 
+  src={ networkSelected === 'solana' ? solIcon : solIcon} 
   alt={networkSelected === 'ethereum' ? "Ethereum Logo" : "Solana Logo"}
   style={{ 
     height: '20px', 

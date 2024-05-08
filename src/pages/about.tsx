@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/header';
-import AboutPageText from '../components/aboutPage/aboutPageText';
-import AboutPageText2 from '../components/aboutPage/aboutPageText2';
-import AboutPageText3 from '../components/aboutPage/aboutPageText3';
-import AboutPageText4 from '../components/aboutPage/aboutPageText4';
 import { useParams } from 'react-router-dom';
 import { setLanguage } from '../helpers/languageManager';
 import { LanguageCodeProps } from '../helpers/languageManager';
@@ -102,7 +97,6 @@ function About() {
   return (
     <div style = {{overflowX: 'hidden'}}>
 
-<Header languageProps={{ language: 'en' }} colorProps={{ color: 'dark' }} pageProps={{ page: 'about' }} />
     <div
       style={{
         paddingTop: window.innerWidth < 768 ? '75px' : '100px',
@@ -144,7 +138,6 @@ function About() {
     </span>
     </div>
     <div style={{paddingBottom: '10px'}}>
-      <AboutPageText language={languageRef} />
     </div>
   </div>
 
@@ -176,7 +169,6 @@ function About() {
 )}
 
       </div>
-      <AboutPageText2 language={languageRef} />
 
 
       {window.innerWidth < 768 ? (
@@ -195,7 +187,6 @@ function About() {
       />
       </div>
 
-      <AboutPageText3 language={languageRef} />
       </div>
       ) : (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -210,7 +201,6 @@ function About() {
           margin: '0 auto', // Center the image horizontally
         }}
       />
-            <AboutPageText3 language={languageRef} />
       </div>
 
 
@@ -232,7 +222,6 @@ function About() {
       />
       
       </div>
-      <AboutPageText4 language={languageRef} />
       </div>
 
       
@@ -240,7 +229,6 @@ function About() {
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',
           marginTop: '70px', flexDirection: 'row', maxWidth: '100vw' }}>
 
-<AboutPageText4 language={languageRef} />
           <img
         src={bankIcon}
         alt=""

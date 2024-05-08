@@ -236,7 +236,7 @@ function Withdraw() {
             //update db
             handleWithdrawSuccess(withdrawalToNumber)
           } else {
-            setErrorMessage('Sorry, there was an error with your deposit. Please try again later')
+            setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
             setWithdrawalInProgress(false)
           }
         } else {
