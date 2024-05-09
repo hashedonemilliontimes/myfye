@@ -25,6 +25,7 @@ interface UserWalletDataState {
   connectedWallets: wallet[],
   currentUserKYCVerified: boolean,
   transactionStatus: string,
+  updatingBalance: boolean,
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -49,7 +50,8 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserFirstName: '',
   currentUserLastName: '',
   currentUserEmail: '',
-  transactionStatus: 'Not Initiated'
+  transactionStatus: 'Not Initiated',
+  updatingBalance: false
 };
 
 
@@ -145,7 +147,9 @@ export const userWalletDataSlice = createSlice({
   setTransactionStatus: (state, action: PayloadAction<string>) => {
     state.transactionStatus = action.payload;
   },
-  
+  setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
+    state.updatingBalance = action.payload;
+  },
 
 
   },
@@ -160,7 +164,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setusdcEthValue, setusdtEthValue, setbusdEthValue,
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setTransactionStatus
+  setcurrentUserEmail, setTransactionStatus, setUpdatingBalance
 } = userWalletDataSlice.actions;
 
 export default userWalletDataSlice.reducer;

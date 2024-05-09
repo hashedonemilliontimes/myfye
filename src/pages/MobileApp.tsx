@@ -24,6 +24,7 @@ import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
 import myBalanceImage from '../assets/myBalance.png';
 import { Buffer } from 'buffer';
 import LoadingAnimation from '../components/loadingAnimation';
+import timerImage from '../assets/timer.png';
 
 function WebAppInner() {
 
@@ -32,6 +33,7 @@ function WebAppInner() {
   const { primaryWallet, user } = useDynamicContext();
 
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+  const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
 
   const db = getFirestore();
 
@@ -73,7 +75,7 @@ function WebAppInner() {
       } catch (error) {
         console.error('Error with dynamic user ', error);
       }
-      setUserDataLoaded(true)
+      
     } 
   }
 
@@ -101,6 +103,7 @@ function WebAppInner() {
           
           console.log('got balances: ', balances)
         }
+        setUserDataLoaded(true)
       }
       fetchBalances();
     }
@@ -143,7 +146,14 @@ function WebAppInner() {
 </div>
 
 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
-<label htmlFor="deposit" style={{ fontSize: '20px', 
+
+  {updatingBalance ? (<div style={{ height: '35px', display: 'flex', alignItems: 'center'}}>
+    <div style={{marginRight: '20px', fontSize: '30px'}}>Updating</div>
+  
+    <img src={timerImage} style={{height: '35px', width: 'auto'}}></img>
+    <div>About 7 Minutes</div>
+  </div>) : (<div>
+    <label htmlFor="deposit" style={{ fontSize: '20px', 
      display: 'flex', alignItems: 'center', }}>
     $ <span style={{ fontSize: '35px' }}>
       
@@ -151,6 +161,8 @@ function WebAppInner() {
 
     </span>
 </label>
+  </div>)}
+
    
    </div>
    <Deposit/>
@@ -164,6 +176,12 @@ function WebAppInner() {
   </>
 ) : (<>
       <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '100px' }}>
+
+        <div>
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <img src={myfyelogo} style={{width: '70px', height: 'auto'}}></img>
+          </div>
+        </div>
         <LoadingAnimation/>
 
       </div>

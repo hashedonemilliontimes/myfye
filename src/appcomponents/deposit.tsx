@@ -7,7 +7,8 @@ import { valueAtTime } from '../helpers/growthPercentage';
 import { saveNewDeposit, } from '../helpers/saveNewDeposit';
 import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
-import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, setinitialInvestmentDate, setinitialPrincipal, 
+import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
+  setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
   settotalInvestingValue } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
@@ -17,10 +18,14 @@ import usdtSol from '../assets/usdtSol.png';
 import wallet from '../helpers/walletDataType';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import FailImage from '../assets/FailImage.png';
+import { getFirestore, doc, collection, setDoc } from 'firebase/firestore';
 
 function Deposit() {
 
     const functions = getFunctions();
+    const db = getFirestore();
+
     const [showMenu, setShowMenu] = useState(false);
 
     const { primaryWallet, user } = useDynamicContext();
@@ -85,15 +90,19 @@ function Deposit() {
       console.log('Selected currency: ', currencySelected)
 
         if (usdcSolBalance && !usdtSolBalance) {
-          handleCurrencySelection('usdcSol')
+          setcurrencySelected('usdcSol')
+          setbalanceSelectedInUSD(usdcSolBalance);
         } else if (!usdcSolBalance && usdtSolBalance){
-          handleCurrencySelection('usdtSol')
-        } else {
-          if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
-            handleCurrencySelection('usdcSol')
-          } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
-            handleCurrencySelection('usdtSol')
-          }
+          setcurrencySelected('usdtSol')
+          setbalanceSelectedInUSD(usdtSolBalance);
+        } 
+
+        if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
+          setcurrencySelected('usdcSol')
+          setbalanceSelectedInUSD(usdcSolBalance);
+        } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
+          setcurrencySelected('usdtSol')
+          setbalanceSelectedInUSD(usdtSolBalance);
         }
 
       if (!showMenu) {
@@ -102,6 +111,7 @@ function Deposit() {
         if (depositInProgress) {
           // Do nothing
         } else {
+          dispatch(setTransactionStatus(''))
           setShowMenu(!showMenu);
         }
       }
@@ -141,19 +151,28 @@ function Deposit() {
         setErrorMessage('Sending transaction')
         setErrorMessageColor('#60A05B')
       }
-      if (transactionStatus === 'Success') {
-        setErrorMessage('Success!')
-        setErrorMessageColor('#60A05B')
-        updateUserBalance()
-        setDepositInProgress(false)
-        setShouldNotify(false)
-        setTimeout(() => {
-          setErrorMessage('')
-          setShowMenu(false);
-        }, 2000);
+      if (transactionStatus === 'Deposit Success') {
+        handleBalanceIsUpdating().then((message) => {
+          setErrorMessage('Success!')
+          setErrorMessageColor('#60A05B')
+          // The following two lines of code are different types of balances
+          updateUserBalance() // Update the stable coin balance already
+          dispatch(setUpdatingBalance(true)) // The investment balance is being swapped
+          setShouldNotify(false)
+          setTimeout(() => {
+            setDepositInProgress(false)
+            setErrorMessage('')
+            setShowMenu(false);
+          }, 2000);
+      }).catch((error) => {
+          console.error(error);
+          setErrorMessage('We are having a little trouble processing your deposit. Please give it 10 minutes before reaching out to customer support.')
+          setErrorMessageColor('#000000')
+      });
+
       } else if (transactionStatus === 'Fail') {
-        setErrorMessage('Could not confirm transaction, please try again')
-        setErrorMessageColor('#FF3B30')
+        setErrorMessage('Transaction failed, please try again')
+        setErrorMessageColor('#000000')
         setDepositInProgress(false)
         setShouldNotify(false)
       }
@@ -197,12 +216,26 @@ function Deposit() {
         const cleanedDeposit = newDeposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
         const depositToNumber = Number(cleanedDeposit);
       
-        if (!isNaN(depositToNumber) && depositToNumber > 0.9 && 
-        (depositToNumber <= balanceSelectedInUSD)) {
-          setDepositButtonActive(true);
+        if (!isNaN(depositToNumber) && depositToNumber > 0.9) {
+          if (depositToNumber <= balanceSelectedInUSD) {
+            setDepositButtonActive(true);
+            setErrorMessage('')
+          } else {
+            setDepositButtonActive(false);
+            setErrorMessage('Insufficient balance')
+            setErrorMessageColor('#222222')
+          }
         } else {
           setDepositButtonActive(false);
+          setErrorMessage('The minimum deposit is $1')
+          setErrorMessageColor('#222222')
         }
+        if (depositToNumber > 30) {
+          setDepositButtonActive(false);
+          setErrorMessage('The maximum deposit is $30')
+          setErrorMessageColor('#222222')
+        }
+
       };
 
       const handleQuarterButtonClick = () => {
@@ -314,9 +347,18 @@ function Deposit() {
 
       const handleDepositButtonClick = async () => {
         if (depositButtonActive) {
-          const cleanedDeposit = deposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
-          const depositToNumber = Number(cleanedDeposit);
-          setnewDepositAmount(depositToNumber)
+
+          let depositToNumber = 0.0
+
+          if (!newDepositAmount) {
+            const cleanedDeposit = deposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
+            depositToNumber = Number(cleanedDeposit);
+            setnewDepositAmount(depositToNumber)
+          } else {
+            depositToNumber = newDepositAmount
+          }
+
+
           if (isNaN(depositToNumber)) {
             setErrorMessage('Invalid amount');
             setErrorMessageColor('#FF3B30')
@@ -349,48 +391,7 @@ function Deposit() {
 
             
             if (signDepositSuccess) {
-              
-
-              /*
-              if (connectedWallets[0].chain == 'solana' || connectedWallets[0].chain == 'Solana' ||
-              connectedWallets[0].chain == 'SOL') {
-                const swapDepositorSolanaStableCoinWithUsdy = httpsCallable(functions, 
-                  'swapDepositorSolanaStableCoinWithUsdy');
-                  swapDepositorSolanaStableCoinWithUsdy({ depositorPubKey: publicKey, 
-                    amountInUSD: depositToNumber, currencyType: currencySelected })
-                  .then((result) => {
-                      // Read result of the Cloud Function.
-                      console.log(result);
-                  })
-                  .catch((error) => {
-                      // Getting the Error details.
-                      console.log(error);
-                  });
-              }*/
-
-              /*
-              await saveNewDeposit(publicKey, depositToNumber, currentValue, dispatch);
-              setDepositInProgress(false);
-              setErrorMessage('');
-              */
- 
-
-
-              //dispatch(mergePrincipalInvestedHistory()) We are just rerouting instead now below
-              
-              /*
-              setDepositInProgress(false);
-              setErrorMessage('');
-              */
-
-              // this is a rough workaround to save the change to redux and reload the page
-              /*
-              const currentPath = `/en/app`;
-              navigate("/temporary-route"); // Some non-existent route
-              setTimeout(() => navigate(currentPath), 10);
-              */
-
-              
+                   
 
             } else {
               setDepositInProgress(false);
@@ -400,7 +401,9 @@ function Deposit() {
             }
             
           } 
+
         }
+
       };
 
       const updateUserBalance = () => {
@@ -428,6 +431,32 @@ function Deposit() {
           dispatch(mergePrincipalInvestedHistory({ [timestampInSeconds]: newAmount }));
         }
       }
+
+
+      function goBackButtonPressed() {
+        dispatch(setTransactionStatus(''))
+    }
+    
+    function tryAgainButtonPressed() {
+      handleDepositButtonClick()
+    }
+
+    async function handleBalanceIsUpdating() {
+      const pubKeyDocRef = doc(db, 'pubKeys', publicKey);
+      try {
+          console.log('saving update');
+          
+          await setDoc(pubKeyDocRef, {
+              updatingBalance: true
+          }, { merge: true });
+  
+          console.log("Saved to database!");
+          return "Update saved successfully";  // Resolve with a message or useful data
+      } catch (error) {
+          console.log("Error saving update balance", error);
+          throw new Error("Failed to save update: " + error);  // Reject the promise with an error
+      }
+    }
 
 
       const errorLabelText = () => {
@@ -461,16 +490,17 @@ function Deposit() {
 
       const styles = {
         tradeTimeframeButtonRow: {display: 'flex',justifyContent: 'space-between',
-        alignItems: 'center',padding: '0 10px',gap: '10px',
+        alignItems: 'center',padding: '0 10px',gap: '10px', fontWeight: 'bold',
+        
         },
         button: {flex: 1,padding: '5px',paddingTop: '12px',
         paddingBottom: '12px',backgroundColor: 'white',
-        color: '#333333',border: '1px solid #333333',borderRadius: '4px',
-        fontSize: '14px',cursor: 'pointer',
+        color: '#444444',borderRadius: '4px', border: '2px solid #444444',
+        fontSize: '14px',cursor: 'pointer', fontWeight: 'bold'
         },
         selectedButton: {flex: 1,padding: '5px',paddingTop: '12px',
-        paddingBottom: '12px',backgroundColor: '#333333',color: 'white',
-        border: 'none',borderRadius: '4px',fontSize: '16px',
+        paddingBottom: '12px',backgroundColor: '#444444',color: 'white',
+         borderRadius: '4px',fontSize: '14px', fontWeight: 'bold', border: '2px solid #444444',
         },
       };
 
@@ -541,11 +571,41 @@ function Deposit() {
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{ width: '80vw', marginTop: '100px'}}>
+<div style={{ width: '80vw', marginTop: '80px'}}>
 
 <div style={{marginTop: '10px', fontSize: '45px', color: '#222222'}}>Deposit</div>
 
+{transactionStatus == 'Fail' && (
+  <div>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', 
+    justifyContent: 'center', marginTop: '60px'}}>
+      <img src={FailImage} style={{width: '60px', height: '60px'}}></img>
+      <div>{errorLabelText()}</div>
 
+      <div style={{display: 'flex', justifyContent: 'space-around', width: '100%'}}>
+
+      <div style={{background: '#DDDDDD', color: '#000000', padding: '10px', 
+          borderRadius: '5px', marginTop: '90px', width: '70px', textAlign: 'center', 
+          flex: '1', marginRight: '15px', cursor: 'pointer'}} 
+          onClick={goBackButtonPressed}>
+          Go Back
+      </div>
+
+      <div style={{background: '#86EA6E', color: '#000000', padding: '10px', 
+          borderRadius: '5px', marginTop: '90px', width: '70px', textAlign: 'center', 
+          flex: '1', marginLeft: '15px', cursor: 'pointer'}} 
+          onClick={tryAgainButtonPressed}>
+          Try Again
+      </div>
+
+      </div>
+    </div>
+  </div>
+)}
+
+
+{transactionStatus != 'Fail' && (
+  <div style={{color: '#222222'}}>
     {principalInvested >= 0.01 ? (
       <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>Increase your return</div>
     ) : (
@@ -568,7 +628,7 @@ function Deposit() {
 
 <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
 
-<label htmlFor="deposit" style={{ fontSize: '20px', color: '#444444', 
+<label htmlFor="deposit" style={{ fontSize: '20px', color: '#222222', 
 marginBottom: '15px', display: 'flex', alignItems: 'center', }}>
 $ <span style={{ fontSize: '35px' }}>
     {currencySelected == 'usdcSol' && usdcSolBalance}
@@ -611,7 +671,7 @@ $ <span style={{ fontSize: '35px' }}>
   onInput={handleDepositChange}
   style={{
     backgroundColor: '#EEEEEE', // Slightly lighter gray
-    color: '#444444',
+    color: '#222222',
     fontSize: '20px',
     border: 'none', // Remove the border
     borderRadius: '5px', // Rounded edges
@@ -836,7 +896,8 @@ $ <span style={{ fontSize: '35px' }}>
  ) }
 
 
-
+</div>
+)}
     </div>
 
 

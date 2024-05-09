@@ -10,7 +10,7 @@ import PieChartComponent from '../components/dashboardTiles/pieChart';
 import roadImage1 from '../assets/roadImage1.png'
 import { saveNewWithdrawal } from '../helpers/saveNewWithdrawal';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { updateUSDCBalance, setPrincipalInvested, mergePrincipalInvestedHistory } from '../redux/userWalletData';
+import { setusdySolValue } from '../redux/userWalletData';
 import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
@@ -61,13 +61,13 @@ function Withdraw() {
 
       //default to 100% cash out
       useEffect(() => {
-        setWithdrawal(`${currentPortfolioValue}`)
+        setWithdrawal(`${usdyBalance}`)
         setfeeAmount(0.1)
         setWithdrawalButtonActive(true)
-        if (currentPortfolioValue < 0.0001) {
+        if (usdyBalance < 0.0001) {
           setWithdrawalButtonActive(false)
         }
-      }, [currentPortfolioValue]);
+      }, [usdyBalance]);
 
       useEffect(() => {
         if (showMenu) {
@@ -184,7 +184,7 @@ function Withdraw() {
       const handleCashOutButtonClick = async () => {
 
           console.log('usdyBalance: ', usdyBalance)
-          if (usdyBalance > 0.8) {
+          if (usdyBalance >= 0.9) {
 
         const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
         const withdrawalToNumber = Number(cleanedWithdrawal);
@@ -194,8 +194,8 @@ function Withdraw() {
         setErrorMessage('Check your wallet...')
         setWithdrawalInProgress(true)
 
-        if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 1.0 && 
-        (withdrawalToNumber <= currentPortfolioValue)) {
+        if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 0.5 && 
+        (withdrawalToNumber <= usdyBalance)) {
 
           let withdrawSuccess: boolean
 
@@ -210,11 +210,8 @@ function Withdraw() {
           if (withdrawSuccess) {
 
             //update redux
-            const timestamp = Date.now() / 1000;
-            dispatch(mergePrincipalInvestedHistory({ [timestamp]: currentPortfolioValue-withdrawalToNumber }));
-
             setTimeout(() => {
-              dispatch(setPrincipalInvested(currentPortfolioValue - withdrawalToNumber));
+              dispatch(setusdySolValue(0.0));
             }, 1000);
 
             //send usdc to user
@@ -240,11 +237,12 @@ function Withdraw() {
             setWithdrawalInProgress(false)
           }
         } else {
-          setErrorMessage('Problem with your input')
+          setErrorMessage('Failed number test or minimum after fee test')
+          console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
           setWithdrawalInProgress(false)
         }
       } else {
-        setErrorMessage('No USDY found, Please try again later')
+        setErrorMessage('Sorry, the minimum withdrawal is 1.0 USDY')
         setWithdrawalInProgress(false)
       }
       
@@ -402,7 +400,7 @@ function Withdraw() {
 <div>
 <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
 alignItems: 'center'}}> 
-<div style={{fontSize: '18px', color: 'black'}}>Account Value: $ {currentPortfolioValue.toFixed(6).split('.')[0].toLocaleString() + '.' + currentPortfolioValue.toFixed(6).split('.')[1]}</div>
+<div style={{fontSize: '18px', color: 'black'}}>Account Value: $ {usdyBalance.toFixed(6).split('.')[0].toLocaleString() + '.' + usdyBalance.toFixed(6).split('.')[1]}</div>
 </div>
       <div style={{marginTop: '20px', display: 'flex'}}>
 
@@ -419,11 +417,11 @@ alignItems: 'center'}}>
       
       {!withdrawalInProgress ? (
 <div>
-  { currentPortfolioValue > 0.9 && (
+  { usdyBalance > 0.9 && (
       <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
       alignItems: 'center', justifyContent:'center'}}> 
       <div style={{marginLeft: '20px'}}>$ </div>
-      <div style={{ fontSize: '36px'}}>{(currentPortfolioValue-feeAmount).toFixed(6).split('.')[0].toLocaleString() + '.' + (currentPortfolioValue-feeAmount).toFixed(6).split('.')[1]}</div>
+      <div style={{ fontSize: '36px'}}>{(usdyBalance-feeAmount).toFixed(6).split('.')[0].toLocaleString() + '.' + (usdyBalance-feeAmount).toFixed(6).split('.')[1]}</div>
       </div>
       )}
       </div>

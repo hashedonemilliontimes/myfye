@@ -195,6 +195,8 @@ export const fetchSolBalance = async (address: string): Promise<number> => {
 export const requestNewSolanaTransaction = async (payerPubKey: string, amountSmallestDenomination: number, currencySelected: string, 
   primaryWallet: any, currentInvestedValue: number, principalHistory: Record<string, number>, dispatch: Function, 
   walletType: string = "Turnkey HD", deposit: boolean = false): Promise<boolean> => {
+
+
   try {
 
     if (walletType == "Turnkey HD") {
@@ -202,6 +204,7 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
         currencySelected, primaryWallet, currentInvestedValue, principalHistory, dispatch, deposit)
       return status;
     } else {
+      // user is using a web3 wallet
       const provider = getProvider(); // see "Detecting the Provider"
 
       const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
@@ -451,7 +454,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
       console.log("signedTransaction is", signedTransaction);
       console.log("Type of signedTransaction is", typeof signedTransaction);
 
-      let transactionType 
+      let transactionType: string = ''
       if (deposit) {
         transactionType = 'Deposit'
       } else {
@@ -472,7 +475,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
         // Handle the result
         console.log(result.data); // Process the data returned from the function
         if (result.data) {
-          dispatch(setTransactionStatus('Success'));
+          dispatch(setTransactionStatus(`${transactionType} Success`));
         } else {
           dispatch(setTransactionStatus('Fail'));
         }

@@ -56,7 +56,7 @@ export default function HomeContactForm(props: LanguageCodeProps) {
             firstName: cleanedfirstName,
             lastName: cleanedlastName,
             reason: selectedOption,
-            timestamp: (new Date(Date.now())).toLocaleString()
+            timestamp: new Date().toISOString(),
         };
 
         const contactCollectionRef = collection(db, 'contactFormInquiries');

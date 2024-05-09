@@ -7,8 +7,10 @@ function InvestmentValue() {
     const initialPrincipal = useSelector((state: any) => state.userWalletData.initialPrincipal);
     const initialInvestmentDate = useSelector((state: any) => state.userWalletData.initialInvestmentDate);
     const principalInvestedHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
-
+    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const currentTimeInSeconds = Date.now()/1000;
+    //const updatingBalance = useSelector((state: any) => state.userWalletData.updateUserBalance);
+    const updatingBalance = true
 
     const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
         initialInvestmentDate, principalInvestedHistory)
@@ -22,8 +24,8 @@ function InvestmentValue() {
     useEffect(() => {
         console.log('Current value invested: ', currentValue);
 
-        setUpBy(currentValue);
-    }, [initialPrincipal, principalInvestedHistory]);
+        setUpBy(usdyBalance);
+    }, [usdyBalance]);
 
     if (currentValue >= 10) {
         upByPrecision = 8;
@@ -46,6 +48,7 @@ function InvestmentValue() {
       // Cleanup function to clear the interval when the component unmounts
       return () => clearInterval(interval);
   }, [upByPrecision]);
+
 
 if (upBy < 0.9) {
     return(

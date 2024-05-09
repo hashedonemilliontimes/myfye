@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, where, } from 'firebase/firestore';
 import { setPrincipalInvested, setPrincipalInvestedHistory, 
-    setinitialInvestmentDate, setinitialPrincipal, 
+    setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
     settotalInvestingValue } from '../redux/userWalletData';
 import { valueAtTime } from '../helpers/growthPercentage';
 
@@ -15,6 +15,13 @@ export const getPrincipalInvested = async (pubKey: string, dispatch: Function): 
     const data = docSnapshot.data();
 
     if (data) {
+
+        if (data.updatingBalance) {
+            dispatch(setUpdatingBalance(data.updatingBalance))
+        } else {
+            dispatch(setUpdatingBalance(false))
+        }
+
         if (data.principalChanges) {
             dispatch(setPrincipalInvestedHistory(data.principalChanges));
         }

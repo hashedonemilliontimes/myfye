@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 import HomeContactForm from '../components/homePage/homePageContactForm';
 import Logo from '../assets/Logo.png';
 import MyFyeLogo1 from '../assets/MyFyeLogo1.png';
-import MyFyeQRCode from '../assets/myfye_com_qr_code.png';
+import MyFyeQRCode2 from '../assets/myfye_qr_code2.png';
 import PortfolioBreakdown from '../components/homePage/portfolio';
 import usdcSol from '../assets/usdcSol.png';
 import myfyeUseCase1 from '../assets/myfyeUseCase1.png';
@@ -88,7 +88,7 @@ useEffect (() => {
         <div style={{color: 'black', fontSize: '25px'}}>Myfye gives users around the world instant access to yield on their deposits backed by US treasury bonds, directly from their phone.</div>
 
         <img
-        src={MyFyeQRCode}
+        src={MyFyeQRCode2}
         alt="qrCode"
         style={{
           width: '200px',

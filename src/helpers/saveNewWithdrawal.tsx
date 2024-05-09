@@ -45,8 +45,6 @@ export const saveNewWithdrawal = async (pubKey: string, amount: number,
             principalChanges: principalChanges
           }, { merge: true });
 
-        
-        
           await Promise.all([updateWithdrawals, updatePubKey]);
         
           return true;
