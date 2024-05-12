@@ -25,6 +25,10 @@ import myBalanceImage from '../assets/myBalance.png';
 import { Buffer } from 'buffer';
 import LoadingAnimation from '../components/loadingAnimation';
 import timerImage from '../assets/timer.png';
+import MyWallet from '../appcomponents/myWallet';
+import myfyeEarn from '../assets/myfyeEarn.png';
+import myfyeBalance from '../assets/myfyeBalance.png';
+import EarnPage from '../appcomponents/EarnPage';
 
 function WebAppInner() {
 
@@ -35,6 +39,9 @@ function WebAppInner() {
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
   const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
 
+  const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
+  const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+  
   const db = getFirestore();
 
   const dispatch = useDispatch();
@@ -135,15 +142,45 @@ function WebAppInner() {
 <Menu/>
 
 
-<div style={{fontSize: '25px', fontWeight: 'bold', width: '80vw', maxWidth: '550px', marginTop: '100px',}}>Welcome, {firstNameUI}</div>
+<div style={{fontSize: '25px', fontWeight: 'bold', width: '80vw', maxWidth: '550px', marginTop: '80px',}}>Welcome, {firstNameUI}</div>
 
 <hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
 
 <div style={{display: 'flex'}}>
 
-  <img style={{ width: '150px', height: 'auto'}}src={myBalanceImage}/>
+  <img style={{ width: '180px', height: 'auto'}}src={myfyeBalance}/>
 
 </div>
+
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
+
+
+    <label htmlFor="deposit" style={{ fontSize: '20px', 
+     display: 'flex', alignItems: 'center', }}>
+    $ <span style={{ fontSize: '35px' }}>
+      
+    <div>
+    {((usdcSolBalance + usdtSolBalance).toFixed(6)).toLocaleString('en-US')}
+  </div>
+
+    </span>
+</label>
+
+   
+   </div>
+
+   <MyWallet/>
+
+   <hr style={{height: '2px', backgroundColor: '#CCCCCC', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
+
+   {/*
+   <Deposit/>
+    <Withdraw/>
+           <HoldingsPortfolio/>
+  */}
+
+<img style={{ width: '150px', height: 'auto'}}src={myfyeEarn}/>
+
 
 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
 
@@ -165,12 +202,12 @@ function WebAppInner() {
 
    
    </div>
-   <Deposit/>
-    <Withdraw/>
 
-       <hr style={{height: '2px', backgroundColor: '#CCCCCC', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
 
-       <HoldingsPortfolio/>
+<div>
+
+<EarnPage/>
+</div>
                     
                         </div>
   </>

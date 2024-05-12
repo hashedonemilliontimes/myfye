@@ -26,6 +26,7 @@ interface UserWalletDataState {
   currentUserKYCVerified: boolean,
   transactionStatus: string,
   updatingBalance: boolean,
+  pieChartOpacity: number
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -51,7 +52,8 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserLastName: '',
   currentUserEmail: '',
   transactionStatus: 'Not Initiated',
-  updatingBalance: false
+  updatingBalance: false,
+  pieChartOpacity: 1
 };
 
 
@@ -150,7 +152,9 @@ export const userWalletDataSlice = createSlice({
   setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
     state.updatingBalance = action.payload;
   },
-
+  setPieChartOpacity: (state, action: PayloadAction<number>) => {
+    state.pieChartOpacity = action.payload;
+  },
 
   },
 });
@@ -164,7 +168,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setusdcEthValue, setusdtEthValue, setbusdEthValue,
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setTransactionStatus, setUpdatingBalance
+  setcurrentUserEmail, setTransactionStatus, setUpdatingBalance,
+  setPieChartOpacity
 } = userWalletDataSlice.actions;
 
 export default userWalletDataSlice.reducer;

@@ -20,7 +20,7 @@ function WithdrawStableCoin() {
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
     const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
-    const [menuPosition, setMenuPosition] = useState('-100vh'); 
+    const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
@@ -412,7 +412,7 @@ padding: '10px', borderRadius: '10px', border: (currencySelected == 'usdcSol') ?
         borderRadius: '5px', // Rounded edges
         padding: '10px 10px', // Adjust padding as needed
       }}
-      placeholder="Recipient's Solana Address"
+      placeholder="Solana Address"
     />
   </div>
 

@@ -6,14 +6,21 @@ import backButton from '../assets/backButton3.png';
 import DepositStableCoin from './myWalletComponents/DepositStableCoin';
 import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
 import DepositFromCreditCard from './myWalletComponents/DepositFromCreditCard';
+import Deposit from '../appcomponents/deposit';
+import Withdraw from '../appcomponents/withdraw';
+import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
+import PieChartComponent from '../components/dashboardTiles/pieChart';
+import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
+import { setPieChartOpacity } from '../redux/userWalletData';
+import { useDispatch } from 'react-redux';
 
-
-function MyWallet() {
+function EarnPage() {
     const [showMenu, setShowMenu] = useState(false);
 
     const [currencySelected, setcurrencySelected] = useState('');
-
+    const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -68,9 +75,13 @@ function MyWallet() {
         
       };
 
+      const fadePieChartOpacity = () => {
+        dispatch(setPieChartOpacity(0))
+    };
 
+      
     return (
-        <div style={{ backgroundColor: 'white' }}>
+        <div style={{ backgroundColor: 'white'}}>
 
 { showMenu && (
 <div style={{ 
@@ -104,7 +115,7 @@ function MyWallet() {
            cursor: 'pointer',
            fontSize: '20px'     
        }} onClick={handleMenuClick}>
-           View Wallet
+           View Portfolio
        </div>
        </div>
 
@@ -116,63 +127,46 @@ function MyWallet() {
         height: '90vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease', // Animate the left property
+        transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '100px', fontSize: '45px', color: '#222222'}}>Wallet</div>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img src = {myfyeEarnGreen} style= {{marginTop: '30px', width: '50vw', height: 'auto'}}></img>
+
+</div>
+
+
+
+<div style={{marginTop: '15px', fontSize: '20px'}}>Current Balance: ${usdyBalance}</div>
+<div style={{marginTop: '15px', fontSize: '20px'}}>MyFye Earn APY: 5.1%</div>
+
+<div style={{marginTop: '15px', 
+display: 'flex', alignItems: 'center', 
+justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
+
+<Deposit/>
+<Withdraw/>
+</div>
+
+<div style={{marginTop: '15px', textAlign: 'center', fontSize: '16px'}}>Portoflio Allocation:</div>
+
+    <div style={{
+        transition: 'opacity 250ms ease-out',
+    }}>
+        <PieChartComponent/>
+    </div>
 
 <div>
 
+<div style={{marginTop: '30px', fontSize: '14px', textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are tokenized US treasury bonds created by Ondo Finance</div>
 
-
-
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px' }}>
-
-  <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-    
-    <div style= {{fontSize: '18px', marginTop: '12px'}}>US Dollar balance</div>
-    <div>
-    <div style={{ fontSize: '18px' }}>
-    <span style={{ fontSize: '18px' }}>$</span>
-    {((usdcSolBalance + usdtSolBalance) > 0.00001) ? (
-    <span style={{ fontSize: '30px' }}>{(usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
-    ) : (
-      <span style={{ fontSize: '30px' }}>0.0</span>
-    )}
+<a href="https://ondo.finance/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
+<div style={{borderRadius: '20px', padding: '10px', 
+color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
+backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
 </div>
-      
-      </div>
-
-
-      </div>
-
-      <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '40px'}}>
-
-  <div style= {{fontSize: '18px', marginTop: '12px'}}>USD Yield balance </div>
-
-    {(usdyBalance > 0.0001) ? (
-        <div style={{ fontSize: '30px' }}> {usdyBalance.toFixed(6)} </div>
-    ) : (
-      <div style={{ fontSize: '30px' }}> 0.0 </div>
-    )}
-
-</div>
-
-</div>
-
-
-<div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '100px', gap: '20px'}}>
-
-
-<DepositFromCreditCard/>
-
-
-<DepositStableCoin/>
-
-
-<WithdrawStableCoin/>
-  </div>
-
+</a>
 
 
 </div>
@@ -183,4 +177,4 @@ function MyWallet() {
         </div>
     )
 }
-export default MyWallet;
+export default EarnPage;

@@ -242,7 +242,7 @@ function Withdraw() {
           setWithdrawalInProgress(false)
         }
       } else {
-        setErrorMessage('Sorry, the minimum withdrawal is 1.0 USDY')
+        setErrorMessage('Sorry, the minimum withdrawal is $1')
         setWithdrawalInProgress(false)
       }
       
@@ -347,11 +347,11 @@ function Withdraw() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 3     // Add some padding for spacing from the edges
+      zIndex: 20     // Add some padding for spacing from the edges
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+                currencySelected ? backButton : backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -368,7 +368,7 @@ function Withdraw() {
            alignItems: 'center',// Centers the text vertically inside the button
            cursor: 'pointer',
            fontSize: '20px',
-           width: '220px',
+           width: '135px',
        }} onClick={handleMenuClick}>
            Withdraw
        </div>
@@ -381,7 +381,8 @@ function Withdraw() {
         height: '90vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease' // Animate the left property
+        transition: 'top 0.5s ease', // Animate the left property
+        zIndex: 4
       }}>
 
 <div style={{display:'flex', justifyContent: 'space-between', flexDirection: 'column', height: '80vh'}}>

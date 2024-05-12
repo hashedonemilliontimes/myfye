@@ -27,60 +27,51 @@ const PieChartComponent = () => {
 
   const cryptoList = useSelector((state: any) => state.userWalletData.cryptoList);
   const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-  const principalInvested = useSelector((state: any) => state.userWalletData.principalInvested);
-  const initialPrincipal = useSelector((state: any) => state.userWalletData.initialPrincipal);
-  const initialInvestmentDate = useSelector((state: any) => state.userWalletData.initialInvestmentDate);
-  const principalHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
 
-  const currentTimeInSeconds = Date.now()/1000;
-  const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
-    initialInvestmentDate, principalHistory)
+  const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
   let labels = cryptoList.map((crypto: any) => crypto.type);
   let dataPoints = cryptoList.map((crypto: any) => crypto.balanceUSD);
   let backgroundColors = ['#4CD964', '#9945FF',];
-
-  const [isEmptyAccount, setIsEmptyAccount] = useState(true);
   
   useEffect(() => {
-    let balance = currentValue;
+    let balance = usdyBalance;
     for (let i = 0; i < dataPoints.length; i++) {
       let balanceIndex = dataPoints[i];
       balance = balance + balanceIndex;
     }
 
-    console.log("BALANCE FOR IS EMPTY ACCOUNT CHECK: ", balance);
-    if (balance < 0.10) {
-      setIsEmptyAccount(true);
-    } else {
-      setIsEmptyAccount(false);
-    }
-  }, [cryptoList]);
+
+
+    
+  }, [usdyBalance]);
  
-  // ondo, openeden, matrixport
-  if (principalInvested > 0.9) {
-    labels = [];
-    dataPoints = [];
-    backgroundColors = [];
 
-    labels.push("First Citizens - Bank Deposits");
-    labels.push("StoneX - US T-Bills");
-    labels.push("Morgan Stanley - Bank Deposits");
-    labels.push("StoneX - Cash & Cash Equivalents");
-    labels.push("Morgan Stanley - US T-Notes");
-    labels.push("StoneX - US T-Notes");
-    labels.push("First Citizens - Cash & Cash Eq.");
-    labels.push("Morgan Stanley - Cash & Cash Eq.");
+  labels = [];
+  dataPoints = [];
+  backgroundColors = [];
+  
+  labels.push("First Citizens - Bank Deposits");
+  labels.push("StoneX - US T-Bills");
+  labels.push("Morgan Stanley - Bank Deposits");
+  labels.push("StoneX - Cash & Cash Equivalents");
+  labels.push("Morgan Stanley - US T-Notes");
+  labels.push("StoneX - US T-Notes");
+  labels.push("First Citizens - Cash & Cash Eq.");
+  labels.push("Morgan Stanley - Cash & Cash Eq.");
 
-    dataPoints.push(currentValue*.70);
-    dataPoints.push(currentValue*.16);
-    dataPoints.push(currentValue*.06);
-    dataPoints.push(currentValue*.06);
-    dataPoints.push(currentValue*0.05);
-    dataPoints.push(currentValue*0.03);
-    dataPoints.push(currentValue*0.02);
-    dataPoints.push(currentValue*0);
 
+
+  backgroundColors.push('#5d9b26');
+backgroundColors.push('#74ad2e');
+backgroundColors.push('#93ed6d');
+backgroundColors.push('#56e06b');
+backgroundColors.push('#71dab7');
+backgroundColors.push('#80c85a');
+backgroundColors.push('#5ab86a');
+backgroundColors.push('#7ed785');
+
+    /*
     backgroundColors.push('#FFB3BA'); // Pastel red
     backgroundColors.push('#FFDFBA'); // Pastel orange
     backgroundColors.push('#FFFFBA'); // Pastel yellow
@@ -89,18 +80,29 @@ const PieChartComponent = () => {
     backgroundColors.push('#B5BAFF'); // Pastel indigo
     backgroundColors.push('#D9BAFF'); // Pastel violet
     backgroundColors.push('#FFBAF8'); // Pastel pink
-     
+     */
 
-    
+  // ondo, openeden, matrixport
+  if (usdyBalance > 0.01) {
+
+    dataPoints.push(usdyBalance*.70);
+    dataPoints.push(usdyBalance*.16);
+    dataPoints.push(usdyBalance*.06);
+    dataPoints.push(usdyBalance*.06);
+    dataPoints.push(usdyBalance*0.05);
+    dataPoints.push(usdyBalance*0.03);
+    dataPoints.push(usdyBalance*0.02);
+    dataPoints.push(usdyBalance*0);
 
 } else {
-  labels = [];
-  dataPoints = [];
-  backgroundColors = [];
-
-  labels = cryptoList.map((crypto: any) => crypto.type);
-  dataPoints = cryptoList.map((crypto: any) => crypto.balanceUSD);
-  backgroundColors = ['#4CD964', '#9945FF',];
+  dataPoints.push(1.0*.70);
+  dataPoints.push(1.0*.16);
+  dataPoints.push(1.0*.06);
+  dataPoints.push(1.0*.06);
+  dataPoints.push(1.0*0.05);
+  dataPoints.push(1.0*0.03);
+  dataPoints.push(1.0*0.02);
+  dataPoints.push(1.0*0);
 }
 
   const data = {
@@ -173,22 +175,13 @@ const PieChartComponent = () => {
   return (<div>
 
 
-    { isEmptyAccount ? (
-      <div>
-
-      </div>
-
-    ) : (
-
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
       marginTop: '13px',color: '#333333', flexDirection: window.innerWidth < 600 ? 'column' : 'row' }}>
-  <div style={{ width: '50%', aspectRatio: '1/1', position: 'relative', zIndex: 0 }}>
+  <div style={{ width: '60%', aspectRatio: '1/1', position: 'relative', zIndex: 0}}>
       <Pie data={data} options={options} />
   </div>
 
-
-  { (principalInvested > 0.9) ? (
-      <>
+{/*
         <div 
       style={{
       display: 'flex', 
@@ -201,72 +194,51 @@ const PieChartComponent = () => {
   
 
   <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#FFB3BA', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[0]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>First Citizens - Bank Deposits</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#FFDFBA', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[1]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>StoneX - US T-Bills</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#FFFFBA', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[2]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>Morgan Stanley - Bank Deposits</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#BAFFC9', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[3]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>StoneX - Cash & Cash Equivalents</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#BAE1FF', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[4]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>Morgan Stanley - US T-Notes</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#B5BAFF', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[5]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>StoneX - US T-Notes</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#D9BAFF', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[6]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>First Citizens - Cash & Cash Eq.</span>
 </div>
 
 <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#FFBAF8', marginRight: '4px' }}></span>
+    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: `${backgroundColors[7]}`, marginRight: '4px' }}></span>
     <span style={{ fontSize: '15px' }}>Morgan Stanley - Cash & Cash Eq.</span>
 </div>
 
 
   </div>
-      </>
-    ) : (
-  <div 
-      style={{
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'flex-start',
-      marginLeft: '15px', 
-      fontSize: '25px'
-      }}
-  >
-  <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#4CD964', marginRight: '4px' }}></span>
-    <span style={{ fontSize: '15px' }}>USDC</span>
+
+  */}
   </div>
 
-  <div style={{alignItems: 'center'}}>
-    <span style={{ display: 'inline-block', width: '12px', height: '12px', backgroundColor: '#9945FF', marginRight: '4px' }}></span>
-    <span style={{ fontSize: '15px' }}>Solana</span>
-  </div>
-  </div>
-    )}
-  </div>
-
-    ) }
 
 
     </div>);

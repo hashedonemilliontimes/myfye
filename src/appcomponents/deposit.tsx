@@ -9,7 +9,7 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue } from '../redux/userWalletData';
+  settotalInvestingValue, setPieChartOpacity } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -35,7 +35,7 @@ function Deposit() {
     const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
 
     const [menuPosition, setMenuPosition] = useState('-100vh'); 
-
+    const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const busdSolBalance = useSelector((state: any) => state.userWalletData.busdSolBalance);
@@ -112,6 +112,7 @@ function Deposit() {
           // Do nothing
         } else {
           dispatch(setTransactionStatus(''))
+          dispatch(setPieChartOpacity(1))
           setShowMenu(!showMenu);
         }
       }
@@ -517,7 +518,7 @@ function Deposit() {
       marginTop: '15px',
       marginLeft: '15px',
       cursor: 'pointer',
-      zIndex: 3,
+      zIndex: 20,
       overflowX: 'hidden'     // Add some padding for spacing from the edges
     }}>
         
@@ -540,8 +541,8 @@ function Deposit() {
     }}
   />
 )}
-
             </div>)}
+
 
             <div style={{
                             color: 'white', 
@@ -550,7 +551,7 @@ function Deposit() {
                             borderRadius: '10px', 
                             border: 'none', 
                             height: '40px', 
-                            width: '220px',
+                            width: '135px',
                             display: 'flex',        // Makes this div also a flex container
                             justifyContent: 'center', // Centers the text horizontally inside the button
                             alignItems: 'center',// Centers the text vertically inside the button
@@ -568,7 +569,8 @@ function Deposit() {
         height: '90vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease' // Animate the left property
+        transition: 'top 0.5s ease', // Animate the left property
+        zIndex: 4
       }}>
 
 <div style={{ width: '80vw', marginTop: '80px'}}>
@@ -903,8 +905,7 @@ $ <span style={{ fontSize: '35px' }}>
 
                   </div> 
 
-
-        </div>
+                  </div>
     )
 }
 
