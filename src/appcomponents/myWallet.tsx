@@ -263,9 +263,9 @@ justifyContent: 'space-around', width: '90vw'}}>
 
 <div style={{fontSize: '25px', marginTop: '15px',}}>Internal Wallet</div>
 
-<div style={{marginTop: '15px', maxWidth: '250px'}}></div>
+<div style={{marginTop: '15px', marginLeft: '20px', width: '220px'}}>
 <DynamicWidget />
-
+</div>
 
 </div>
 

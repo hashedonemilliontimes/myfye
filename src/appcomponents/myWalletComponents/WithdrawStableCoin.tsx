@@ -311,7 +311,7 @@ function WithdrawStableCoin() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 3    
+      zIndex: 5    
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
@@ -348,7 +348,8 @@ function WithdrawStableCoin() {
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+        zIndex: 4
       }}>
 
 

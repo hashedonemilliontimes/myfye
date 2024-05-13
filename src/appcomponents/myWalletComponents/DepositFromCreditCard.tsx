@@ -83,7 +83,7 @@ function DepositFromCreditCard() {
         top: '30vh',
         left: 0,
         width: '100vw',
-        height: '210px',
+        height: '230px',
         background: '#ffffff',
         zIndex: 11
 }}> 
