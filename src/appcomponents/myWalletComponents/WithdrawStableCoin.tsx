@@ -328,14 +328,14 @@ function WithdrawStableCoin() {
       borderRadius: '10px', 
       border: 'none', 
       height: '40px', 
-      width: '280px',
+      width: '130px',
       display: 'flex',        // Makes this div also a flex container
       justifyContent: 'center', // Centers the text horizontally inside the button
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
   }} onClick={handleMenuClick}>
-      Withdraw Stable Coin
+      Withdraw
   </div>
        </div>
 
@@ -347,39 +347,46 @@ function WithdrawStableCoin() {
         height: '90vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease' // Animate the left property
+        transition: 'top 0.5s ease', // Animate the left property
+        overflowY: 'hidden'
       }}>
 
-<div style={{marginTop: '100px', fontSize: '35px', color: '#222222'}}>Withdraw Stable Coin</div>
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '20px', fontSize: '35px', color: '#222222'}}>Withdraw</div>
+</div>
 
 <div>
 
 
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+<div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
 
-<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
     
-<div style={{ display: 'flex', alignItems: 'center', background: (currencySelected == 'usdcSol') ? '#90ee90' : 'white', 
-padding: '10px', borderRadius: '10px', border: (currencySelected == 'usdcSol') ? 'none' : '1px solid black',  }} onClick={() => handleCurrencySelection('usdcSol')}>
-                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
+<div style={{ display: 'flex', alignItems: 'center', 
+                background: (currencySelected == 'usdcSol') ? '#444444' : '#ffffff', 
+                color: (currencySelected == 'usdcSol') ? '#ffffff' : '#000000',  
+padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('usdcSol')}>
+                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '50px', height: 'auto' }} />
                     <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>USDC</div> {/* Adjust marginLeft as needed */}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', background: (currencySelected == 'usdtSol') ? '#90ee90' : 'white', 
-                padding: '10px', borderRadius: '10px', border: (currencySelected == 'usdtSol') ? 'none' : '1px solid black', }} onClick={() => handleCurrencySelection('usdtSol')}>
-                    <img  src={usdtSol} style={{ width: '70px', height: 'auto' }} ></img>
+                <div style={{ display: 'flex', alignItems: 'center', 
+                background: (currencySelected == 'usdtSol') ? '#444444' : '#ffffff', 
+                color: (currencySelected == 'usdtSol') ? '#ffffff' : '#000000', 
+                padding: '10px', borderRadius: '10px', 
+                border: '1px solid black', }} onClick={() => handleCurrencySelection('usdtSol')}>
+                    <img  src={usdtSol} style={{ width: '50px', height: 'auto' }} ></img>
                     <div style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
                     
                 </div>
                 </div>
 
-
-
 </div>
 
-
+<div style={{marginTop: '20px', fontSize: '20px', marginLeft: '20px'}}>Balance: {balanceSelectedInUSD}</div>
 
 
 <div
@@ -389,14 +396,13 @@ padding: '10px', borderRadius: '10px', border: (currencySelected == 'usdcSol') ?
         borderRadius: '10px',
         marginBottom: '40px',
         maxWidth: '500px',
-        marginTop: '-50px',
         height: '82vh'
     }}
     >
 
 
-        <div style={{ marginTop: '100px'}}>
-  <div style={{ marginTop: '30px', marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
+        <div style={{ marginTop: '30px'}}>
+  <div style={{marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
 
     <input
       id="SolanaAddress"

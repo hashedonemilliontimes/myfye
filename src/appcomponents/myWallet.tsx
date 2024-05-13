@@ -6,7 +6,9 @@ import backButton from '../assets/backButton3.png';
 import DepositStableCoin from './myWalletComponents/DepositStableCoin';
 import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
 import DepositFromCreditCard from './myWalletComponents/DepositFromCreditCard';
-
+import myfyeWalletImage from '../assets/myfyeWallet.png';
+import QRCode from 'qrcode.react';
+import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 
 function MyWallet() {
     const [showMenu, setShowMenu] = useState(false);
@@ -17,39 +19,25 @@ function MyWallet() {
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-    const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-
+    const [showQRCode, setshowQRCode] = useState(false);
+    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const [qrCodeURL, setqrCodeURL] = useState(''); 
 
-
-    const handleDepositButtonClick = () => {
-      console.log("Handling quarter button click");
-
-    };
-    
-
-    const handleMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const newMessage = event.target.value;
-        setMessage(newMessage);
-        checkForMessageComplete(Message);
-    };
+    useEffect(() => {
+      const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
+      const params = new URLSearchParams({
+        size: "150x150", // Size of the QR code
+        data: publicKey, // Data to encode
+      });
+      setqrCodeURL(`${baseUrl}?${params.toString()}`);
+    }, [publicKey]);
 
     const removeWhitespace = (str: string) => {
         return str.replace(/\s/g, '');
       };
-
-    const checkForMessageComplete = (newMessage: string) => {
-        const cleanedMessage = removeWhitespace(newMessage);
-        if (cleanedMessage === '') {
-          //error
-          setSubmitButtonActive(false);
-        } else {
-            setSubmitButtonActive(true);
-
-    }
-}
 
     useEffect(() => {
         if (showMenu) {
@@ -68,6 +56,15 @@ function MyWallet() {
         
       };
 
+
+      function generateQRCodeURL(publicKey: string) {
+        const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
+        const params = new URLSearchParams({
+          size: "150x150", // Size of the QR code
+          data: publicKey, // Data to encode
+        });
+        return `${baseUrl}?${params.toString()}`;
+      }
 
     return (
         <div style={{ backgroundColor: 'white' }}>
@@ -119,25 +116,28 @@ function MyWallet() {
         transition: 'top 0.5s ease', // Animate the left property
       }}>
 
-<div style={{marginTop: '100px', fontSize: '45px', color: '#222222'}}>Wallet</div>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img src = {myfyeWalletImage} style= {{marginTop: '30px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+</div>
+
 
 <div>
 
 
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px' }}>
+<div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px' }}>
 
   <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
     
-    <div style= {{fontSize: '18px', marginTop: '12px'}}>US Dollar balance</div>
+    <div style= {{fontSize: '18px', marginTop: '6px'}}>Wallet balance:</div>
     <div>
     <div style={{ fontSize: '18px' }}>
     <span style={{ fontSize: '18px' }}>$</span>
     {((usdcSolBalance + usdtSolBalance) > 0.00001) ? (
-    <span style={{ fontSize: '30px' }}>{(usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
+    <span style={{ fontSize: '25px' }}>{(usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
     ) : (
-      <span style={{ fontSize: '30px' }}>0.0</span>
+      <span style={{ fontSize: '25px' }}>0.00</span>
     )}
 </div>
       
@@ -146,33 +146,125 @@ function MyWallet() {
 
       </div>
 
-      <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '40px'}}>
+      <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px'}}>
 
-  <div style= {{fontSize: '18px', marginTop: '12px'}}>USD Yield balance </div>
+  <div style= {{fontSize: '18px', marginTop: '6px'}}>Earn balance:</div>
 
-    {(usdyBalance > 0.0001) ? (
-        <div style={{ fontSize: '30px' }}> {usdyBalance.toFixed(6)} </div>
+{updatingBalance ? (
+<div style={{ fontSize: '25px' }}>
+  Updating
+</div>
+
+) : (
+  <div>
+    <div style={{ fontSize: '18px' }}>
+    <span style={{ fontSize: '18px' }}>$</span>
+    {((usdyBalance) > 0.001) ? (
+    <span style={{ fontSize: '25px' }}>{(usdyBalance).toFixed(6)}</span>
     ) : (
-      <div style={{ fontSize: '30px' }}> 0.0 </div>
+      <span style={{ fontSize: '25px' }}>0.00</span>
     )}
+</div>
+      
+      </div>
+)}
+
+
+</div>
+
+
+<div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px'}}>
+
+<div style= {{fontSize: '18px', marginTop: '6px', fontWeight: 'bold'}}>Total balance:</div>
+
+<div>
+  <div style={{ fontSize: '18px' }}>
+  <span style={{ fontSize: '18px' }}>$</span>
+  {((usdyBalance + usdcSolBalance + usdtSolBalance) > 0.001) ? (
+  <span style={{ fontSize: '25px' }}>{(usdyBalance + usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
+  ) : (
+    <span style={{ fontSize: '25px' }}>0.00</span>
+  )}
+</div>
+    
+    </div>
 
 </div>
 
 </div>
 
 
-<div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '100px', gap: '20px'}}>
-
+<div style={{marginTop: '15px', 
+display: 'flex', alignItems: 'center', 
+justifyContent: 'space-around', width: '90vw'}}>
 
 <DepositFromCreditCard/>
-
-
-<DepositStableCoin/>
-
-
 <WithdrawStableCoin/>
-  </div>
+</div>
 
+
+<div style={{fontSize: '25px', marginTop: '15px',}}>Crypto Wallet</div>
+
+<div style={{marginTop: '15px', 
+display: 'flex', alignItems: 'center', 
+justifyContent: 'space-around', width: '90vw'}}>
+
+<div style={{width: '70px', height: '70px'}} onClick={() => setshowQRCode(true)}>
+<QRCode value={publicKey} size={70} level="H" />
+</div>
+
+</div>
+
+
+<div>{showQRCode && (
+<div       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10 // Ensure it's above other content
+      }} onClick={() => setshowQRCode(false)}>
+
+
+<div style={{
+        position: 'fixed',
+        top: '30vh',
+        left: 0,
+        width: '100vw',
+        height: '210px',
+        background: '#ffffff',
+        zIndex: 11
+}}> 
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '5px'}}>
+<div style={{width: '200px', height: '200px'}} onClick={() => setshowQRCode(true)}>
+<QRCode value={publicKey} size={200} level="H" />
+</div>
+</div>
+</div>
+</div>)}
+</div>
+
+
+
+
+
+<div style={{marginTop: '15px', 
+display: 'flex', alignItems: 'center', 
+justifyContent: 'space-around', width: '90vw'}}>
+<DepositStableCoin/>
+<WithdrawStableCoin/>
+</div>
+
+<div style={{fontSize: '25px', marginTop: '15px',}}>Internal Wallet</div>
+
+<div style={{marginTop: '15px', maxWidth: '250px'}}></div>
+<DynamicWidget />
 
 
 </div>

@@ -101,14 +101,14 @@ function DepositStableCoin() {
       borderRadius: '10px', 
       border: 'none', 
       height: '40px', 
-      width: '280px',
+      width: '130px',
       display: 'flex',        // Makes this div also a flex container
       justifyContent: 'center', // Centers the text horizontally inside the button
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
   }} onClick={handleMenuClick}>
-      Deposit Stable Coin
+      Deposit
   </div>
        </div>
 
@@ -123,7 +123,12 @@ function DepositStableCoin() {
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '100px', fontSize: '40px', color: '#222222'}}>Deposit Stable Coin</div>
+
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '30px', fontSize: '40px', color: '#222222'}}>Deposit</div>
+
+</div>
 
 <div>
 

@@ -13,6 +13,8 @@ import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
 import { setPieChartOpacity } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
+import timerImage from '../assets/timer.png';
+import InvestmentValue from '../appcomponents/investmentValue';
 
 function EarnPage() {
     const [showMenu, setShowMenu] = useState(false);
@@ -25,7 +27,7 @@ function EarnPage() {
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-
+    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
@@ -131,13 +133,28 @@ function EarnPage() {
       }}>
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeEarnGreen} style= {{marginTop: '30px', width: '50vw', height: 'auto'}}></img>
+<img src = {myfyeEarnGreen} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
 </div>
 
 
+<div style={{display: 'flex', alignItems: 'center', marginTop: '15px',}}>
 
-<div style={{marginTop: '15px', fontSize: '20px'}}>Current Balance: ${usdyBalance}</div>
+<div style={{ fontSize: '20px', whiteSpace: 'nowrap'}}>Current Balance:&nbsp;</div>
+
+{updatingBalance ? (<div style={{ height: '30px', display: 'flex', alignItems: 'center'}}>
+    <div style={{marginRight: '10px', fontSize: '20px'}}>Updating</div>
+  
+    <img src={timerImage} style={{height: '20px', width: 'auto'}}></img>
+    <div style={{width: '90px'}}>About 7 Minutes</div>
+  </div>) : (<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
+    $ <InvestmentValue/>
+  </div>)}
+
+
+</div>
+
+
 <div style={{marginTop: '15px', fontSize: '20px'}}>MyFye Earn APY: 5.1%</div>
 
 <div style={{marginTop: '15px', 
@@ -151,7 +168,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 <div style={{marginTop: '15px', textAlign: 'center', fontSize: '16px'}}>Portoflio Allocation:</div>
 
     <div style={{
-        transition: 'opacity 250ms ease-out',
+        
     }}>
         <PieChartComponent/>
     </div>

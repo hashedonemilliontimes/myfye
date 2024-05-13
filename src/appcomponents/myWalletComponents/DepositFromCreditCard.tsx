@@ -7,6 +7,7 @@ import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
 import solanaLogo from '../../assets/solanaLogo.png';
 import copy from '../../assets/copy.png';
+import { useFunding } from "@dynamic-labs/sdk-react-core";
 
 function DepositFromCreditCard() {
     const [showMenu, setShowMenu] = useState(false);
@@ -17,54 +18,17 @@ function DepositFromCreditCard() {
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-    const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
+    const [showBanxaPopUp, setshowBanxaPopUp] = useState(false);
 
-    
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
-    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
-    const handleCopyAddress = () => {
-
-        navigator.clipboard.writeText(publicKey)
-            .then(() => {
-                console.log('Address copied to clipboard!');
-                setaddressCopied(true);
-    
-                setTimeout(() => {
-                    setaddressCopied(false);
-                }, 2000); // 2000 milliseconds = 2 seconds
-            })
-            .catch(err => {
-                console.error('Failed to copy address: ', err);
-            });
+    const { enabled, openFunding } = useFunding();
+  
+    const onClick = () => {
+      openFunding({
+        token: "USDC",
+        address: publicKey,
+      }).then(() => window.alert("Success!"));
     };
-
-    const removeWhitespace = (str: string) => {
-        return str.replace(/\s/g, '');
-      };
-
-    const checkForMessageComplete = (newMessage: string) => {
-        const cleanedMessage = removeWhitespace(newMessage);
-        if (cleanedMessage === '') {
-          //error
-          setSubmitButtonActive(false);
-        } else {
-            setSubmitButtonActive(true);
-
-    }
-}
-
-    useEffect(() => {
-        if (showMenu) {
-          setMenuPosition('0'); // Bring the menu into view
-        } else {
-          setMenuPosition('-100vh'); // Move the menu off-screen
-
-          setcurrencySelected('');
-        }
-      }, [showMenu]);
     
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
@@ -77,111 +41,108 @@ function DepositFromCreditCard() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-{ showMenu && (
-<div style={{ 
-      position: 'absolute', // Position it relative to the viewport
-      top: 0,              // Align to the top of the viewport
-      left: 0,            // Align to the right of the viewport
-      padding: '15px',
-      cursor: 'pointer',
-      zIndex: 3    
-    }}>
-
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
-            onClick={handleMenuClick} alt="Exit" />
-            </div>)}
-
                 <div style={{display: 'flex', alignItems: 'center', 
                 justifyContent: 'center',}}>
   <div style={{
-      color: 'white', 
-      opacity: 0.5,
+      color: 'white',
       background: '#60A05B', 
       fontWeight: 'bold',
       borderRadius: '10px', 
       border: 'none', 
       height: '40px', 
-      width: '280px',
+      width: '130px',
       display: 'flex',        // Makes this div also a flex container
       justifyContent: 'center', // Centers the text horizontally inside the button
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
-      fontSize: '20px'     
-  }}>
-      Deposit From Credit Card
+      fontSize: '20px',
+  }} onClick={() => setshowBanxaPopUp(true)}  >
+      Deposit
   </div>
        </div>
 
-      <div style={{
-        position: 'absolute',
-        top: menuPosition,
-        left: 0, // Use state variable for position
-        padding: '15px',
-        height: '90vh',
-        backgroundColor: 'white',
-        width: '92vw',
-        transition: 'top 0.5s ease' // Animate the left property
-      }}>
-
-<div style={{marginTop: '100px', fontSize: '40px', color: '#222222'}}>Deposit From Card</div>
-
-<div>
 
 
+<div>{showBanxaPopUp && (
+<div       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10 // Ensure it's above other content
+      }} onClick={() => setshowBanxaPopUp(false)}>
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px', gap: '40px' }}>
+<div style={{
+        position: 'fixed',
+        top: '30vh',
+        left: 0,
+        width: '100vw',
+        height: '210px',
+        background: '#ffffff',
+        zIndex: 11
+}}> 
 
-<div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
-    
-<div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
-                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>USDC</div> {/* Adjust marginLeft as needed */}
-                </div>
-
-{usdcSolBalance}
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img  src={usdtSol} style={{ width: '70px', height: 'auto' }} />
-                    <div style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
-                    
-                </div>
-                <div>{usdtSolBalance}</div>
-                </div>
-
-<div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', 
-justifyContent: 'center', gap: '10px', cursor: 'pointer', alignItems: 'center', }} onClick={handleCopyAddress}>
-<img src={solanaLogo} style={{ width: '90px', height: 'auto', background: '#666666', padding: '5px', borderRadius: '5px' }} />
-
-{addressCopied ? (
-    <div style={{fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center'}} >
-    Copied!     &#10003;
+<div style={{textAlign: 'center', fontSize: '25px', marginTop: '5px'}}>
+  How To Buy Crypto
 </div>
 
-) : (
-<div style={{fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center'}} >
-                        {publicKey.length >= 6
-                          ? `${publicKey.substring(0, 3)}...${publicKey.substring(publicKey.length - 3)}`
-                          : publicKey}
-<img src={copy} style={{ width: '20px', height: 'auto' }} />
-                      </div>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '5px', fontSize: '17px', padding: '10px', whiteSpace: 'nowrap', textAlign: 'left'}}>
+  MyFye uses Banxa to enable you to<br /> purchase crypto. There are a lot of <br />currencies available on Banxa, however, <br />
+  <span style={{fontWeight: 'bold'}}>MyFye is only compatabile with USDC <br />and USDT on the Solana network.</span>
+  </div>
+  </div>
 
-)}
+  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around'}}>
 
-                      </div>
+  <div style={{
+      color: 'white',
+      background: '#777777', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px',
+  }} onClick={() => setshowBanxaPopUp(false)}  >
+      Cancel
+  </div>
+
+
+  <div style={{
+      color: 'white',
+      background: '#60A05B', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px',
+  }} onClick={onClick}>
+      Buy Crypto
+  </div>
+
+
+  </div>
 </div>
 
-
-
-
 </div>
 
-                  </div> 
-
-
+)}</div>
         </div>
     )
 }
