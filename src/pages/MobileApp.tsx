@@ -3,7 +3,6 @@ import { DynamicContextProvider, DynamicWidget, useDynamicContext, useUserUpdate
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { SolanaWalletConnectors } from "@dynamic-labs/solana";
 import myfyelogo from '../assets/MyFyeLogo1.png';
-import Menu from '../appcomponents/menu';
 import Deposit from '../appcomponents/deposit';
 import Withdraw from '../appcomponents/withdraw';
 import { HandleSolanaConnection } from '../dynamichelpers/HandleNewSolanaConnection';
@@ -29,6 +28,10 @@ import MyWallet from '../appcomponents/myWallet';
 import myfyeEarn from '../assets/myfyeEarn.png';
 import myfyeBalance from '../assets/myfyeBalance.png';
 import EarnPage from '../appcomponents/EarnPage';
+import userImage from '../assets/user.png';
+import Menu from '../appcomponents/menu';
+import Support from '../appcomponents/support';
+import BottomNav from '../appcomponents/bottomNavigation';
 
 function WebAppInner() {
 
@@ -139,10 +142,15 @@ function WebAppInner() {
           <div style={{ display: 'flex',  alignItems: 'center', height: '100vh',
         flexDirection: 'column', color: '#222222', gap: '20px' }}>
 
-<Menu/>
+<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '45px',}}>
+<div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
 
+<div style={{display: 'flex',}}>
+  <Menu/>
+  <Support/>
 
-<div style={{fontSize: '25px', fontWeight: 'bold', width: '80vw', maxWidth: '550px', marginTop: '80px',}}>Welcome, {firstNameUI}</div>
+</div>
+</div>
 
 <hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
 
@@ -160,13 +168,12 @@ function WebAppInner() {
     $ <span style={{ fontSize: '35px' }}>
       
     <div>
-    {((usdcSolBalance + usdtSolBalance).toFixed(6)).toLocaleString('en-US')}
+    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
   </div>
 
     </span>
 </label>
 
-   
    </div>
 
    <MyWallet/>
@@ -209,6 +216,7 @@ function WebAppInner() {
 <EarnPage/>
 </div>
                     
+                <BottomNav/>
                         </div>
   </>
 ) : (<>

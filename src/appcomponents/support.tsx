@@ -4,6 +4,7 @@ import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import questionMarkImage from '../assets/questionMark.png';
 
 function Support() {
 
@@ -108,6 +109,9 @@ function Support() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
+<img src={questionMarkImage} style={{width: '30px', height: '30px'}}
+onClick={handleMenuClick}></img>
+
 { showMenu && (
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
@@ -125,22 +129,6 @@ function Support() {
 
                 <div style={{display: 'flex', alignItems: 'center', 
                 justifyContent: 'center'}}>
-            <div style={{
-           color: '#222222', 
-           background: 'white', // gray '#999999', 
-           borderRadius: '10px', 
-           border: '2px solid #222222', 
-           fontWeight: 'bold',
-           height: '40px', 
-           width: '210px',
-           display: 'flex',        // Makes this div also a flex container
-           justifyContent: 'center', // Centers the text horizontally inside the button
-           alignItems: 'center',// Centers the text vertically inside the button
-           cursor: 'pointer',
-           fontSize: '20px'     
-       }} onClick={handleMenuClick}>
-           Support
-       </div>
        </div>
 
       <div style={{
@@ -154,15 +142,15 @@ function Support() {
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '100px', fontSize: '45px', color: '#222222'}}>We're here to help</div>
+<div style={{marginTop: '70px', fontSize: '35px', color: '#222222'}}>We're here to help</div>
 
 <div>
 
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column' }}>
+<div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column' }}>
   <label htmlFor="message" style={{ fontSize: '20px', color: '#444444', marginBottom: '5px' }}>
-    What is the problem?
+    What issue are you running into today?
   </label>
   <textarea
     id="message"
@@ -177,7 +165,7 @@ function Support() {
       padding: '10px', // Padding
       width: '100%', // Full-width in the container
       boxSizing: 'border-box', // Ensures padding doesn't add to the width
-      height: '220px', // Adjust the height as needed, enough for about 10 lines
+      height: '250px', // Adjust the height as needed, enough for about 10 lines
       resize: 'vertical', // Allows the user to resize the textarea vertically
       marginTop: '15px'
     }}

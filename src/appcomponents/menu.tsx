@@ -4,8 +4,8 @@ import xIcon from '../assets/xIconGray2.png';
 import { DynamicContextProvider, DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useSelector } from 'react-redux';
 import AccountHistory from './accountHistory';
-import Support from './support';
 import MyWallet from './myWallet';
+import userImage from '../assets/user.png';
 
 function Menu() {
 
@@ -31,6 +31,12 @@ function Menu() {
 
     return (
         <div style={{ backgroundColor: 'white' }}>
+
+        <div>
+                    <img style={{width: '30px', height: '30px'}} src={userImage}
+                    onClick={handleMenuClick} alt="Menu" />
+                    </div>
+
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
       top: 0,              // Align to the top of the viewport
@@ -50,9 +56,13 @@ function Menu() {
   zIndex: 11
 }} onClick={() => setShowMenu(false)} />
 
-      
-            <img style={{width: '45px', height: '45px'}} src={ showMenu ? xIcon : menuIcon }
-            onClick={handleMenuClick} alt="Menu" />
+      { showMenu && (
+        <div>
+                    <img style={{width: '45px', height: '45px'}} src={ xIcon}
+                    onClick={handleMenuClick} alt="Menu" />
+                    </div>
+      )}
+
             </div>
 
             {menuPosition == '0' && (
@@ -104,8 +114,8 @@ function Menu() {
         <div style = {{marginTop: '20px'}}>
         <AccountHistory/>
         </div>
-        <div style = {{marginTop: '20px'}}>
-        <Support/>
+        <div style = {{marginTop: '40px'}}>
+          
         </div>
         </div>
 
