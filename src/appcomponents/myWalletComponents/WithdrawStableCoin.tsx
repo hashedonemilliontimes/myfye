@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../../assets/menuIcon.png';
-import xIcon from '../../assets/xIconGray2.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
-
+import { setShowWithdrawStablecoinPage } from '../../redux/userWalletData';
 
 function WithdrawStableCoin() {
-    const [showMenu, setShowMenu] = useState(false);
+  const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
 
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const { primaryWallet, user } = useDynamicContext();
@@ -27,7 +26,7 @@ function WithdrawStableCoin() {
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [selectedPortion, setselectedPortion] = useState('');
     const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
-
+    const dispatch = useDispatch();
     const [withdrawalButtonActive, setWithdrawalButtonActive] = useState(false);
     const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
@@ -40,21 +39,18 @@ function WithdrawStableCoin() {
         setbalanceSelectedInUSD(usdcSolBalance)
       }, [usdcSolBalance, usdtSolBalance]);
 
+      
 
     useEffect(() => {
-        if (showMenu) {
+        if (showWithdrawStablecoinPage) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
           setMenuPosition('-100vh'); // Move the menu off-screen
-
         }
-      }, [showMenu]);
+      }, [showWithdrawStablecoinPage]);
     
       const handleMenuClick = () => {
-        // Add your logic here for what happens when the menu is clicked
-
-        setShowMenu(!showMenu);
-        
+        dispatch(setShowWithdrawStablecoinPage(false));
       };
 
       const handleCurrencySelection = (selection: string) => {
@@ -203,7 +199,7 @@ function WithdrawStableCoin() {
               setWithdrawalInProgress(false);
               setErrorMessage('');
               // this is a rough workaround to save the change to redux and reload the page
-              setTimeout(() =>  setShowMenu(false), 10);
+              setTimeout(() =>  dispatch(setShowWithdrawStablecoinPage(false)), 10);
 
               
             } else {
@@ -304,40 +300,22 @@ function WithdrawStableCoin() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-{ showMenu && (
+{ showWithdrawStablecoinPage && (
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
       top: 0,              // Align to the top of the viewport
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 5    
+      zIndex: 7    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                 xIcon) : menuIcon }
+            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showWithdrawStablecoinPage ? (
+                 backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
-                <div style={{display: 'flex', alignItems: 'center', 
-                justifyContent: 'center',}}>
-  <div style={{
-      color: 'white', 
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-  }} onClick={handleMenuClick}>
-      Withdraw
-  </div>
-       </div>
+
 
       <div style={{
         position: 'absolute',
@@ -349,7 +327,7 @@ function WithdrawStableCoin() {
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
         overflowY: 'hidden',
-        zIndex: 4
+        zIndex: 6
       }}>
 
 

@@ -3,8 +3,7 @@ import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
 import { DynamicContextProvider, DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useSelector } from 'react-redux';
-import AccountHistory from './accountHistory';
-import MyWallet from './myWallet';
+import MyWallet from './WalletPage';
 import userImage from '../assets/user.png';
 
 function Menu() {
@@ -43,7 +42,7 @@ function Menu() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 3     // Add some padding for spacing from the edges
+      zIndex: 21     // Add some padding for spacing from the edges
     }}>
 
 <div style={{
@@ -53,7 +52,7 @@ function Menu() {
   height: '100vh',
   width: showMenu ? '40vw' : '0', // Cover the right side when the menu is open
   backgroundColor: 'transparent',
-  zIndex: 11
+  zIndex: 21
 }} onClick={() => setShowMenu(false)} />
 
       { showMenu && (
@@ -84,9 +83,11 @@ function Menu() {
         top: 0,
         left: menuPosition, // Use state variable for position
         padding: '15px',
-        backgroundColor: 'white',
+        backgroundColor: '#ffffff',
         width: '60vw',
-        transition: 'left 0.5s ease' // Animate the left property
+        transition: 'left 0.5s ease', // Animate the left property
+        height: 'calc(100vh - 40px)', 
+        zIndex: 20
       }}>
 
 
@@ -95,7 +96,7 @@ function Menu() {
       flexDirection: 'column', justifyContent: 'center', 
        }}>
 
-        <div style={{fontWeight: 'bold', fontSize: '18px', marginTop: '150px' }}>{currentUserFirstName} {currentUserLastName}</div>
+        <div style={{fontWeight: 'bold', fontSize: '18px', marginTop: '110px' }}>{currentUserFirstName} {currentUserLastName}</div>
         
 
         <div style={{ fontSize: '13px'}}>{currentUserEmail}</div>
@@ -111,9 +112,7 @@ function Menu() {
           <div>
         <MyWallet/>
         </div>
-        <div style = {{marginTop: '20px'}}>
-        <AccountHistory/>
-        </div>
+
         <div style = {{marginTop: '40px'}}>
           
         </div>

@@ -378,7 +378,7 @@ function Withdraw() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        height: 'calc(100vh - 35px)',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property

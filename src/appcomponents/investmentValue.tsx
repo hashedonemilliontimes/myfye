@@ -9,8 +9,6 @@ function InvestmentValue() {
     const principalInvestedHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const currentTimeInSeconds = Date.now()/1000;
-    //const updatingBalance = useSelector((state: any) => state.userWalletData.updateUserBalance);
-    const updatingBalance = true
 
     const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
         initialInvestmentDate, principalInvestedHistory)

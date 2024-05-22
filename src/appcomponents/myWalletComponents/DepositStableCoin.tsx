@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../../assets/menuIcon.png';
-import xIcon from '../../assets/xIconGray2.png';
-import { useSelector } from 'react-redux';
+import backIcon from '../../assets/backButton3.png';
+import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
 import solanaLogo from '../../assets/solanaLogo.png';
 import copy from '../../assets/copy.png';
+import { setShowDepositStablecoinPage } from '../../redux/userWalletData';
 
 function DepositStableCoin() {
-    const [showMenu, setShowMenu] = useState(false);
+    
+    const showMenu = useSelector((state: any) => state.userWalletData.showDepositStablecoinPage);
 
     const [currencySelected, setcurrencySelected] = useState('');
-
+    const dispatch = useDispatch()
     const [addressCopied, setaddressCopied] = useState(false); 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-
+    
     
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
@@ -62,6 +64,7 @@ function DepositStableCoin() {
         } else {
           setMenuPosition('-100vh'); // Move the menu off-screen
 
+          
           setcurrencySelected('');
         }
       }, [showMenu]);
@@ -69,7 +72,7 @@ function DepositStableCoin() {
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
 
-        setShowMenu(!showMenu);
+        dispatch(setShowDepositStablecoinPage(false));
         
       };
 
@@ -88,28 +91,13 @@ function DepositStableCoin() {
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+                currencySelected ? backButton : backIcon) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
                 <div style={{display: 'flex', alignItems: 'center', 
                 justifyContent: 'center',}}>
-  <div style={{
-      color: 'white', 
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-  }} onClick={handleMenuClick}>
-      Deposit
-  </div>
+
        </div>
 
       <div style={{

@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import DepositStableCoin from './myWalletComponents/DepositStableCoin';
 import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
-import DepositFromCreditCard from './myWalletComponents/DepositFromCreditCard';
+import ShowBanxaPopUp from './myWalletComponents/ShowBanxaPopUp';
 import myfyeWalletImage from '../assets/myfyeWallet.png';
 import QRCode from 'qrcode.react';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
+  setShowBanxaPopUp, setShowDepositStablecoinPage,
+setShowWalletPage } from '../redux/userWalletData';
 
-function MyWallet() {
-    const [showMenu, setShowMenu] = useState(false);
+function WalletPage() {
+    const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
 
+    const dispatch = useDispatch()
     const [currencySelected, setcurrencySelected] = useState('');
 
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
@@ -42,7 +46,9 @@ function MyWallet() {
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
+          dispatch(setShouldShowBottomNav(true))
         } else {
+          dispatch(setShouldShowBottomNav(false))
           setMenuPosition('-110vh'); // Move the menu off-screen
 
           setcurrencySelected('');
@@ -51,20 +57,33 @@ function MyWallet() {
     
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
-
-        setShowMenu(!showMenu);
+        dispatch(setShowWalletPage(false))
         
       };
 
 
-      function generateQRCodeURL(publicKey: string) {
-        const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
-        const params = new URLSearchParams({
-          size: "150x150", // Size of the QR code
-          data: publicKey, // Data to encode
-        });
-        return `${baseUrl}?${params.toString()}`;
-      }
+      const handleWithdrawStableCoinClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+
+        dispatch(setShowWithdrawStablecoinPage(true))
+        
+      };
+
+      const handleBanxaPopUpClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+
+        dispatch(setShowBanxaPopUp(true))
+        
+      };
+
+      const handleDepositStableCoinClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+
+        dispatch(setShowDepositStablecoinPage(true))
+        
+      };
+      
+      
 
     return (
         <div style={{ backgroundColor: 'white' }}>
@@ -76,7 +95,7 @@ function MyWallet() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 3    
+      zIndex: 4
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
@@ -84,37 +103,25 @@ function MyWallet() {
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
-                <div style={{display: 'flex', alignItems: 'center', 
-                justifyContent: 'center',
-                marginTop: '0px'}}>
-            <div style={{
-           color: '#ffffff', 
-           background: '#2E7D32', // gray '#999999', 
-           borderRadius: '10px', 
-           border: '2px solid #2E7D32', 
-           fontWeight: 'bold',
-           height: '40px', 
-           width: '210px',
-           display: 'flex',        // Makes this div also a flex container
-           justifyContent: 'center', // Centers the text horizontally inside the button
-           alignItems: 'center',// Centers the text vertically inside the button
-           cursor: 'pointer',
-           fontSize: '20px'     
-       }} onClick={handleMenuClick}>
-           View Wallet
-       </div>
-       </div>
 
+
+       <WithdrawStableCoin/>
+       <ShowBanxaPopUp/>
+       <DepositStableCoin/>
+       
       <div style={{
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        height: 'calc(100vh - 35px)',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
+        zIndex: 3
       }}>
+
+
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <img src = {myfyeWalletImage} style= {{marginTop: '30px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
@@ -198,8 +205,47 @@ function MyWallet() {
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', width: '90vw'}}>
 
-<DepositFromCreditCard/>
-<WithdrawStableCoin/>
+
+
+<div style={{
+      color: 'white',
+      background: '#60A05B', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px',
+  }} onClick={handleBanxaPopUpClick}  >
+      Deposit
+  </div>
+
+
+
+<div style={{display: 'flex', alignItems: 'center', 
+                justifyContent: 'center',}}>
+  <div style={{
+      color: 'white', 
+      background: '#60A05B', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+  }} onClick={handleWithdrawStableCoinClick}>
+      Withdraw
+  </div>
+       </div>
+
 </div>
 
 
@@ -253,12 +299,45 @@ justifyContent: 'space-around', width: '90vw'}}>
 
 
 
-
 <div style={{marginTop: '15px', 
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', width: '90vw'}}>
-<DepositStableCoin/>
-<WithdrawStableCoin/>
+
+<div style={{
+      color: 'white', 
+      background: '#60A05B', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+  }} onClick={handleDepositStableCoinClick}>
+      Deposit
+  </div>
+
+
+<div style={{
+      color: 'white', 
+      background: '#60A05B', 
+      fontWeight: 'bold',
+      borderRadius: '10px', 
+      border: 'none', 
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+  }} onClick={handleWithdrawStableCoinClick}>
+      Withdraw
+  </div>
+
 </div>
 
 <div style={{fontSize: '25px', marginTop: '15px',}}>Internal Wallet</div>
@@ -275,4 +354,4 @@ justifyContent: 'space-around', width: '90vw'}}>
         </div>
     )
 }
-export default MyWallet;
+export default WalletPage;

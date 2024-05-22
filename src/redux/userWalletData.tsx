@@ -26,7 +26,15 @@ interface UserWalletDataState {
   currentUserKYCVerified: boolean,
   transactionStatus: string,
   updatingBalance: boolean,
-  pieChartOpacity: number
+  shouldShowBottomNav: boolean,
+  showPayPage: boolean,
+  showSendPage: boolean,
+  showWithdrawStablecoinPage: boolean,
+  showDepositStablecoinPage: boolean,
+  showBanxaPopUp: boolean,
+  showEarnPage: boolean,
+  showWalletPage: boolean,
+  showAccountHistory: boolean
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -53,7 +61,15 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserEmail: '',
   transactionStatus: 'Not Initiated',
   updatingBalance: false,
-  pieChartOpacity: 1
+  shouldShowBottomNav: true,
+  showPayPage: false,
+  showSendPage: false,
+  showWithdrawStablecoinPage: false,
+  showBanxaPopUp: false,
+  showDepositStablecoinPage: false,
+  showEarnPage: false,
+  showWalletPage: false,
+  showAccountHistory: false
 };
 
 
@@ -152,10 +168,35 @@ export const userWalletDataSlice = createSlice({
   setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
     state.updatingBalance = action.payload;
   },
-  setPieChartOpacity: (state, action: PayloadAction<number>) => {
-    state.pieChartOpacity = action.payload;
+  setShouldShowBottomNav: (state, action: PayloadAction<boolean>) => {
+    state.shouldShowBottomNav = action.payload;
+  },
+  setShowPayPage: (state, action: PayloadAction<boolean>) => {
+    state.showPayPage = action.payload;
+  },
+  setShowSendPage: (state, action: PayloadAction<boolean>) => {
+    state.showSendPage = action.payload;
+  },
+  setShowWithdrawStablecoinPage: (state, action: PayloadAction<boolean>) => {
+    state.showWithdrawStablecoinPage = action.payload;
+  },
+  setShowBanxaPopUp: (state, action: PayloadAction<boolean>) => {
+    state.showBanxaPopUp = action.payload;
+  },
+  setShowDepositStablecoinPage: (state, action: PayloadAction<boolean>) => {
+    state.showDepositStablecoinPage= action.payload;
+  },
+  setShowEarnPage: (state, action: PayloadAction<boolean>) => {
+    state.showEarnPage = action.payload;
+  },
+  setShowWalletPage: (state, action: PayloadAction<boolean>) => {
+    state.showWalletPage = action.payload;
   },
 
+  setShowAccountHistory: (state, action: PayloadAction<boolean>) => {
+    state.showAccountHistory= action.payload;
+  },
+  
   },
 });
 
@@ -169,7 +210,10 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setTransactionStatus, setUpdatingBalance,
-  setPieChartOpacity
+  setShouldShowBottomNav, setShowPayPage, setShowSendPage,
+  setShowWithdrawStablecoinPage, setShowBanxaPopUp,
+  setShowDepositStablecoinPage, setShowEarnPage,
+  setShowWalletPage, setShowAccountHistory
 } = userWalletDataSlice.actions;
 
 export default userWalletDataSlice.reducer;

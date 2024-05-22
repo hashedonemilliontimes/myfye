@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import questionMarkImage from '../assets/questionMark.png';
+import { setShouldShowBottomNav } from '../redux/userWalletData';
 
 function Support() {
 
     const [showMenu, setShowMenu] = useState(false);
 
     const [currencySelected, setcurrencySelected] = useState('');
-
+    const dispatch = useDispatch()
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const firestore = getFirestore();
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
@@ -43,9 +44,10 @@ function Support() {
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
+          dispatch(setShouldShowBottomNav(true))
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-
+          dispatch(setShouldShowBottomNav(false))
           setcurrencySelected('');
         }
       }, [showMenu]);

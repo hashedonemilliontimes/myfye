@@ -9,7 +9,7 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue, setPieChartOpacity } from '../redux/userWalletData';
+  settotalInvestingValue } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -112,7 +112,6 @@ function Deposit() {
           // Do nothing
         } else {
           dispatch(setTransactionStatus(''))
-          dispatch(setPieChartOpacity(1))
           setShowMenu(!showMenu);
         }
       }
@@ -518,15 +517,14 @@ function Deposit() {
       marginTop: '15px',
       marginLeft: '15px',
       cursor: 'pointer',
-      zIndex: 20,
+      zIndex: 10,
       overflowX: 'hidden'     // Add some padding for spacing from the edges
     }}>
         
-
         {!depositInProgress ? (
   <img 
     style={{ width: 'auto', height: '45px', background: 'white' }} 
-    src={showMenu ? (currencySelected ? backButton : xIcon) : menuIcon}
+    src={showMenu ? (currencySelected ? backButton : backButton) : menuIcon}
     onClick={handleMenuClick} 
     alt="Exit" 
   />
@@ -536,7 +534,7 @@ function Deposit() {
       width: '45px', 
       height: '45px', 
       backgroundColor: 'white', 
-      zIndex: 10000, 
+      zIndex: 10, 
       border: 'none'
     }}
   />
@@ -566,7 +564,7 @@ function Deposit() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        height: 'calc(100vh - 35px)',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property

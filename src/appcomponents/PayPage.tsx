@@ -5,21 +5,18 @@ import { useSelector } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import DepositStableCoin from './myWalletComponents/DepositStableCoin';
 import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
-import Deposit from '../appcomponents/deposit';
+import SendPage from './SendPage';
 import Withdraw from '../appcomponents/withdraw';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
-import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
-import { setShouldShowBottomNav, setShowEarnPage } from '../redux/userWalletData';
+import myfyePay from '../assets/myfyePay.png';
+import { setShouldShowBottomNav, setShowPayPage, setShowSendPage } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
-import dollarSign from '../assets/dollarSign.png';
 
-function EarnPage() {
-    const showMenu = useSelector((state: any) => state.userWalletData.showEarnPage);
-
-    const [currencySelected, setcurrencySelected] = useState('');
+function PayPage() {
+    const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
@@ -32,25 +29,21 @@ function EarnPage() {
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
-    
 
     useEffect(() => {
-        if (showMenu) {
+        if (showPayPage) {
           setMenuPosition('0'); // Bring the menu into view
           dispatch(setShouldShowBottomNav(true))
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
           dispatch(setShouldShowBottomNav(false))
-          setcurrencySelected('');
         }
-      }, [showMenu]);
+      }, [showPayPage]);
     
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
 
-        if (showMenu) {
-          dispatch(setShowEarnPage(false))
-        }
+        dispatch(setShowPayPage(!showPayPage));
         
       };
 
@@ -58,93 +51,79 @@ function EarnPage() {
         //dispatch(setShouldShowBottomNav(false))
     };
 
+
+    const handleSendPageClick = () => {
+      dispatch(setShowSendPage(true));
+    };
       
     return (
         <div style={{ backgroundColor: 'white'}}>
 
-{ showMenu && (
+{ showPayPage && (
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
       top: 0,              // Align to the top of the viewport
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 4    
+      zIndex: 3    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+            <img style={{width: 'auto', height: '45px', background: 'white'}} src={xIcon}
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
-
-
 
       <div style={{
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: 'calc(100vh - 35px)',
+        height: '90vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease', // Animate the left property
-        zIndex: 3
+        transition: 'top 0.5s ease' // Animate the left property
       }}>
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeEarnGreen} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyePay} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
 </div>
 
 
-<div style={{display: 'flex', alignItems: 'center', marginTop: '15px',}}>
 
-<div style={{ fontSize: '20px', whiteSpace: 'nowrap'}}>Current Balance:&nbsp;</div>
-
-{updatingBalance ? (<div style={{ height: '30px', display: 'flex', alignItems: 'center'}}>
-    <div style={{marginRight: '10px', fontSize: '20px'}}>Updating</div>
-  
-    <img src={timerImage} style={{height: '20px', width: 'auto'}}></img>
-    <div style={{width: '90px'}}>About 7 Minutes</div>
-  </div>) : (<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
-    $ <InvestmentValue/>
-  </div>)}
-
-
-</div>
-
-
-<div style={{marginTop: '15px', fontSize: '20px'}}>MyFye Earn APY: 5.1%</div>
-
-<div style={{marginTop: '15px', 
+<div style={{marginTop: '40px', 
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
-
-<Deposit/>
-<Withdraw/>
-</div>
-
-<div style={{marginTop: '15px', textAlign: 'center', fontSize: '16px'}}>Portoflio Allocation:</div>
-
+  <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
+  <div style={{
+      color: '#ffffff', 
+      background: '#2E7D32', // gray '#999999', 
+      borderRadius: '10px', 
+      border: '2px solid #2E7D32', 
+      fontWeight: 'bold',
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+    }} onClick={handleSendPageClick}>Send</div>
     <div style={{
-        
-    }}>
-        <PieChartComponent/>
-    </div>
-
-<div>
-
-<div style={{marginTop: '30px', fontSize: '14px', textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are tokenized US treasury bonds created by Ondo Finance</div>
-
-<a href="https://ondo.finance/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
-<div style={{borderRadius: '20px', padding: '10px', 
-color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
-backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
-</div>
-</a>
-
-
+      color: '#ffffff', 
+      background: '#2E7D32', // gray '#999999', 
+      borderRadius: '10px', 
+      border: '2px solid #2E7D32', 
+      fontWeight: 'bold',
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+    }}>Request</div>
+  </div>
 </div>
 
                   </div> 
@@ -153,4 +132,4 @@ backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More Abou
         </div>
     )
 }
-export default EarnPage;
+export default PayPage;

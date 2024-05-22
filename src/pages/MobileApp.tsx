@@ -12,9 +12,10 @@ import InvestmentPercentageChange from '../appcomponents/investmentPercentageGai
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setbusdSolValue, 
   setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
-  addConnectedWallets, setCurrentUserKYCVerified,
+  addConnectedWallets, setShowEarnPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setusdySolValue} from '../redux/userWalletData';
+  setcurrentUserEmail, setusdySolValue, setShowSendPage,
+  setShowWalletPage} from '../redux/userWalletData';
 import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
 import wallet from '../helpers/walletDataType';
 import { useSelector } from 'react-redux';
@@ -24,7 +25,7 @@ import myBalanceImage from '../assets/myBalance.png';
 import { Buffer } from 'buffer';
 import LoadingAnimation from '../components/loadingAnimation';
 import timerImage from '../assets/timer.png';
-import MyWallet from '../appcomponents/myWallet';
+import WalletPage from '../appcomponents/WalletPage';
 import myfyeEarn from '../assets/myfyeEarn.png';
 import myfyeBalance from '../assets/myfyeBalance.png';
 import EarnPage from '../appcomponents/EarnPage';
@@ -32,6 +33,9 @@ import userImage from '../assets/user.png';
 import Menu from '../appcomponents/menu';
 import Support from '../appcomponents/support';
 import BottomNav from '../appcomponents/bottomNavigation';
+import PayPage from '../appcomponents/PayPage';
+import SendPage from '../appcomponents/SendPage';
+import AccountHistory from '../appcomponents/accountHistory';
 
 function WebAppInner() {
 
@@ -44,7 +48,8 @@ function WebAppInner() {
 
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-  
+  const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
+
   const db = getFirestore();
 
   const dispatch = useDispatch();
@@ -130,6 +135,20 @@ function WebAppInner() {
     console.log('primaryWallet', primaryWallet)
   }, [primaryWallet]);
   
+  const handleSendPageClick = () => {
+    dispatch(setShowSendPage(true));
+  };
+
+  const handleEarnPageClick = () => {
+    dispatch(setShowEarnPage(true))
+    
+  };
+
+  const handleWalletPageClick = () => {
+    dispatch(setShowWalletPage(true))
+  };
+
+  
 
   if (primaryWallet !== null || user) {
     return (
@@ -139,10 +158,16 @@ function WebAppInner() {
 
 {userDataLoaded ? (
   <>
+
+  <PayPage/>
+  <SendPage/>
+  <EarnPage/>
+  <WalletPage/>
+  <AccountHistory/>
           <div style={{ display: 'flex',  alignItems: 'center', height: '100vh',
         flexDirection: 'column', color: '#222222', gap: '20px' }}>
 
-<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '45px',}}>
+<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px',}}>
 <div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
 
 <div style={{display: 'flex',}}>
@@ -152,9 +177,10 @@ function WebAppInner() {
 </div>
 </div>
 
-<hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
+<hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '100vw', 
+maxWidth: '550px', marginTop: '-10px'}}></hr>
 
-<div style={{display: 'flex'}}>
+<div style={{display: 'flex', marginTop: '-10px'}}>
 
   <img style={{ width: '180px', height: 'auto'}}src={myfyeBalance}/>
 
@@ -176,15 +202,34 @@ function WebAppInner() {
 
    </div>
 
-   <MyWallet/>
 
-   <hr style={{height: '2px', backgroundColor: '#CCCCCC', border: 'none', width: '80vw', maxWidth: '550px'}}></hr>
 
    {/*
    <Deposit/>
     <Withdraw/>
            <HoldingsPortfolio/>
   */}
+
+<div style={{display: 'flex', alignItems: 'center', 
+                justifyContent: 'center',
+                marginTop: '0px'}}>
+            <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           height: '40px', 
+           width: '210px',
+           display: 'flex',        // Makes this div also a flex container
+           justifyContent: 'center', // Centers the text horizontally inside the button
+           alignItems: 'center',// Centers the text vertically inside the button
+           cursor: 'pointer',
+           fontSize: '20px'     
+       }} onClick={handleWalletPageClick}>
+           View Wallet
+       </div>
+       </div>
 
 <img style={{ width: '150px', height: 'auto'}}src={myfyeEarn}/>
 
@@ -213,10 +258,66 @@ function WebAppInner() {
 
 <div>
 
-<EarnPage/>
+<div style={{display: 'flex', alignItems: 'center', 
+                justifyContent: 'center',
+                marginTop: '0px'}}>
+            <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           height: '40px', 
+           width: '210px',
+           display: 'flex',        // Makes this div also a flex container
+           justifyContent: 'center', // Centers the text horizontally inside the button
+           alignItems: 'center',// Centers the text vertically inside the button
+           cursor: 'pointer',
+           fontSize: '20px'     
+       }} onClick={handleEarnPageClick}>
+           View Portfolio
+       </div>
+       </div>
+
 </div>
+
+{!shouldShowBottomNav && (
+<div style={{position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)'}}>
+  <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
+  <div style={{
+      color: '#ffffff', 
+      background: '#2E7D32', // gray '#999999', 
+      borderRadius: '10px', 
+      border: '2px solid #2E7D32', 
+      fontWeight: 'bold',
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+    }} onClick={handleSendPageClick}>Send</div>
+    <div style={{
+      color: '#ffffff', 
+      background: '#2E7D32', // gray '#999999', 
+      borderRadius: '10px', 
+      border: '2px solid #2E7D32', 
+      fontWeight: 'bold',
+      height: '40px', 
+      width: '130px',
+      display: 'flex',        // Makes this div also a flex container
+      justifyContent: 'center', // Centers the text horizontally inside the button
+      alignItems: 'center',// Centers the text vertically inside the button
+      cursor: 'pointer',
+      fontSize: '20px'     
+    }}>Request</div>
+  </div>
+</div>
+)}
                     
-                <BottomNav/>
+                
+                    <BottomNav/>
                         </div>
   </>
 ) : (<>
@@ -228,9 +329,9 @@ function WebAppInner() {
           </div>
         </div>
         <LoadingAnimation/>
-
       </div>
 </>)}
+
 
       </div>
     );
