@@ -10,7 +10,7 @@ import { setShowWithdrawStablecoinPage } from '../../redux/userWalletData';
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
-
+  const [errorMessage, setErrorMessage] = useState('');
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const { primaryWallet, user } = useDynamicContext();
     const [addressCopied, setaddressCopied] = useState(false); 
@@ -157,10 +157,6 @@ function WithdrawStableCoin() {
     
 
 
-
-    const [errorMessage, setErrorMessage] = useState('');
-
-
     const handleWithdrawalButtonClick = async () => {
         if (withdrawalButtonActive) {
           const cleanedAddress = removeWhitespace(addressText)
@@ -204,11 +200,11 @@ function WithdrawStableCoin() {
               
             } else {
               setWithdrawalInProgress(false);
-              setErrorMessage('Sorry, there was an error with your deposit. Please try again later')
+              setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
             }
           } else {
             setWithdrawalInProgress(false);
-            setErrorMessage('Sorry, there was an error with your deposit. Please try again later')
+            setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
           }
         }
       };
@@ -382,7 +378,6 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
 
         <div style={{ marginTop: '30px'}}>
   <div style={{marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
-
     <input
       id="SolanaAddress"
       type="text"
@@ -400,9 +395,7 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
       placeholder="Solana Address"
     />
   </div>
-
   <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
-
     <input
       id="USDAmount"
       type="text"
@@ -420,7 +413,6 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
       placeholder="Amount"
     />
   </div>
-
 <div style={{opacity: withdrawalInProgress ? '0' : '1'}}>
   <div style={styles.tradeTimeframeButtonRow} >
         <button style={selectedPortion === '25%' ? styles.selectedButton : styles.button} onClick={handleQuarterButtonClick}>25%</button>

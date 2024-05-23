@@ -14,8 +14,11 @@ import { setShouldShowBottomNav, setShowPayPage, setShowSendPage } from '../redu
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
+import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, where, } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 function PayPage() {
+  
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
@@ -28,7 +31,77 @@ function PayPage() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+    const [email, setEmail] = useState('');
+    const db = getFirestore();
+    interface Contact {
+      email: string;
+      firstName: string;
+      publicKey: string;
+  }
+  const [contacts, setContacts] = useState<Contact[]>([]);
 
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newEmail = event.target.value;
+      setEmail(newEmail);
+    };
+
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const removeWhitespace = (str: string) => {
+      return str.replace(/\s/g, '');
+    };
+
+    const handleReferButtonPressed= async () => {
+      const cleanedEmail = removeWhitespace(email)
+      if (cleanedEmail === '') {
+        setErrorMessage('Please enter an email address');
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
+          setErrorMessage('Please enter a valid email address');
+      } else {
+
+        const newContactData = {
+          email: cleanedEmail,
+          timestamp: new Date().toISOString(),
+      };
+
+      const contactCollectionRef = collection(db, 'contacts');
+
+      const updateContactInvites = await addDoc(contactCollectionRef, newContactData);
+      const sendEmailCall = await sendEmail(currentUserFirstName, email);
+      await Promise.all([updateContactInvites, sendEmailCall]);
+
+      setErrorMessage(`Invite sent to ${email}`)
+      setEmail('');
+
+
+      }
+    };
+
+    const sendEmail = async (firstName: string, email: string) => {
+
+      const requestData = {
+          emailAddress: email,
+          firstName: firstName,
+        };
+
+        const functions = getFunctions();
+
+        const sendEmailFn = httpsCallable(functions, 
+          'sendgridEmail');
+          sendEmailFn({ emailAddress: email,
+            firstName: firstName, })
+          .then((result) => {
+              // Read result of the Cloud Function.
+              console.log(result);
+          })
+          .catch((error) => {
+              // Getting the Error details.
+              console.log(error);
+          });
+
+
+    };
 
     useEffect(() => {
         if (showPayPage) {
@@ -56,6 +129,45 @@ function PayPage() {
       dispatch(setShowSendPage(true));
     };
       
+  
+    const errorLabelText = () => {
+      if (errorMessage) {
+        
+        return (
+          <label
+            style={{
+              display: 'flex',
+              justifyContent: 'left',
+              alignItems: 'left',
+              margin: '0 auto',
+              marginTop: '0px',
+              fontSize: '18px',
+              color: '#000000',
+            }}
+          >
+            {errorMessage}
+          </label>
+        );
+      } else {
+        return (
+          <div style={{ visibility: 'hidden' }}>
+            <label
+              style={{
+                display: 'flex',
+                justifyContent: 'left',
+                alignItems: 'left',
+                margin: '0 auto',
+                marginTop: '0px',
+                fontSize: '18px',
+              }}
+            >
+              $
+            </label>
+          </div>
+        );
+      }
+    };
+    
     return (
         <div style={{ backgroundColor: 'white'}}>
 
@@ -78,10 +190,11 @@ function PayPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        minHeight: '100vh',
         backgroundColor: 'white',
         width: '92vw',
-        transition: 'top 0.5s ease' // Animate the left property
+        transition: 'top 0.5s ease', // Animate the left property
+        zIndex: 2
       }}>
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -126,10 +239,57 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   </div>
 </div>
 
+
+
+<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: '60px'}}>Refer a friend!</div>
+
+
+
+    <input
+      id="email"
+      type="text"
+      value={email}
+      onChange={handleEmailChange}
+      onInput={handleEmailChange}
+      style={{
+        backgroundColor: '#EEEEEE', // Slightly lighter gray
+        color: '#444444',
+        fontSize: '20px',
+        border: 'none', // Remove the border
+        borderRadius: '5px', // Rounded edges
+        padding: '10px 10px', // Adjust padding as needed
+        marginTop: '15px',
+        width: '85vw',
+      }}
+      placeholder="Email"
+    />
+
+
+  <div style={{marginTop: '15px'}}>{errorLabelText()}</div>
+
+  <button
+    style={{
+        backgroundColor: '#2E7D32',
+        color: '#ffffff',
+        padding: '10px 20px',
+        fontSize: '25px',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        borderRadius: '10px',
+        border: '1px solid transparent',
+        cursor: 'pointer',
+        marginTop: '15px'
+      }} onClick={handleReferButtonPressed}> Submit
+
+      </button>
+
+  </div>
+
+
+
+
+
                   </div> 
-
-
-        </div>
     )
 }
 export default PayPage;
