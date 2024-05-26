@@ -10,7 +10,8 @@ import Withdraw from '../appcomponents/withdraw';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyePay from '../assets/myfyePay.png';
-import { setShouldShowBottomNav, setShowPayPage, setShowSendPage } from '../redux/userWalletData';
+import { setShouldShowBottomNav, setShowPayPage, 
+  setShowSendPage, setShowRequestPage } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
@@ -90,7 +91,8 @@ function PayPage() {
         const sendEmailFn = httpsCallable(functions, 
           'sendgridEmail');
           sendEmailFn({ emailAddress: email,
-            firstName: firstName, })
+            firstName: firstName, 
+            templateId: 'd-65ea71c05ebe438b8c71cbe6ff1a48dc' })
           .then((result) => {
               // Read result of the Cloud Function.
               console.log(result);
@@ -129,6 +131,9 @@ function PayPage() {
       dispatch(setShowSendPage(true));
     };
       
+    const handleRequestPageClick = () => {
+      dispatch(setShowRequestPage(true));
+    };
   
     const errorLabelText = () => {
       if (errorMessage) {
@@ -235,7 +240,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }}>Request</div>
+    }} onClick={handleRequestPageClick}>Request</div>
   </div>
 </div>
 

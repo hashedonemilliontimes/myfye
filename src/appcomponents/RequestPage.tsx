@@ -3,22 +3,21 @@ import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { getFirestore, doc, collection, setDoc, getDoc } from 'firebase/firestore';
-import { setShowSendPage } from '../redux/userWalletData';
+import { setShowRequestPage } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
 
-function SendPage() {
+function RequestPage() {
 
     const functions = getFunctions();
     const db = getFirestore();
     const [errorMessage, setErrorMessage] = useState('');
-    const showSendPage = useSelector((state: any) => state.userWalletData.showSendPage);
+    const showRequestPage = useSelector((state: any) => state.userWalletData.showRequestPage);
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const { primaryWallet, user } = useDynamicContext();
     const [selectedPortion, setselectedPortion] = useState('');
@@ -36,24 +35,6 @@ function SendPage() {
 
     const dispatch = useDispatch();
 
-    interface User {
-      chain?: string;
-      createdAt?: string;
-      email?: string;
-      firstName?: string;
-      firstVisit?: string;
-      id?: string;
-      lastName?: string;
-      lastVisit?: string;
-      metadata?: Record<string, unknown>; // Or a more specific type if you know the structure
-      oauthAccounts?: Array<unknown>; // Specify the type if you know what it contains
-      projectEnvironmentId?: string;
-      sessions?: Array<unknown>; // Specify the type if you know what it contains
-      updatedAt?: string;
-      wallet?: string;
-      walletPublicKey?: string;
-      wallets?: Array<unknown>; // Specify the type if you know what it contains
-    }
 
     useEffect(() => {
       if (usdtSolBalance > usdcSolBalance) {
@@ -66,15 +47,15 @@ function SendPage() {
 
 
     useEffect(() => {
-      if (showSendPage) {
+      if (showRequestPage) {
         setMenuPosition('0'); // Bring the menu into view
       } else {
         setMenuPosition('-130vh'); // Move the menu off-screen
       }
-    }, [showSendPage]);
+    }, [showRequestPage]);
   
     const handleMenuClick = () => {
-      dispatch(setShowSendPage(!showSendPage));
+      dispatch(setShowRequestPage(!showRequestPage));
     };
 
     useEffect(() => {
@@ -208,117 +189,11 @@ function SendPage() {
       } else {
         setAmountText('');
         setAddressText('')
-        setSendInProgress(true);
-        setErrorMessage('Check your wallet');
-        const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
-        setSendButtonActive(false); // Deactivate button here
-        console.log('Requesting new transaction')
-
-
-        const users = await getDynamicUsers(cleanedAddress); // Get all the dynamic users on the SOL network
-        const sendToDynamicUserPublicKey = await getUserInfoFromEmail(users, cleanedAddress);
-
-
-        console.log('sendToPublicKey', sendToDynamicUserPublicKey)
-
-        /*
-        If there is a myfye user with this email, send to their public key, else
-        send to the server address and send the user an email letting them
-        know that they have money on MyFye. When the users comes to make an
-        account, send them the money.
-        */
-
-        let sendToPublicKey 
-
-        if (sendToDynamicUserPublicKey) {
-          sendToPublicKey = sendToDynamicUserPublicKey
-        } else {
-          sendToPublicKey = 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn'
-        }
-      
-        const transactionSuccess = await requestNewSolanaTransaction2(publicKey, 
-          sendToPublicKey, convertToSmallestDenomination, currencySelected, 
-            primaryWallet, walletName);
-
-        console.log('Got transaction status: ', transactionSuccess)
-        if (transactionSuccess) {
-          sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
-          setSendInProgress(false);
-
-          if (sendToPublicKey == 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn') {
-            // save the user's balance that doe not have an account yet
-            saveUncreatedUserBalance(cleanedAddress, amountToNumber)
-          }
-
-          setErrorMessage('');
-          // this is a rough workaround to save the change to redux and reload the page
-          setTimeout(() =>  setErrorMessage(`Sent USD to ${addressText}`), 20);
-      } else {
-        setSendInProgress(false);
-        setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
-      }
+        sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
+        setErrorMessage(`Invoice sent to ${cleanedAddress}`)
     }
   };
 }
-
-const getDynamicUsers = async (emailAddress: string) => {
-  const functions = getFunctions();
-  const getUserDataFn = httpsCallable(functions, 'getDynamicUsers');
-
-  return getUserDataFn({emailAddress: emailAddress}).then((result) => {
-    // Assuming the result follows the structure { data: { users: User[] } }
-    const usersData = result as HttpsCallableResult<{ users: User[] }>;
-    console.log("usersData", usersData);
-    return usersData.data; // This returns { data: { users: User[] } }
-  }).catch((error) => {
-    console.error("Failed to fetch user data", error);
-    throw error; // Rethrow to handle it outside or indicate failure
-  });
-};
-
-
-const getUserInfoFromEmail = async (data: { users: User[] }, sendToEmail: string) => {
-  if (data && data.users) {
-    for (const user of data.users) {
-      const email = user.email ?? "No email provided";
-      const walletPublicKey = user.walletPublicKey ?? "No public key provided";
-      console.log(`Email: ${email}, Wallet Public Key: ${walletPublicKey}`);
-      if (sendToEmail === email && walletPublicKey !== "No public key provided") {
-        return walletPublicKey;  // This will return the walletPublicKey from the function
-      }
-    }
-    console.log("No matching user found");
-    return null;  // Optionally return null if no matching email is found
-  } else {
-    console.log("No user data available");
-    return null;  // Return null if data or users array is not valid
-  }
-};
-
-const saveUncreatedUserBalance = async (email: string, amount: number) => {
-  const contactCollectionRef = collection(db, 'uncreatedUserBalances');
-  const userBalanceDocRef = doc(contactCollectionRef, email);  // Specify the document ID explicitly as email
-
-  try {
-    // Attempt to retrieve the existing document
-    const docSnap = await getDoc(userBalanceDocRef);
-    let newAmount = amount;
-
-    if (docSnap.exists()) {
-      // If document exists, retrieve current amount and add the new amount
-      const currentData = docSnap.data();
-      newAmount += currentData.amountInUSD;
-      newAmount = parseFloat(newAmount.toFixed(6));
-    }
-
-    // Update or set the document with the new amount
-    await setDoc(userBalanceDocRef, { amountInUSD: newAmount });
-
-    console.log("saveUncreatedUserBalance successfully updated!");
-  } catch (error) {
-    console.error("Error accessing or updating document: ", error);
-  }
-};
 
 const sendEmail = async (firstName: string, email: string, amount: number) => {
 
@@ -327,7 +202,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
       'sendgridEmail');
       sendEmailFn({ emailAddress: email,
         firstName: firstName, 
-        templateId: 'd-01416b6dc85446b7baf63c535e2950e8',
+        templateId: 'd-63ff86dad3f34b9d989842a7d5efc143',
         amount: `$${amount}` })
       .then((result) => {
           // Read result of the Cloud Function.
@@ -385,7 +260,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
             alignItems: 'center',
             margin: '0 auto',
             marginTop: '15px',
-            fontSize: '17px',
+            fontSize: '18px',
             color: color,
             textAlign: 'center'
           }}
@@ -404,7 +279,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
               alignItems: 'center',
               margin: '0 auto',
               marginTop: '15px',
-              fontSize: '17px',
+              fontSize: '18px',
             }}
           >
             $
@@ -417,7 +292,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
     return (
         <div style={{ backgroundColor: 'white', overflowX: 'hidden' }}>
 
-{ showSendPage && !sendInProgress && (
+{ showRequestPage && (
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
       top: 0,              // Align to the top of the viewport
@@ -456,7 +331,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '10px', fontSize: '35px', color: '#222222'}}>Send</div>
+<div style={{marginTop: '10px', fontSize: '35px', color: '#222222'}}>Request</div>
 
 </div>
 
@@ -470,7 +345,6 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
 <div style={{ marginBottom: '15px', display: 'flex', 
 flexDirection: 'column', marginTop: '-20px',
 alignItems: 'center' }}>
-<LoadingAnimation/>
 
 {errorLabelText()}
 
@@ -480,41 +354,9 @@ alignItems: 'center' }}>
 ) : (
 
 <div>
-<div style={{marginTop: '60px', fontSize: '25px'}}>
+<div style={{marginTop: '60px', fontSize: '23px'}}>
 
-  {stableCoinBalance > 0.01 ? (
-    <div style={{display: 'flex', justifyContent: 'space-between', width: '80vw'}}>
-    <div>Balance: ${(stableCoinBalance.toFixed(2)).toLocaleString()}</div>
-    {(usdtSolBalance > usdcSolBalance) ? (
-      <div>
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
-        <div style={{fontSize: '15px'}}>USDT</div>
-        <img 
-          style={{ width: 'auto', height: '30px', background: 'white' }} 
-          src={usdtSol}
-          onClick={handleMenuClick} 
-          alt="Exit" 
-        />
-      </div>
-    </div>
-    ) : (
-      <div>
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
-          <div style={{fontSize: '15px'}}>USDC</div>
-          <img 
-            style={{ width: 'auto', height: '30px', background: 'white' }} 
-            src={usdcSol}
-            onClick={handleMenuClick} 
-            alt="Exit" 
-          />
-        </div>
-      </div>
-    )}
-
-    </div>
-  ) : (
-    <div>$0.00</div>
-  )}
+<div>Send an invoice to get paid</div>
 </div>
 
 <div style={{ marginTop: '60px'}}>
@@ -586,7 +428,7 @@ alignItems: 'center' }}>
       border: '1px solid transparent',
       cursor: 'pointer',
       width: '100%'
-    }} onClick={handleSendButtonClick}>Send
+    }} onClick={handleSendButtonClick}>Invoice
 
     </button>
 
@@ -606,5 +448,5 @@ alignItems: 'center' }}>
     )
 }
 
-export default SendPage;
+export default RequestPage;
 

@@ -653,6 +653,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   
       const payer = new PublicKey(payerPubKey);
       const senderPublicKey = new PublicKey(payerPubKey);
+      console.log('receiverPubKey', receiverPubKey)
       const destinationPublicKey = new PublicKey(receiverPubKey);
   
       let mintAddress: string;
@@ -738,11 +739,17 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   
       try {
 
+        /*
         const signedPriorityTx = await (primaryWallet as any).connector.signTransaction({ transaction: txPriority });
         let priorityTransactionID = await (primaryWallet as any).connector.signAndSendTransaction({ transaction: signedPriorityTx });
-  
-        if (priorityTransactionID) {
-          console.log(`Transaction successful: https://solscan.io/tx/${priorityTransactionID}`);
+        */
+
+        let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: txPriority });
+        const transactionBuffer = Transaction.from(Buffer.from(signedTransaction, 'base64'));
+        const transactionID = await connection.sendRawTransaction(transactionBuffer.serialize());
+
+        if (transactionID) {
+          console.log(`Transaction successful: https://solscan.io/tx/${transactionID}`);
   
           return true;
         } else {

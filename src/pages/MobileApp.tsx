@@ -12,7 +12,7 @@ import InvestmentPercentageChange from '../appcomponents/investmentPercentageGai
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setbusdSolValue, 
   setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
-  addConnectedWallets, setShowEarnPage,
+  addConnectedWallets, setShowEarnPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setShowSendPage,
   setShowWalletPage} from '../redux/userWalletData';
@@ -35,20 +35,23 @@ import Support from '../appcomponents/support';
 import BottomNav from '../appcomponents/bottomNavigation';
 import PayPage from '../appcomponents/PayPage';
 import SendPage from '../appcomponents/SendPage';
+import RequestPage from '../appcomponents/RequestPage';
 import AccountHistory from '../appcomponents/accountHistory';
+import { checkUncreatedUserBalance } from '../helpers/uncreatedUserBalance';
+import NewUserPreviousBalanceNotification from '../appcomponents/NewUserPreviousBalanceNotification';
 
 function WebAppInner() {
 
   window.Buffer = Buffer;
   
   const { primaryWallet, user } = useDynamicContext();
-
+  
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
   const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
-
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
+  const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
 
   const db = getFirestore();
 
@@ -86,6 +89,7 @@ function WebAppInner() {
           dispatch(setcurrentUserFirstName(currentUserFirstName!))
           dispatch(setcurrentUserLastName(currentUserLastName!))
           dispatch(setcurrentUserEmail(currentUserEmail!))
+
 
       } catch (error) {
         console.error('Error with dynamic user ', error);
@@ -135,8 +139,20 @@ function WebAppInner() {
     console.log('primaryWallet', primaryWallet)
   }, [primaryWallet]);
   
+
+  useEffect(() => {
+    if (userEmail != '' && userEmail != null) {
+      console.log('checkUncreatedUserBalance in Mobile App')
+      checkUncreatedUserBalance(userEmail, primaryWallet!.address, dispatch)
+    }
+  }, [userEmail]);
+
   const handleSendPageClick = () => {
     dispatch(setShowSendPage(true));
+  };
+
+  const handleRequestPageClick = () => {
+    dispatch(setShowRequestPage(true));
   };
 
   const handleEarnPageClick = () => {
@@ -161,9 +177,12 @@ function WebAppInner() {
 
   <PayPage/>
   <SendPage/>
+  <RequestPage/>
   <EarnPage/>
   <WalletPage/>
   <AccountHistory/>
+  <NewUserPreviousBalanceNotification/>
+  
           <div style={{ display: 'flex',  alignItems: 'center', height: '100vh',
         flexDirection: 'column', color: '#222222', gap: '20px' }}>
 
@@ -311,7 +330,7 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }}>Request</div>
+    }} onClick={handleRequestPageClick}>Request</div>
   </div>
 </div>
 )}
@@ -345,6 +364,7 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
     );
   }
 }
+
 
 function WebApp() {
   return (

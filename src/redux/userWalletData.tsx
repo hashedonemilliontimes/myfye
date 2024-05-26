@@ -34,7 +34,9 @@ interface UserWalletDataState {
   showBanxaPopUp: boolean,
   showEarnPage: boolean,
   showWalletPage: boolean,
-  showAccountHistory: boolean
+  showAccountHistory: boolean,
+  newUserHasPreviousBalance: boolean,
+  showRequestPage: boolean
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -69,7 +71,9 @@ const initialUserWalletData: UserWalletDataState = {
   showDepositStablecoinPage: false,
   showEarnPage: false,
   showWalletPage: false,
-  showAccountHistory: false
+  showAccountHistory: false,
+  newUserHasPreviousBalance: false,
+  showRequestPage: false
 };
 
 
@@ -177,6 +181,9 @@ export const userWalletDataSlice = createSlice({
   setShowSendPage: (state, action: PayloadAction<boolean>) => {
     state.showSendPage = action.payload;
   },
+  setShowRequestPage: (state, action: PayloadAction<boolean>) => {
+    state.showRequestPage = action.payload;
+  },
   setShowWithdrawStablecoinPage: (state, action: PayloadAction<boolean>) => {
     state.showWithdrawStablecoinPage = action.payload;
   },
@@ -196,6 +203,9 @@ export const userWalletDataSlice = createSlice({
   setShowAccountHistory: (state, action: PayloadAction<boolean>) => {
     state.showAccountHistory= action.payload;
   },
+  setNewUserHasPreviousBalance: (state, action: PayloadAction<boolean>) => {
+    state.newUserHasPreviousBalance = action.payload;
+  },
   
   },
 });
@@ -213,7 +223,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShouldShowBottomNav, setShowPayPage, setShowSendPage,
   setShowWithdrawStablecoinPage, setShowBanxaPopUp,
   setShowDepositStablecoinPage, setShowEarnPage,
-  setShowWalletPage, setShowAccountHistory
+  setShowWalletPage, setShowAccountHistory,
+  setNewUserHasPreviousBalance, setShowRequestPage
 } = userWalletDataSlice.actions;
 
 export default userWalletDataSlice.reducer;
