@@ -78,54 +78,38 @@ function RequestPage() {
 
     const handleQuarterButtonClick = () => {
       console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.25 * stableCoinBalance);
+        const newDeposit = (1);
         console.log("Setting deposit to:", newDeposit); // Added logging
       setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
       checkForValidInput(addressText, String(newDeposit));
-      } else {
-          setAmountText("$ 0.0")
-      }
-      setselectedPortion('25%');
+      setselectedPortion('$1');
     };
     
     const handleHalfButtonClick = () => {
       console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.5 * stableCoinBalance);
+        const newDeposit = (10);
         console.log("Setting deposit to:", newDeposit); // Added logging
         setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newDeposit));
-      }else {
-          setAmountText("$ 0.0")
-      }
-      setselectedPortion('50%');
+        setselectedPortion('$10');
     };
     
     const handleTwoThirdsButtonClick = () => {
       console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.75 * stableCoinBalance);
+        const newDeposit = (100);
         console.log("Setting deposit to:", newDeposit); // Added logging
         setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newDeposit));
-      } else {
-          setAmountText("$ 0.0")
-      }
-      setselectedPortion('75%');
+      setselectedPortion('$100');
     };
     
     const handleAllButtonClick = () => {
       console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (1.0 * stableCoinBalance);
+        const newDeposit = (1000);
         console.log("Setting deposit to:", newDeposit); // Added logging
         setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newDeposit));
-      } else {
-          setAmountText("$ 0.0")
-      }
-      setselectedPortion('100%');
+      setselectedPortion('$1,000');
     };
 
 
@@ -164,9 +148,9 @@ function RequestPage() {
       } else if (isNaN(amountToNumber) && amountToNumber < 0.00001) {
         setSendButtonActive(false);
         setErrorMessage('Please enter a valid number');
-      } else if (amountToNumber > stableCoinBalance) {
+      } else if (amountToNumber > 10000) {
         setSendButtonActive(false);
-        setErrorMessage('Insufficient balance');
+        setErrorMessage('Maximum $10,000');
       } else {
         setSendButtonActive(true);
         setErrorMessage('');
@@ -182,8 +166,8 @@ function RequestPage() {
       const amountToNumber = Number(cleanedAmount);
       if (isNaN(amountToNumber)) {
         setErrorMessage('Invalid amount');
-      } else if (amountToNumber > stableCoinBalance) {
-        setErrorMessage('Insufficient balance');
+      } else if (amountToNumber > 10000) {
+        setErrorMessage('Maximum $10,000');
       } else if (amountToNumber < 0.001) {
         setErrorMessage('Minimum: $0.001');
       } else {
@@ -404,10 +388,10 @@ alignItems: 'center' }}>
 
 <div style={{opacity: sendInProgress ? '0' : '1'}}>
 <div style={styles.tradeTimeframeButtonRow} >
-      <button style={selectedPortion === '25%' ? styles.selectedButton : styles.button} onClick={handleQuarterButtonClick}>25%</button>
-      <button style={selectedPortion === '50%' ? styles.selectedButton : styles.button} onClick={handleHalfButtonClick}>50%</button>
-      <button style={selectedPortion === '75%' ? styles.selectedButton : styles.button} onClick={handleTwoThirdsButtonClick}>75%</button>
-      <button style={selectedPortion === '100%' ? styles.selectedButton : styles.button} onClick={handleAllButtonClick}>100%</button>
+      <button style={selectedPortion === '$1' ? styles.selectedButton : styles.button} onClick={handleQuarterButtonClick}>$1</button>
+      <button style={selectedPortion === '$10' ? styles.selectedButton : styles.button} onClick={handleHalfButtonClick}>$10</button>
+      <button style={selectedPortion === '$100' ? styles.selectedButton : styles.button} onClick={handleTwoThirdsButtonClick}>$100</button>
+      <button style={selectedPortion === '$1,000' ? styles.selectedButton : styles.button} onClick={handleAllButtonClick}>$1,000</button>
     </div>
     </div>
 
