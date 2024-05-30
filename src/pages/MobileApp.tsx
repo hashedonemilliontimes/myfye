@@ -14,7 +14,7 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
   addConnectedWallets, setShowEarnPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setusdySolValue, setShowSendPage,
+  setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
   setShowWalletPage} from '../redux/userWalletData';
 import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
 import wallet from '../helpers/walletDataType';
@@ -119,6 +119,7 @@ function WebAppInner() {
           dispatch(setusdcSolValue(Number(balances.usdc)));
           dispatch(setusdtSolValue(Number(balances.usdt)));
           dispatch(setusdySolValue(Number(balances.usdy)));
+          dispatch(setpyusdSolValue(Number(balances.pyusd)));
           
           console.log('got balances: ', balances)
         }

@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
+import pyusdSol from '../../assets/pyusdSol.png';
 import solanaLogo from '../../assets/solanaLogo.png';
 import copy from '../../assets/copy.png';
 import { setShowDepositStablecoinPage } from '../../redux/userWalletData';
@@ -25,6 +26,7 @@ function DepositStableCoin() {
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
     const handleCopyAddress = () => {
@@ -105,7 +107,7 @@ function DepositStableCoin() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        height: '95vh',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -115,7 +117,7 @@ function DepositStableCoin() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '30px', fontSize: '40px', color: '#222222'}}>Deposit</div>
+<div style={{marginTop: '20px', fontSize: '40px', color: '#222222'}}>Deposit</div>
 
 </div>
 
@@ -124,7 +126,7 @@ function DepositStableCoin() {
 
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px', gap: '40px' }}>
+<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px', gap: '30px' }}>
 
 <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
     
@@ -146,6 +148,30 @@ function DepositStableCoin() {
     )}
 </div>
                 </div>
+
+
+                <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
+    
+<div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+<div style={{fontWeight: 'bold', fontSize: '20px'}}>
+    {pyusdSolBalance > 0.00001 ? (
+        <>
+        {pyusdSolBalance}
+        </>
+
+    ) : (
+<>
+0.0
+</>
+    )}
+</div>
+                </div>
+
+
 
                 <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -32,6 +32,7 @@ function RequestPage() {
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const walletName = useSelector((state: any) => state.userWalletData.type);
+    const [confirmSend, setconfirmSend] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -363,6 +364,7 @@ alignItems: 'center' }}>
       padding: '10px 10px', // Adjust padding as needed
     }}
     placeholder="Email Address"
+    autoCapitalize="none"
   />
 </div>
 

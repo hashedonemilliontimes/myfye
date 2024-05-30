@@ -17,6 +17,7 @@ interface UserWalletDataState {
   totalInvestingValue: number,
   usdcSolBalance: number,
   usdtSolBalance: number,
+  pyusdSolBalance: number,
   busdSolBalance: number,
   usdySolBalance: number,
   usdcEthBalance: number,
@@ -51,6 +52,7 @@ const initialUserWalletData: UserWalletDataState = {
   totalInvestingValue: 0,
   usdcSolBalance: 0,
   usdtSolBalance: 0,
+  pyusdSolBalance: 0,
   usdySolBalance: 0,
   busdSolBalance: 0,
   usdcEthBalance: 0,
@@ -134,6 +136,9 @@ export const userWalletDataSlice = createSlice({
     setbusdSolValue: (state, action: PayloadAction<number>) => {
       state.busdSolBalance = action.payload;
     },
+    setpyusdSolValue: (state, action: PayloadAction<number>) => {
+      state.pyusdSolBalance = action.payload;
+    },
     setusdySolValue: (state, action: PayloadAction<number>) => {
       state.usdySolBalance = action.payload;
     },
@@ -215,8 +220,9 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setPrincipalInvested, setPrincipalInvestedHistory, 
   setinitialPrincipal, setinitialInvestmentDate, 
   settotalInvestingValue, mergePrincipalInvestedHistory,
-  setusdcSolValue, setusdtSolValue, setbusdSolValue, setusdySolValue,
-  setusdcEthValue, setusdtEthValue, setbusdEthValue,
+  setusdcSolValue, setusdtSolValue, setpyusdSolValue, 
+  setbusdSolValue, setusdySolValue,
+  setusdcEthValue, setusdtEthValue, setbusdEthValue, 
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setTransactionStatus, setUpdatingBalance,
@@ -224,7 +230,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowWithdrawStablecoinPage, setShowBanxaPopUp,
   setShowDepositStablecoinPage, setShowEarnPage,
   setShowWalletPage, setShowAccountHistory,
-  setNewUserHasPreviousBalance, setShowRequestPage
+  setNewUserHasPreviousBalance, setShowRequestPage,
+  
 } = userWalletDataSlice.actions;
 
 export default userWalletDataSlice.reducer;
