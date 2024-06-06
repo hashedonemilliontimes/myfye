@@ -30,7 +30,7 @@ import myfyeEarn from '../assets/myfyeEarn.png';
 import myfyeBalance from '../assets/myfyeBalance.png';
 import EarnPage from '../appcomponents/EarnPage';
 import userImage from '../assets/user.png';
-import Menu from '../appcomponents/menu';
+import ProfileMenu from '../appcomponents/menu';
 import Support from '../appcomponents/support';
 import BottomNav from '../appcomponents/bottomNavigation';
 import PayPage from '../appcomponents/PayPage';
@@ -183,6 +183,7 @@ function WebAppInner() {
   <WalletPage/>
   <AccountHistory/>
   <NewUserPreviousBalanceNotification/>
+  <ProfileMenu/>
   
           <div style={{ display: 'flex',  alignItems: 'center', height: '100vh',
         flexDirection: 'column', color: '#222222', gap: '20px' }}>
@@ -191,7 +192,7 @@ function WebAppInner() {
 <div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
 
 <div style={{display: 'flex',}}>
-  <Menu/>
+  
   <Support/>
 
 </div>

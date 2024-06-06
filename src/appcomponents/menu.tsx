@@ -5,14 +5,17 @@ import { DynamicContextProvider, DynamicWidget, useDynamicContext } from '@dynam
 import { useSelector } from 'react-redux';
 import MyWallet from './WalletPage';
 import userImage from '../assets/user.png';
+import { useDispatch } from 'react-redux';
+import { setShowProfileMenu } from '../redux/userWalletData';
 
 function Menu() {
 
-    const [showMenu, setShowMenu] = useState(false);
+  const showMenu = useSelector((state: any) => state.userWalletData.showProfileMenu);
     const [menuPosition, setMenuPosition] = useState('-70vw'); 
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
     const currentUserLastName = useSelector((state: any) => state.userWalletData.currentUserLastName);
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
+  const dispatch = useDispatch()
 
     useEffect(() => {
         if (showMenu) {
@@ -24,7 +27,7 @@ function Menu() {
     
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
-        setShowMenu(!showMenu);
+        dispatch(setShowProfileMenu(!showMenu))
         
       };
 
@@ -32,8 +35,6 @@ function Menu() {
         <div style={{ backgroundColor: 'white' }}>
 
         <div>
-                    <img style={{width: '30px', height: '30px'}} src={userImage}
-                    onClick={handleMenuClick} alt="Menu" />
                     </div>
 
 <div style={{ 
@@ -53,7 +54,7 @@ function Menu() {
   width: showMenu ? '40vw' : '0', // Cover the right side when the menu is open
   backgroundColor: 'transparent',
   zIndex: 21
-}} onClick={() => setShowMenu(false)} />
+}} onClick={() => handleMenuClick()} />
 
       { showMenu && (
         <div>
