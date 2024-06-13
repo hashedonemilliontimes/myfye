@@ -9,7 +9,7 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue } from '../redux/userWalletData';
+  settotalInvestingValue, setShowEarnDepositPage } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -19,14 +19,14 @@ import wallet from '../helpers/walletDataType';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import FailImage from '../assets/FailImage.png';
-import { getFirestore, doc, collection, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
 
 function Deposit() {
 
     const functions = getFunctions();
     const db = getFirestore();
 
-    const [showMenu, setShowMenu] = useState(false);
+    const showMenu = useSelector((state: any) => state.userWalletData.showEarnDepositPage);
 
     const { primaryWallet, user } = useDynamicContext();
 
@@ -81,21 +81,15 @@ function Deposit() {
       } else {
         setMenuPosition('-100vh'); // Move the menu off-screen
 
-        setcurrencySelected('');
-      }
-    }, [showMenu]);
-  
-    const handleMenuClick = () => {
-      // Add your logic here for what happens when the menu is clicked
-      console.log('Selected currency: ', currencySelected)
-
         if (usdcSolBalance && !usdtSolBalance) {
           setcurrencySelected('usdcSol')
           setbalanceSelectedInUSD(usdcSolBalance);
         } else if (!usdcSolBalance && usdtSolBalance){
           setcurrencySelected('usdtSol')
           setbalanceSelectedInUSD(usdtSolBalance);
-        } 
+        } else {
+          setcurrencySelected('')
+        }
 
         if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
           setcurrencySelected('usdcSol')
@@ -103,16 +97,24 @@ function Deposit() {
         } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
           setcurrencySelected('usdtSol')
           setbalanceSelectedInUSD(usdtSolBalance);
+        } else {
+          setcurrencySelected('')
         }
+      }
+    }, [showMenu]);
+  
+    const handleMenuClick = () => {
+      // Add your logic here for what happens when the menu is clicked
+      console.log('Selected currency: ', currencySelected)
 
       if (!showMenu) {
-        setShowMenu(!showMenu);
+        dispatch(setShowEarnDepositPage(false))
       } else {
         if (depositInProgress) {
           // Do nothing
         } else {
           dispatch(setTransactionStatus(''))
-          setShowMenu(!showMenu);
+          dispatch(setShowEarnDepositPage(false))
         }
       }
     };
@@ -162,7 +164,7 @@ function Deposit() {
           setTimeout(() => {
             setDepositInProgress(false)
             setErrorMessage('')
-            setShowMenu(false);
+            dispatch(setShowEarnDepositPage(false))
           }, 2000);
       }).catch((error) => {
           console.error(error);
@@ -391,6 +393,7 @@ function Deposit() {
 
             
             if (signDepositSuccess) {
+              // save the new transaction
                    
 
             } else {
@@ -438,11 +441,13 @@ function Deposit() {
     }
     
     function tryAgainButtonPressed() {
+      setDepositButtonActive(true)
       handleDepositButtonClick()
     }
 
     async function handleBalanceIsUpdating() {
       const pubKeyDocRef = doc(db, 'pubKeys', publicKey);
+      const transactionsCollectionRef = collection(db, 'earnTransactions');
       try {
           console.log('saving update');
           
@@ -450,8 +455,18 @@ function Deposit() {
               updatingBalance: true
           }, { merge: true });
   
+          const docRef = await addDoc(transactionsCollectionRef, {
+            type: 'deposit',
+            time: new Date().toISOString(),
+            amount: newDepositAmount,
+            currency: currencySelected,
+            publicKey: publicKey
+          });
+
           console.log("Saved to database!");
           return "Update saved successfully";  // Resolve with a message or useful data
+
+          
       } catch (error) {
           console.log("Error saving update balance", error);
           throw new Error("Failed to save update: " + error);  // Reject the promise with an error
@@ -540,24 +555,6 @@ function Deposit() {
   />
 )}
             </div>)}
-
-
-            <div style={{
-                            color: 'white', 
-                            background: '#60A05B', 
-                            fontWeight: 'bold',
-                            borderRadius: '10px', 
-                            border: 'none', 
-                            height: '40px', 
-                            width: '135px',
-                            display: 'flex',        // Makes this div also a flex container
-                            justifyContent: 'center', // Centers the text horizontally inside the button
-                            alignItems: 'center',// Centers the text vertically inside the button
-                            cursor: 'pointer',
-                            fontSize: '20px'     
-                        }} onClick={handleMenuClick}>
-                            Deposit
-                        </div>
 
       <div style={{
         position: 'absolute',

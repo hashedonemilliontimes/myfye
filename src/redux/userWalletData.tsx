@@ -38,7 +38,9 @@ interface UserWalletDataState {
   showAccountHistory: boolean,
   newUserHasPreviousBalance: boolean,
   showRequestPage: boolean,
-  showProfileMenu: boolean
+  showProfileMenu: boolean,
+  showEarnWithdrawPage: boolean,
+  showEarnDepositPage: boolean
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -77,7 +79,9 @@ const initialUserWalletData: UserWalletDataState = {
   showAccountHistory: false,
   newUserHasPreviousBalance: false,
   showRequestPage: false,
-  showProfileMenu: false
+  showProfileMenu: false,
+  showEarnWithdrawPage: false,
+  showEarnDepositPage: false
 };
 
 
@@ -216,7 +220,12 @@ export const userWalletDataSlice = createSlice({
   setShowProfileMenu: (state, action: PayloadAction<boolean>) => {
     state.showProfileMenu = action.payload;
   },
-  
+  setShowEarnWithdrawPage: (state, action: PayloadAction<boolean>) => {
+    state.showEarnWithdrawPage = action.payload;
+  },
+  setShowEarnDepositPage: (state, action: PayloadAction<boolean>) => {
+    state.showEarnDepositPage = action.payload;
+  },
   },
 });
 
@@ -236,7 +245,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowDepositStablecoinPage, setShowEarnPage,
   setShowWalletPage, setShowAccountHistory,
   setNewUserHasPreviousBalance, setShowRequestPage,
-  setShowProfileMenu
+  setShowProfileMenu, setShowEarnWithdrawPage,
+  setShowEarnDepositPage
   
 } = userWalletDataSlice.actions;
 

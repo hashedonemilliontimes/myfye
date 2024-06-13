@@ -257,12 +257,13 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
 
 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
 
-  {updatingBalance ? (<div style={{ height: '35px', display: 'flex', alignItems: 'center'}}>
+  {updatingBalance ? (<div style={{position: 'relative', height: '35px', display: 'flex', alignItems: 'center', overflow: 'hidden'}}>
+    <div className="white-box-animator"></div>
     <div style={{marginRight: '20px', fontSize: '30px'}}>Updating</div>
-  
     <img src={timerImage} style={{height: '35px', width: 'auto'}}></img>
     <div>About 7 Minutes</div>
-  </div>) : (<div>
+</div>
+) : (<div>
     <label htmlFor="deposit" style={{ fontSize: '20px', 
      display: 'flex', alignItems: 'center', }}>
     $ <span style={{ fontSize: '35px' }}>

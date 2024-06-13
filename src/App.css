@@ -542,3 +542,66 @@ overflow-x: hidden;
 .animate-fade-in-out {
   animation: fadeinandoutAnimation 1.6s ease-in-out forwards;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.animation-wrapper {
+  position: relative;
+  width: 300px;
+  height: 100px;
+  background-color: #f0f0f0; /* Light grey background for visibility */
+  overflow: hidden; /* Ensures the animated box does not move outside the wrapper */
+}
+
+.white-box-animator {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: white;
+  left: -100px; /* Start off-screen to the left */
+  top: 0;
+  opacity: 0; /* Start with box fully transparent */
+  filter: blur(20px); /* Increase blur effect */
+  transform: rotate(45deg); /* Rotate the box by 45 degrees */
+  animation: horizontal-slide-right 4s infinite; /* Adjusted for overall cycle timing */
+}
+
+@keyframes horizontal-slide-right {
+  0%, 60%, 100% { 
+      left: -150px; /* Start and stay off-screen */
+      opacity: 0; /* Keep box invisible while off-screen */
+  }
+  10% {
+      opacity: 0.9; /* Box becomes visible when it starts moving */
+  }
+  50% {
+      left: 350px; /* Move box across the screen */
+      opacity: 0.7; /* Box is fully visible while moving */
+  }
+  90% {
+      opacity: 0; /* Start fading the box out before it goes off-screen */
+  }
+}
+
+.underlying-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: -1; /* Ensure the content is under the animated white box */
+}

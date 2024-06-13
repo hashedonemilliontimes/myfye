@@ -10,15 +10,18 @@ import Withdraw from '../appcomponents/withdraw';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
-import { setShouldShowBottomNav, setShowEarnPage } from '../redux/userWalletData';
+import { setShouldShowBottomNav, setShowEarnPage,
+  setShowEarnWithdrawPage, setShowEarnDepositPage } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
 import dollarSign from '../assets/dollarSign.png';
+import history from '../assets/history.png';
+import EarnTransactions from './EarnTransactions';
 
 function EarnPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showEarnPage);
-
+    const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [currencySelected, setcurrencySelected] = useState('');
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
@@ -32,8 +35,6 @@ function EarnPage() {
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
-    
-
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
@@ -46,10 +47,13 @@ function EarnPage() {
       }, [showMenu]);
     
       const handleMenuClick = () => {
-        // Add your logic here for what happens when the menu is clicked
 
-        if (showMenu) {
-          dispatch(setShowEarnPage(false))
+        if (showTransactionHistory) {
+          setshowTransactionHistory(false)
+        } else {
+          if (showMenu) {
+            dispatch(setShowEarnPage(false))
+          }
         }
         
       };
@@ -58,9 +62,23 @@ function EarnPage() {
         //dispatch(setShouldShowBottomNav(false))
     };
 
+    const toggleShowTransactionHistory = () => {
+      setshowTransactionHistory(!showTransactionHistory)
+    };
+  
+    const handleWithdrawPageClick = () => {
+      dispatch(setShowEarnWithdrawPage(true))
+    };
+
+    const handleDepositPageClick = () => {
+      dispatch(setShowEarnDepositPage(true))
+    };
       
     return (
         <div style={{ backgroundColor: 'white'}}>
+
+<Withdraw/>
+<Deposit/>
 
 { showMenu && (
 <div style={{ 
@@ -73,7 +91,7 @@ function EarnPage() {
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+                currencySelected ? backButton : showTransactionHistory ? backButton : xIcon) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -91,9 +109,24 @@ function EarnPage() {
         zIndex: 3
       }}>
 
+
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <img src = {myfyeEarnGreen} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
+</div>
+
+        {!showTransactionHistory ? (
+<div>
+
+<div style={{
+        position: 'absolute', // Position it relative to the viewport
+        top: 0,              // Align to the top of the viewport
+        right: 0,            // Align to the right of the viewport
+        padding: '15px',
+        cursor: 'pointer',
+        zIndex: 4    
+}}>
+<img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
 </div>
 
 
@@ -101,12 +134,14 @@ function EarnPage() {
 
 <div style={{ fontSize: '20px', whiteSpace: 'nowrap'}}>Current Balance:&nbsp;</div>
 
-{updatingBalance ? (<div style={{ height: '30px', display: 'flex', alignItems: 'center'}}>
-    <div style={{marginRight: '10px', fontSize: '20px'}}>Updating</div>
-  
+{updatingBalance ? (
+  <div style={{position: 'relative', height: '30px', display: 'flex', alignItems: 'center', overflow: 'hidden'}}>
+    <div className="white-box-animator"></div>
+    <div style={{marginRight: '2px', fontSize: '20px'}}>Updating</div>
     <img src={timerImage} style={{height: '20px', width: 'auto'}}></img>
-    <div style={{width: '90px'}}>About 7 Minutes</div>
-  </div>) : (<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
+    <div style={{marginRight: '2px', fontSize: '20px', marginLeft: '2px'}}>7 Min.</div>
+</div>
+) : (<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
     $ <InvestmentValue/>
   </div>)}
 
@@ -120,8 +155,41 @@ function EarnPage() {
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 
-<Deposit/>
-<Withdraw/>
+<div style={{
+    color: 'white', 
+    background: '#60A05B', 
+    fontWeight: 'bold',
+    borderRadius: '10px', 
+    border: 'none', 
+    height: '40px', 
+    width: '135px',
+    display: 'flex',        // Makes this div also a flex container
+    justifyContent: 'center', // Centers the text horizontally inside the button
+    alignItems: 'center',// Centers the text vertically inside the button
+    cursor: 'pointer',
+    fontSize: '20px'     
+}} onClick={handleDepositPageClick}>
+    Deposit
+</div>
+
+
+<div style={{
+           color: 'white', 
+           background: '#60A05B', // red '#FF6961', 
+           borderRadius: '10px', 
+           border: 'none', 
+           fontWeight: 'bold',
+           height: '40px', 
+           display: 'flex',        // Makes this div also a flex container
+           justifyContent: 'center', // Centers the text horizontally inside the button
+           alignItems: 'center',// Centers the text vertically inside the button
+           cursor: 'pointer',
+           fontSize: '20px',
+           width: '135px',
+       }} onClick={handleWithdrawPageClick}>
+           Withdraw
+       </div>
+
 </div>
 
 <div style={{marginTop: '15px', textAlign: 'center', fontSize: '16px'}}>Portoflio Allocation:</div>
@@ -146,6 +214,21 @@ backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More Abou
 
 
 </div>
+  
+</div>
+
+        ) : (
+
+          <div>
+<EarnTransactions/>
+
+
+          </div>
+
+
+        )}
+
+
 
                   </div> 
 

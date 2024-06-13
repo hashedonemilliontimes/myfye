@@ -14,11 +14,14 @@ import { setusdySolValue } from '../redux/userWalletData';
 import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
+import { setShowEarnWithdrawPage, setTransactionStatus } from '../redux/userWalletData';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 function Withdraw() {
 
   const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
+  const showMenu = useSelector((state: any) => state.userWalletData.showEarnWithdrawPage)
+  const db = getFirestore();
     const { primaryWallet, user } = useDynamicContext();
     const [feeAmount, setfeeAmount] = useState(0.1);
     const dispatch = useDispatch();
@@ -26,6 +29,7 @@ function Withdraw() {
     const functions = getFunctions();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessageColor, setErrorMessageColor] = useState('#222222');
     const [withdrawalButtonActive, setWithdrawalButtonActive] = useState(false);
     const [confirmButtonActive, setconfirmButtonActive] = useState(false);
     const [reviewButtonClicked, setreviewButtonClicked] = useState(false); 
@@ -42,6 +46,7 @@ function Withdraw() {
       initialInvestmentDate, principalHistory)
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [shouldNotify, setShouldNotify] = useState(false);
+    const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
 
     useEffect(() => {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -89,98 +94,58 @@ function Withdraw() {
         }
       }, [showMenu]);
     
+      useEffect(() => {
+
+        if (transactionStatus === 'Signed') {
+          setErrorMessage('Sending transaction')
+          setErrorMessageColor('#60A05B')
+        }
+
+        if (transactionStatus === 'Withdrawal Success') {
+          console.log('Withdrawal Success!')
+          //send usdc to user
+          console.log('Calling handleWithdrawal with pubKey: ', publicKey, ' usdyBalance: ', usdyBalance);
+          const handleWithdrawal = httpsCallable(functions, 
+            'handleWithdrawal');
+            handleWithdrawal({ withdrawerPubKey: publicKey, 
+              amountInUSDY: usdyBalance })
+            .then((result) => {
+                // Read result of the Cloud Function.
+                console.log('RESULT handleWithdrawal', result);
+                //update db
+                const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
+                const withdrawalToNumber = Number(cleanedWithdrawal);
+                handleWithdrawSuccess(withdrawalToNumber)
+                dispatch(setusdySolValue(0.0));
+            })
+            .catch((error) => {
+                // Getting the Error details.
+                console.log('ERROR in call to handleWithdrawal');
+                console.log(error);
+            });
+      }
+      if (transactionStatus === 'Fail') {
+        setErrorMessage('Transaction failed, please try again')
+        setErrorMessageColor('#000000')
+        setWithdrawalInProgress(false)
+        setShouldNotify(false)
+      }
+      if (transactionStatus === 'Deposit Success') {
+        setErrorMessage('')
+      }
+      }, [transactionStatus]);
+
+
+
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
         setreviewButtonClicked(false)
         setconfirmButtonActive(false);
-        setShowMenu(!showMenu);
-        
-      };
-
-      const handleWithdrawalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newWithdrawal = event.target.value;
-        if (newWithdrawal.length == 1 && (newWithdrawal[0] != '$')) {
-          setWithdrawal("$ " + newWithdrawal);
-        } else {
-          setWithdrawal(newWithdrawal);
-        }
-        setselectedWithdrawalPortion('');
-        checkForWithdrawalFieldComplete(newWithdrawal);
-      };
-
-      const checkForWithdrawalFieldComplete = (newWithdrawal: string) => {
-        const cleanedWithdrawal = newWithdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
-        const withdrawalToNumber = Number(cleanedWithdrawal);
-      
-        if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 1.0 && 
-        (withdrawalToNumber <= currentPortfolioValue)) {
-          setErrorMessage('')
-          setWithdrawalInProgress(false)
-          setWithdrawalButtonActive(true);
-          setfeeAmount(Number(withdrawalToNumber)*0.01)
-
-        } else {
-          setErrorMessage('Minimum withdrawal: $1')
-          setWithdrawalInProgress(false)
-          setfeeAmount(0)
-          setWithdrawalButtonActive(false);
-        }
-      };
-      
-      const handleAllButtonClick = () => {
-        
-        if (currentPortfolioValue>0.0001) {
-          const newWithdrawal = (1.0 * currentPortfolioValue);
-          console.log("Setting Withdrawal to:", newWithdrawal); // Added logging
-        setWithdrawal("$ " + String(newWithdrawal.toFixed(6).toString().replace(/\.?0+$/, '')))
-        checkForWithdrawalFieldComplete(String(newWithdrawal));
-        }
-        setselectedWithdrawalPortion('100%');
-      };
-
-      const styles = {
-        tradeTimeframeButtonRow: {
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 10px',
-          gap: '10px',
-          width: '80vw'
-        },
-        button: {
-          flex: 1,
-          padding: '5px',
-          paddingTop: '12px',
-          paddingBottom: '12px',
-          backgroundColor: 'white',
-          color: '#333333',
-          border: '1px solid #333333',
-          borderRadius: '4px',
-          fontSize: '14px',
-          cursor: 'pointer',
-        },
-        selectedButton: {
-          flex: 1,
-          padding: '5px',
-          paddingTop: '12px',
-          paddingBottom: '12px',
-          backgroundColor: '#333333',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          fontSize: '16px',
-        },
-      };
-
-      const handleReviewButtonClick = async () => {
+        dispatch(setShowEarnWithdrawPage(false))
+        dispatch(setTransactionStatus(''))
         setErrorMessage('')
-        setWithdrawalInProgress(false)
-        setreviewButtonClicked(true)
-        setTimeout(() => {
-          setconfirmButtonActive(true);
-        }, 2000);
       };
-      
+
       const handleCashOutButtonClick = async () => {
 
           console.log('usdyBalance: ', usdyBalance)
@@ -192,6 +157,7 @@ function Withdraw() {
         const finalAmount = withdrawalToNumber - feeAmount
 
         setErrorMessage('Check your wallet...')
+        setErrorMessageColor('#60A05B')
         setWithdrawalInProgress(true)
 
         if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 0.5 && 
@@ -207,37 +173,20 @@ function Withdraw() {
             convertToSmallestDenomination, 'usdySol', primaryWallet, 0, principalHistory, dispatch, walletName);
           setShouldNotify(false)
 
+          console.log('withdrawSuccess', withdrawSuccess)
+          console.log('transactionStatus', transactionStatus)
           if (withdrawSuccess) {
 
-            //update redux
-            setTimeout(() => {
-              dispatch(setusdySolValue(0.0));
-            }, 1000);
+            console.log('Returned withdraw success')
 
-            //send usdc to user
-            console.log('Calling handleWithdrawal with pubKey: ', publicKey, ' usdyBalance: ', usdyBalance);
-            const handleWithdrawal = httpsCallable(functions, 
-              'handleWithdrawal');
-              handleWithdrawal({ withdrawerPubKey: publicKey, 
-                amountInUSDY: usdyBalance })
-              .then((result) => {
-                  // Read result of the Cloud Function.
-                  console.log('RESULT handleWithdrawal', result);
-              })
-              .catch((error) => {
-                  // Getting the Error details.
-                  console.log('ERROR in call to handleWithdrawal');
-                  console.log(error);
-              });
-
-            //update db
-            handleWithdrawSuccess(withdrawalToNumber)
           } else {
             setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
             setWithdrawalInProgress(false)
+            setErrorMessageColor('#000000')
           }
         } else {
           setErrorMessage('Failed number test or minimum after fee test')
+          setErrorMessageColor('#000000')
           console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
           setWithdrawalInProgress(false)
         }
@@ -249,9 +198,18 @@ function Withdraw() {
       };
 
       const handleWithdrawSuccess = async (withdrawalToNumber: number) => {
-        const withdrawSavedToDB: boolean = await saveNewWithdrawal(publicKey, withdrawalToNumber, currentPortfolioValue, true);
 
-        if (withdrawSavedToDB) {
+        const transactionsCollectionRef = collection(db, 'earnTransactions');
+
+        const docRef = await addDoc(transactionsCollectionRef, {
+          type: 'withdrawal',
+          time: new Date().toISOString(),
+          amount: withdrawalToNumber,
+          currencySelected: 'usdySol',
+          publicKey: publicKey
+        });
+
+        if (docRef) {
           // success ready to update UI
 
          setErrorMessage('')
@@ -268,33 +226,9 @@ function Withdraw() {
 
       const errorLabelText = () => {
         if (errorMessage) {
-          const color = errorMessage === 'Check your wallet...' ? '#60A05B' : ('#FF3B30');
+          const color = errorMessageColor;
           return (
-
-            
-
             <div>
-
-            {withdrawalInProgress && ( 
-            <div style={{display: 'flex', justifyContent: 'center',marginTop: '50px' }}>
-            <div style={{display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          width: '50px',
-                          height: '50px',
-                          border: '3px solid #60A05B',
-                          borderRadius: '50%', // This makes the shape a circle
-                          color: '#222222',
-                          fontSize: '40px',
-                          fontWeight: 'bold',
-                          marginTop: '-40px'}}>
-            1
-            </div>
-            </div>
-            )}
-
-
-
             <div style={{display:'flex', alignItems: 'center', justifyContent: 'center'}}>
             <label
               style={{
@@ -355,24 +289,6 @@ function Withdraw() {
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
-
-            <div style={{
-           color: 'white', 
-           background: '#60A05B', // red '#FF6961', 
-           borderRadius: '10px', 
-           border: 'none', 
-           fontWeight: 'bold',
-           height: '40px', 
-           display: 'flex',        // Makes this div also a flex container
-           justifyContent: 'center', // Centers the text horizontally inside the button
-           alignItems: 'center',// Centers the text vertically inside the button
-           cursor: 'pointer',
-           fontSize: '20px',
-           width: '135px',
-       }} onClick={handleMenuClick}>
-           Withdraw
-       </div>
-
        <div style={{
         position: 'absolute',
         top: menuPosition,
@@ -387,12 +303,12 @@ function Withdraw() {
 
 <div style={{display:'flex', justifyContent: 'space-between', flexDirection: 'column', height: '80vh'}}>
   <div>
-<div style={{marginTop: '70px', fontSize: '45px', color: '#222222'}}>Withdraw</div>
+<div style={{marginTop: '60px', fontSize: '45px', color: '#222222'}}>Withdraw</div>
 
 
 {withdrawalInProgress ? (
   <>
-        <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
+        <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '-20px' }}>
         <LoadingAnimation/>
 
       </div>
@@ -439,28 +355,7 @@ alignItems: 'center'}}>
 
   <div>
 
-<div style={{display: 'flex', justifyContent: 'center', 
-  marginTop: '-140px' }}>
-<div style={{display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '50px',
-  height: '50px',
-  border: '3px solid #60A05B',
-  borderRadius: '50%', // This makes the shape a circle
-  color: '#222222',
-  fontSize: '40px',
-  fontWeight: 'bold',}}>
-2
-</div>
-</div>
 
-
-  
-  <div style={{textAlign: 'center', color: '#60A05B', fontSize: '18px', 
-  marginTop: '20px'}}>
-    Please wait while we validate the transaction
-  </div>
   </div>
     ) : (
 
