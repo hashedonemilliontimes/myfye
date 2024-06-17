@@ -7,7 +7,7 @@ import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { getFirestore, doc, collection, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, collection, setDoc, getDoc, addDoc } from 'firebase/firestore';
 import { setShowSendPage } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
@@ -33,6 +33,7 @@ function SendPage() {
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const walletName = useSelector((state: any) => state.userWalletData.type);
+    const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
 
     const dispatch = useDispatch();
 
@@ -243,6 +244,7 @@ function SendPage() {
         console.log('Got transaction status: ', transactionSuccess)
         if (transactionSuccess) {
           sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
+          saveTransaction(amountToNumber, cleanedAddress);
           setSendInProgress(false);
 
           if (sendToPublicKey == 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn') {
@@ -338,6 +340,30 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
           console.log(error);
       });
 };
+
+async function saveTransaction(amount: number, address: string) {
+  const transactionsCollectionRef = collection(db, 'payTransactions');
+  try {
+      console.log('saving transaction');
+
+      const docRef = await addDoc(transactionsCollectionRef, {
+        type: 'deposit',
+        time: new Date().toISOString(),
+        amount: amount,
+        currency: currencySelected,
+        publicKey: publicKey,
+        receiverEmail: address,
+        senderEmail: userEmail
+      });
+
+      console.log("Saved to database!", docRef);
+      return "Update saved successfully";  // Resolve with a message or useful data
+      
+  } catch (error) {
+      console.log("Error saving update balance", error);
+      throw new Error("Failed to save update: " + error);  // Reject the promise with an error
+  }
+}
 
   const styles = {
     tradeTimeframeButtonRow: {

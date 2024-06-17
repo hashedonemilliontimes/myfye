@@ -17,9 +17,12 @@ import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
 import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, where, } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import history from '../assets/history.png';
+import PayTransactions from './PayTransactions';
 
 function PayPage() {
   
+  const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
@@ -116,9 +119,14 @@ function PayPage() {
       }, [showPayPage]);
     
       const handleMenuClick = () => {
-        // Add your logic here for what happens when the menu is clicked
 
-        dispatch(setShowPayPage(!showPayPage));
+        if (showTransactionHistory) {
+          setshowTransactionHistory(false)
+        } else {
+          if (showPayPage) {
+            dispatch(setShowPayPage(false))
+          }
+        }
         
       };
 
@@ -135,6 +143,10 @@ function PayPage() {
       dispatch(setShowRequestPage(true));
     };
   
+    const toggleShowTransactionHistory = () => {
+      setshowTransactionHistory(!showTransactionHistory)
+    };
+
     const errorLabelText = () => {
       if (errorMessage) {
         
@@ -186,7 +198,7 @@ function PayPage() {
       zIndex: 3    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={xIcon}
+            <img style={{width: 'auto', height: '45px', background: 'white'}} src= {showTransactionHistory ? backButton : xIcon}
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -207,7 +219,19 @@ function PayPage() {
 
 </div>
 
+{!showTransactionHistory ? (
+<div>
 
+<div style={{
+        position: 'absolute', // Position it relative to the viewport
+        top: 0,              // Align to the top of the viewport
+        right: 0,            // Align to the right of the viewport
+        padding: '15px',
+        cursor: 'pointer',
+        zIndex: 4    
+}}>
+<img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
+</div>
 
 <div style={{marginTop: '40px', 
 display: 'flex', alignItems: 'center', 
@@ -287,6 +311,20 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       }} onClick={handleReferButtonPressed}> Submit
 
       </button>
+
+
+</div>
+
+) : (
+
+  <div>
+
+ <PayTransactions/>
+  </div>
+)}
+
+
+
 
   </div>
 

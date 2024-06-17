@@ -148,7 +148,7 @@ function Withdraw() {
 
       const handleCashOutButtonClick = async () => {
 
-          console.log('usdyBalance: ', usdyBalance)
+          console.log('Withdraw usdyBalance: ', usdyBalance)
           if (usdyBalance >= 0.9) {
 
         const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
@@ -174,7 +174,6 @@ function Withdraw() {
           setShouldNotify(false)
 
           console.log('withdrawSuccess', withdrawSuccess)
-          console.log('transactionStatus', transactionStatus)
           if (withdrawSuccess) {
 
             console.log('Returned withdraw success')
@@ -284,9 +283,15 @@ function Withdraw() {
       zIndex: 20     // Add some padding for spacing from the edges
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
+{!withdrawalInProgress ? (<>
+  <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
                 currencySelected ? backButton : backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
+</>) : (<>
+
+  <div style={{ width: '45px', height: '45px', backgroundColor: 'white', border: 'none' }}></div>
+  </>)}
+
             </div>)}
 
        <div style={{

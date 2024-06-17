@@ -10,8 +10,7 @@ function InvestmentValue() {
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const currentTimeInSeconds = Date.now()/1000;
 
-    const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
-        initialInvestmentDate, principalInvestedHistory)
+    const currentValue: number = usdyBalance
   
     const [upBy, setUpBy] = useState(currentValue);
     const zero = 0.0
@@ -20,7 +19,6 @@ function InvestmentValue() {
   
   
     useEffect(() => {
-        console.log('Current value invested: ', currentValue);
 
         setUpBy(usdyBalance);
     }, [usdyBalance]);

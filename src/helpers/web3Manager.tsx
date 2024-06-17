@@ -570,10 +570,12 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
     try {
   
       if (walletType == "Turnkey HD") {
+        console.log("Turnkey HD running sendDynamicWeb2EmbeddedSolanaTransaction2")
         const status = sendDynamicWeb2EmbeddedSolanaTransaction2(payerPubKey, receiverPubKey, 
           amountSmallestDenomination, currencySelected, primaryWallet)
         return status;
       } else {
+        console.log("Not Turnkey HD")
         const provider = getProvider(); // see "Detecting the Provider"
   
         const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
@@ -657,7 +659,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         console.log("Retrieved blockhash:", blockhashInfo.blockhash);
   
         const signedTransaction = await provider.signAndSendTransaction(transaction);
-        console.log("Transaction sent:", signedTransaction);
+        console.log("Transaction sent in requestNewSolanaTransaction2:", signedTransaction);
   
         return true;
   
@@ -672,10 +674,13 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   };
   
   
-  export const sendDynamicWeb2EmbeddedSolanaTransaction2 = async (payerPubKey: string, receiverPubKey: string, amountSmallestDenomination: number, currencySelected: string, 
+  export const sendDynamicWeb2EmbeddedSolanaTransaction2 = async (payerPubKey: string, receiverPubKey: string, 
+    amountSmallestDenomination: number, currencySelected: string, 
     primaryWallet: any): Promise<boolean> => {
   
     window.Buffer = Buffer;
+
+    console.log("Running in sendDynamicWeb2EmbeddedSolanaTransaction2");
     
     if (primaryWallet) {
       const connection: any = await (
@@ -784,9 +789,26 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         const transactionID = await connection.sendRawTransaction(transactionBuffer.serialize());
 
         if (transactionID) {
-          console.log(`Transaction successful: https://solscan.io/tx/${transactionID}`);
-  
-          return true;
+
+
+          let transactionConfirmed = false
+          for (let attempt = 1; attempt <= 3 && !transactionConfirmed; attempt++) {
+            try {
+              const confirmation = await connection.confirmTransaction(transactionID, 'confirmed');
+              console.log('got confirmation', confirmation, 'on attempt', attempt);
+              if (confirmation && confirmation.value && confirmation.value.err === null) {
+                console.log(`Transaction successful: https://solscan.io/tx/${transactionID}`);
+                return true;
+              }
+              } catch (error) {
+                console.error('Error sending transaction or in post-processing:', error, 'on attempt', attempt);
+              }
+              if (!transactionConfirmed) {
+                await delay(1000); // Delay in milliseconds
+              }
+            }
+            console.log("Transaction Uncomfirmed");
+            return false
         } else {
           console.log("Transaction Failed: Unknown error");
           return false;
@@ -801,4 +823,9 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
       console.log("Error primary wallet: ", primaryWallet);
       return false;
     }
+  }
+
+
+  function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
