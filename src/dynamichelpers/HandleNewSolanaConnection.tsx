@@ -5,7 +5,6 @@ import { initializePhantomConnection, fetchUSDCBalance,
   fetchSolBalance, fetchUSDTBalance, fetchUSDYBalance,
   fetchPYUSDBalance } from '../helpers/web3Manager';
 import crypto from '../helpers/cryptoDataType';
-import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { Buffer } from 'buffer';
 

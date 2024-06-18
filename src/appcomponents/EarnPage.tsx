@@ -134,16 +134,10 @@ function EarnPage() {
 
 <div style={{ fontSize: '20px', whiteSpace: 'nowrap'}}>Current Balance:&nbsp;</div>
 
-{updatingBalance ? (
-  <div style={{position: 'relative', height: '30px', display: 'flex', alignItems: 'center', overflow: 'hidden'}}>
-    <div className="white-box-animator"></div>
-    <div style={{marginRight: '2px', fontSize: '20px'}}>Updating</div>
-    <img src={timerImage} style={{height: '20px', width: 'auto'}}></img>
-    <div style={{marginRight: '2px', fontSize: '20px', marginLeft: '2px'}}>7 Min.</div>
-</div>
-) : (<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
+
+<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
     $ <InvestmentValue/>
-  </div>)}
+  </div>
 
 
 </div>

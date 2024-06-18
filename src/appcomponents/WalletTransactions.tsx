@@ -141,7 +141,7 @@ function WalletTransactions() {
     return (
         <div>
             {!transactionsLoaded ? (
-<div>
+<div style={{marginTop: '30px'}}>
     <LoadingAnimation/>
 </div>
 

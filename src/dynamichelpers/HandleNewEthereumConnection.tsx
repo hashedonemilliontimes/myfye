@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { initializePhantomConnection, fetchUSDCBalance, fetchSolBalance } from '../helpers/web3Manager';
 import crypto from '../helpers/cryptoDataType';
-import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
 
 
 import Web3 from 'web3';

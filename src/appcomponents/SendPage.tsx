@@ -151,7 +151,7 @@ function SendPage() {
 
     const handleAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const newAddress = event.target.value;
-      setAddressText(newAddress);
+      setAddressText(newAddress.toLowerCase());
       checkForValidInput(newAddress, amountText);
   };
 
@@ -482,7 +482,7 @@ async function saveTransaction(amount: number, address: string) {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '10px', fontSize: '35px', color: '#222222'}}>Send</div>
+<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>Send</div>
 
 </div>
 

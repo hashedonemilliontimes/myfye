@@ -16,7 +16,7 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
   setShowWalletPage} from '../redux/userWalletData';
-import { getPrincipalInvested } from '../helpers/getPrincipalInvested';
+import { getUserData } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
 import { useSelector } from 'react-redux';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
@@ -47,7 +47,6 @@ function WebAppInner() {
   const { primaryWallet, user } = useDynamicContext();
   
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
-  const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
@@ -64,7 +63,7 @@ function WebAppInner() {
     if (primaryWallet?.address) {
 
       const getInvestmentData = async () => {
-      const gotPrincipalInvested = await getPrincipalInvested(primaryWallet?.address, dispatch);
+      const userData = await getUserData(primaryWallet?.address, dispatch);
       }
       getInvestmentData();
 
@@ -123,7 +122,7 @@ function WebAppInner() {
           
           console.log('got balances: ', balances)
         }
-        setUserDataLoaded(true)
+        setUserDataLoaded(true) 
       }
       fetchBalances();
     }
@@ -189,6 +188,8 @@ function WebAppInner() {
         flexDirection: 'column', color: '#222222', gap: '20px' }}>
 
 <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px',}}>
+
+
 <div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
 
 <div style={{display: 'flex',}}>
@@ -257,13 +258,6 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
 
 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
 
-  {updatingBalance ? (<div style={{position: 'relative', height: '35px', display: 'flex', alignItems: 'center', overflow: 'hidden'}}>
-    <div className="white-box-animator"></div>
-    <div style={{marginRight: '20px', fontSize: '30px'}}>Updating</div>
-    <img src={timerImage} style={{height: '35px', width: 'auto'}}></img>
-    <div>About 7 Minutes</div>
-</div>
-) : (<div>
     <label htmlFor="deposit" style={{ fontSize: '20px', 
      display: 'flex', alignItems: 'center', }}>
     $ <span style={{ fontSize: '35px' }}>
@@ -272,7 +266,6 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
 
     </span>
 </label>
-  </div>)}
 
    
    </div>
@@ -343,11 +336,11 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
                         </div>
   </>
 ) : (<>
-      <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '100px' }}>
+      <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', marginTop: '60px' }}>
 
         <div>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <img src={myfyelogo} style={{width: '70px', height: 'auto'}}></img>
+          <img src={myfyelogo} style={{width: '100px', height: 'auto', marginBottom: '30px'}}></img>
           </div>
         </div>
         <LoadingAnimation/>

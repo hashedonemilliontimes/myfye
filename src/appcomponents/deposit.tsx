@@ -9,7 +9,7 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue, setShowEarnDepositPage } from '../redux/userWalletData';
+  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -42,6 +42,7 @@ function Deposit() {
     const usdcEthBalance = useSelector((state: any) => state.userWalletData.usdcEthBalance);
     const usdtEthBalance = useSelector((state: any) => state.userWalletData.usdtEthBalance);
     const busdEthBalance = useSelector((state: any) => state.userWalletData.busdEthBalance);
+    const usdySolBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
     const walletName = useSelector((state: any) => state.userWalletData.type);
 
@@ -449,10 +450,16 @@ function Deposit() {
       const pubKeyDocRef = doc(db, 'pubKeys', publicKey);
       const transactionsCollectionRef = collection(db, 'earnTransactions');
       try {
-          console.log('saving update');
-          
+          console.log('saving update with micro usd amount', newDepositAmount * 1000000);
+        
+
+          const quote = await getSwapQuote()
+
+          const newUSDYBalance = Number(usdySolBalance) + Number(quote.outAmount/1000000)
+          dispatch(setHotBalanceUSDY(newUSDYBalance))
           await setDoc(pubKeyDocRef, {
-              updatingBalance: true
+              updatingBalance: true,
+              hotBalanceUSDY: newUSDYBalance
           }, { merge: true });
   
           const docRef = await addDoc(transactionsCollectionRef, {
@@ -471,6 +478,18 @@ function Deposit() {
           console.log("Error saving update balance", error);
           throw new Error("Failed to save update: " + error);  // Reject the promise with an error
       }
+    }
+
+    async function getSwapQuote() {
+
+      const inputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      const outputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
+
+      const quoteResponse = await fetch(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${newDepositAmount* 1000000}&slippageBps=50`
+      ).then(response => response.json());
+      
+      return quoteResponse
     }
 
 
@@ -565,10 +584,10 @@ function Deposit() {
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
-        zIndex: 4
+        zIndex: 4,
       }}>
 
-<div style={{ width: '80vw', marginTop: '80px'}}>
+<div style={{ width: '80vw', marginTop: '60px'}}>
 
 <div style={{marginTop: '10px', fontSize: '45px', color: '#222222'}}>Deposit</div>
 
@@ -616,7 +635,7 @@ function Deposit() {
 
 
 {depositInProgress ? (
-      <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '-20px' }}>
+      <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
         <LoadingAnimation/>
 
       </div>

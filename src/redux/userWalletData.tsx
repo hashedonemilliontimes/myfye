@@ -27,6 +27,7 @@ interface UserWalletDataState {
   currentUserKYCVerified: boolean,
   transactionStatus: string,
   updatingBalance: boolean,
+  hotBalanceUSDY: number,
   shouldShowBottomNav: boolean,
   showPayPage: boolean,
   showSendPage: boolean,
@@ -40,7 +41,8 @@ interface UserWalletDataState {
   showRequestPage: boolean,
   showProfileMenu: boolean,
   showEarnWithdrawPage: boolean,
-  showEarnDepositPage: boolean
+  showEarnDepositPage: boolean,
+  priceOfUSDYinUSDC: number
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -68,6 +70,7 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserEmail: '',
   transactionStatus: 'Not Initiated',
   updatingBalance: false,
+  hotBalanceUSDY: 0,
   shouldShowBottomNav: true,
   showPayPage: false,
   showSendPage: false,
@@ -81,7 +84,8 @@ const initialUserWalletData: UserWalletDataState = {
   showRequestPage: false,
   showProfileMenu: false,
   showEarnWithdrawPage: false,
-  showEarnDepositPage: false
+  showEarnDepositPage: false,
+  priceOfUSDYinUSDC: 0
 };
 
 
@@ -183,6 +187,9 @@ export const userWalletDataSlice = createSlice({
   setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
     state.updatingBalance = action.payload;
   },
+  setHotBalanceUSDY: (state, action: PayloadAction<number>) => {
+    state.hotBalanceUSDY = action.payload;
+  },
   setShouldShowBottomNav: (state, action: PayloadAction<boolean>) => {
     state.shouldShowBottomNav = action.payload;
   },
@@ -226,6 +233,9 @@ export const userWalletDataSlice = createSlice({
   setShowEarnDepositPage: (state, action: PayloadAction<boolean>) => {
     state.showEarnDepositPage = action.payload;
   },
+  setPriceOfUSDYinUSDC: (state, action: PayloadAction<number>) => {
+    state.priceOfUSDYinUSDC = action.payload;
+  },
   },
 });
 
@@ -246,7 +256,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowWalletPage, setShowAccountHistory,
   setNewUserHasPreviousBalance, setShowRequestPage,
   setShowProfileMenu, setShowEarnWithdrawPage,
-  setShowEarnDepositPage
+  setShowEarnDepositPage, setHotBalanceUSDY,
+  setPriceOfUSDYinUSDC
   
 } = userWalletDataSlice.actions;
 
