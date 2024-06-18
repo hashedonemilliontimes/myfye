@@ -83,7 +83,7 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
                         <div style={{width: '140px', fontWeight: 'bold'}}>
                             ${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
-                        <div style={{whiteSpace: 'nowrap'}}>{new Date(transaction.time).toLocaleString()}</div>
+                        <div style={{whiteSpace: 'nowrap'}}>{new Date(transaction.time).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
                         
                         </div>
                     </div>

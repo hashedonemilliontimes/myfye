@@ -103,7 +103,11 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
                         
                         </div>
 
-                        <div style={{whiteSpace: 'nowrap', textAlign: 'right', fontSize: '14px'}}>{new Date(transaction.time).toLocaleString()}</div>
+                        <div style={{whiteSpace: 'nowrap', 
+                            textAlign: 'right', 
+                            fontSize: '14px', 
+                            marginRight: window.innerWidth > 420 ? ('350px') : ('0px')}}
+                            >{new Date(transaction.time).toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
 
 
                     </div>

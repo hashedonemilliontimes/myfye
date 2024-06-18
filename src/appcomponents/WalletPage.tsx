@@ -12,13 +12,15 @@ import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
   setShowBanxaPopUp, setShowDepositStablecoinPage,
 setShowWalletPage } from '../redux/userWalletData';
+import history from '../assets/history.png';
+import WalletTransactions from './WalletTransactions';
 
 function WalletPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
 
     const dispatch = useDispatch()
     const [currencySelected, setcurrencySelected] = useState('');
-
+    const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -54,12 +56,20 @@ function WalletPage() {
           setcurrencySelected('');
         }
       }, [showMenu]);
-    
+
+
       const handleMenuClick = () => {
-        // Add your logic here for what happens when the menu is clicked
-        dispatch(setShowWalletPage(false))
+
+        if (showTransactionHistory) {
+          setshowTransactionHistory(false)
+        } else {
+          if (showMenu) {
+            dispatch(setShowWalletPage(false))
+          }
+        }
         
       };
+
 
 
       const handleWithdrawStableCoinClick = () => {
@@ -83,6 +93,10 @@ function WalletPage() {
         
       };
       
+
+      const toggleShowTransactionHistory = () => {
+        setshowTransactionHistory(!showTransactionHistory)
+      };
       
 
     return (
@@ -99,7 +113,7 @@ function WalletPage() {
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+                currencySelected ? backButton : showTransactionHistory ? backButton : xIcon) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -114,7 +128,7 @@ function WalletPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: 'calc(100vh - 35px)',
+        minHeight: 'calc(100vh - 35px)',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -124,8 +138,26 @@ function WalletPage() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeWalletImage} style= {{marginTop: '30px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyeWalletImage} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 </div>
+
+
+
+{!showTransactionHistory ? (
+<div>
+
+<div style={{
+        position: 'absolute', // Position it relative to the viewport
+        top: 0,              // Align to the top of the viewport
+        right: 0,            // Align to the right of the viewport
+        padding: '15px',
+        cursor: 'pointer',
+        zIndex: 4    
+}}>
+<img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
+</div>
+
+
 
 
 <div>
@@ -347,6 +379,19 @@ justifyContent: 'space-around', width: '90vw'}}>
 </div>
 
 </div>
+
+
+
+
+</div>
+) : (
+
+  <div>
+<WalletTransactions/>
+  </div>
+)}
+
+
 
                   </div> 
 

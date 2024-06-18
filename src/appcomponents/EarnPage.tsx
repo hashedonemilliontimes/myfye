@@ -111,7 +111,7 @@ function EarnPage() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeEarnGreen} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyeEarnGreen} style= {{marginTop: '10px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
 </div>
 
