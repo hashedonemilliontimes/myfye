@@ -11,11 +11,14 @@ import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyePay from '../assets/myfyePay.png';
 import { setShouldShowBottomNav, setShowPayPage, 
-  setShowSendPage, setShowRequestPage } from '../redux/userWalletData';
+  setShowSendPage, setShowRequestPage,
+  setContacts } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
-import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, where, } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, 
+  setDoc, getDoc, doc, getDocs, query, 
+  where, updateDoc, arrayUnion } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import history from '../assets/history.png';
 import PayTransactions from './PayTransactions';
@@ -31,23 +34,21 @@ function PayPage() {
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
-    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+    const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
     const [email, setEmail] = useState('');
+    const [contactIndex, setContactIndex] = useState(0);
+    const [showContactPopup, setShowContactPopup] = useState(false);
     const db = getFirestore();
     interface Contact {
       email: string;
       firstName: string;
       publicKey: string;
   }
-  const [contacts, setContacts] = useState<Contact[]>([]);
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const newEmail = event.target.value;
-      setEmail(newEmail);
+      setEmail(newEmail.toLowerCase());
     };
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -64,17 +65,18 @@ function PayPage() {
           setErrorMessage('Please enter a valid email address');
       } else {
 
-        const newContactData = {
-          email: cleanedEmail,
-          timestamp: new Date().toISOString(),
-      };
-
       const contactCollectionRef = collection(db, 'contacts');
+      const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+      const updateContactInvites = await setDoc(contactDocRef, {
+        emails: arrayUnion(cleanedEmail)
+    }, { merge: true });
 
-      const updateContactInvites = await addDoc(contactCollectionRef, newContactData);
       const sendEmailCall = await sendEmail(currentUserFirstName, email);
       await Promise.all([updateContactInvites, sendEmailCall]);
 
+      if (cleanedEmail in currentUserContacts) {
+
+      }
       setErrorMessage(`Invite sent to ${email}`)
       setEmail('');
 
@@ -147,6 +149,19 @@ function PayPage() {
       setshowTransactionHistory(!showTransactionHistory)
     };
 
+    const closeContactPopUp = () => {
+      // Add your logic here for what happens when the menu is clicked
+
+      setShowContactPopup(false)
+      
+    };
+
+    const openContactPopUp = (index: number) => {
+      // Add your logic here for what happens when the menu is clicked
+      setShowContactPopup(true)
+      setContactIndex(index)
+    };
+
     const errorLabelText = () => {
       if (errorMessage) {
         
@@ -185,6 +200,8 @@ function PayPage() {
       }
     };
     
+
+
     return (
         <div style={{ backgroundColor: 'white'}}>
 
@@ -215,7 +232,7 @@ function PayPage() {
       }}>
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyePay} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyePay} style= {{marginTop: '2px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
 </div>
 
@@ -233,7 +250,7 @@ function PayPage() {
 <img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
 </div>
 
-<div style={{marginTop: '40px', 
+<div style={{marginTop: currentUserContacts ? '20px' : '40px', 
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
@@ -268,11 +285,138 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   </div>
 </div>
 
+{currentUserContacts && currentUserContacts[0] && currentUserContacts.length > 0 && (
+  <div style= {{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+    <div style={{fontSize: '25px', 
+      fontWeight: 'bold', 
+      marginTop: '15px'}}>Top Contacts</div>
 
 
-<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: '60px'}}>Refer a friend!</div>
+    <div style={{ display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'left',
+    gap: '0px' }}
+    onClick={() => openContactPopUp(0)}>
+        <div style={{
+            width: '30px',
+            height: '30px',
+            backgroundColor: '#007AFF',
+            borderRadius: '50%',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '17px',
+            fontWeight: 'bold',
+            position: 'relative', // Added position relative
+            zIndex: 2, // Higher z-index to ensure it appears above the gray background
+        }}>
+            {currentUserContacts[0].charAt(0).toUpperCase()}
+        </div>
+
+        <div style={{
+            backgroundColor: '#E5E5E5', // Light gray background
+            padding: '5px 20px', // Padding to give some space inside the div
+            borderRadius: '0 20px 20px 0', // Rounded border on the right side
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '17px',
+            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            position: 'relative', // Necessary to make z-index work
+            zIndex: 1 // Lower z-index so it appears below the blue circle
+        }}>
+            {currentUserContacts[0]}
+        </div>
+
+    </div>
 
 
+
+{currentUserContacts[1] && (
+    <div style={{ display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'left',
+    gap: '0px' }}
+    onClick={() => openContactPopUp(1)}>
+        <div style={{
+            width: '30px',
+            height: '30px',
+            backgroundColor: '#007AFF',
+            borderRadius: '50%',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '17px',
+            fontWeight: 'bold',
+            position: 'relative', // Added position relative
+            zIndex: 2, // Higher z-index to ensure it appears above the gray background
+        }}>
+            {currentUserContacts[1].charAt(0).toUpperCase()}
+        </div>
+
+        <div style={{
+            backgroundColor: '#E5E5E5', // Light gray background
+            padding: '5px 20px', // Padding to give some space inside the div
+            borderRadius: '0 20px 20px 0', // Rounded border on the right side
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '17px',
+            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            position: 'relative', // Necessary to make z-index work
+            zIndex: 1 // Lower z-index so it appears below the blue circle
+        }}>
+            {currentUserContacts[1]}
+        </div>
+
+    </div>
+    )}
+
+{currentUserContacts[2] && (
+    <div style={{ display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'left',
+    gap: '0px' }}
+    onClick={() => openContactPopUp(2)}>
+        <div style={{
+            width: '30px',
+            height: '30px',
+            backgroundColor: '#007AFF',
+            borderRadius: '50%',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '17px',
+            fontWeight: 'bold',
+            position: 'relative', // Added position relative
+            zIndex: 2, // Higher z-index to ensure it appears above the gray background
+        }}>
+            {currentUserContacts[2].charAt(0).toUpperCase()}
+        </div>
+
+        <div style={{
+            backgroundColor: '#E5E5E5', // Light gray background
+            padding: '5px 20px', // Padding to give some space inside the div
+            borderRadius: '0 20px 20px 0', // Rounded border on the right side
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: '17px',
+            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            position: 'relative', // Necessary to make z-index work
+            zIndex: 1 // Lower z-index so it appears below the blue circle
+        }}>
+            {currentUserContacts[2]}
+        </div>
+
+    </div>
+    )}
+        
+  </div>
+)}
+
+
+<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>Refer a friend!</div>
 
     <input
       id="email"
@@ -294,7 +438,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     />
 
 
-  <div style={{marginTop: '15px'}}>{errorLabelText()}</div>
+  <div style={{marginTop: '5px'}}>{errorLabelText()}</div>
 
   <button
     style={{
@@ -307,7 +451,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
         borderRadius: '10px',
         border: '1px solid transparent',
         cursor: 'pointer',
-        marginTop: '15px'
+        marginTop: '5px'
       }} onClick={handleReferButtonPressed}> Submit
 
       </button>
@@ -332,6 +476,111 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 
 
 
+
+<div style={{ backgroundColor: 'white' }}>
+
+<div style={{display: 'flex', alignItems: 'center', 
+justifyContent: 'center',}}>
+  
+</div>
+
+
+
+<div>{showContactPopup && (
+<div       style={{
+position: 'fixed',
+top: 0,
+left: 0,
+width: '100vw',
+height: '100vh',
+backgroundColor: 'rgba(0, 0, 0, 0.5)',
+display: 'flex',
+justifyContent: 'center',
+alignItems: 'center',
+zIndex: 60 // Ensure it's above other content
+}} onClick={closeContactPopUp}>
+
+
+<div style={{
+position: 'fixed',
+top: '30vh',
+left: 0,
+width: '100vw',
+height: '110px',
+background: '#ffffff',
+zIndex: 61
+}}> 
+
+<div style={{textAlign: 'center', fontSize: '22px', marginTop: '5px'}}>
+{currentUserContacts[contactIndex]}
+</div>
+
+<div style={{display: 'flex', alignItems: 'center', 
+  justifyContent: 'space-around', marginTop: '10px'}}>
+
+<div style={{
+color: 'white',
+background: '#60A05B', 
+fontWeight: 'bold',
+borderRadius: '10px', 
+border: 'none', 
+height: '40px', 
+width: '110px',
+display: 'flex',        // Makes this div also a flex container
+justifyContent: 'center', // Centers the text horizontally inside the button
+alignItems: 'center',// Centers the text vertically inside the button
+cursor: 'pointer',
+fontSize: '20px',
+}} onClick={handleSendPageClick}>
+Send
+</div>
+
+
+<div style={{
+color: 'white',
+background: '#60A05B', 
+fontWeight: 'bold',
+borderRadius: '10px', 
+border: 'none', 
+height: '40px', 
+width: '110px',
+display: 'flex',        // Makes this div also a flex container
+justifyContent: 'center', // Centers the text horizontally inside the button
+alignItems: 'center',// Centers the text vertically inside the button
+cursor: 'pointer',
+fontSize: '20px',
+}} 
+onClick={handleRequestPageClick}>
+Request
+</div>
+
+
+<div style={{
+color: 'white',
+background: '#777777', 
+fontWeight: 'bold',
+borderRadius: '10px', 
+border: 'none', 
+height: '40px', 
+width: '110px',
+display: 'flex',        // Makes this div also a flex container
+justifyContent: 'center', // Centers the text horizontally inside the button
+alignItems: 'center',// Centers the text vertically inside the button
+cursor: 'pointer',
+fontSize: '20px',
+}} onClick={closeContactPopUp}  >
+Cancel
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+)}</div>
+</div>
+  
                   </div> 
     )
 }

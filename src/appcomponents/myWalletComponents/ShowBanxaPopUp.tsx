@@ -14,7 +14,7 @@ function ShowBanxaPopUp() {
     const [showMenu, setShowMenu] = useState(false);
     const dispatch = useDispatch()
     const [currencySelected, setcurrencySelected] = useState('');
-
+    const [showContactPopup, setContactPopup] = useState(false);
     const [addressCopied, setaddressCopied] = useState(false); 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -87,7 +87,7 @@ function ShowBanxaPopUp() {
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <div style={{marginTop: '5px', fontSize: '17px', padding: '10px', whiteSpace: 'nowrap', textAlign: 'left'}}>
-  MyFye uses Banxa to enable you to<br /> purchase crypto. There are a lot of <br />currencies available on Banxa, however, <br />
+  MyFye uses Banxa to enable you to<br /> purchase crypto! There are a lot of <br />currencies available on Banxa, however, <br />
   <span style={{fontWeight: 'bold'}}>MyFye is only compatabile with USDC, <br />PYUSD and USDT on the Solana network.</span>
   </div>
   </div>

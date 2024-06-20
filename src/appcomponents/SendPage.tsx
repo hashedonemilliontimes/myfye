@@ -477,7 +477,7 @@ async function saveTransaction(amount: number, address: string) {
         overflow: 'hidden'
       }}>
 
-<div style={{ width: '93vw', marginTop: '20px'}}>
+<div style={{ width: '93vw', marginTop: '0px'}}>
 
 
 
@@ -570,7 +570,7 @@ alignItems: 'center' }}>
 
   <input
     id="USDAmount"
-    type="tel"
+    type="number"
     value={amountText}
     onChange={handleAmountChange}
     onInput={handleAmountChange}

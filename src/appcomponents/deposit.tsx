@@ -679,7 +679,7 @@ $ <span style={{ fontSize: '35px' }}>
 </label>
 <input
   id="deposit"
-  type="text"
+  type="number"
   inputMode="decimal"  // or 'numeric'
   autoComplete="off"
   value={deposit}

@@ -117,7 +117,7 @@ function DepositStableCoin() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '20px', fontSize: '40px', color: '#222222'}}>Deposit</div>
+<div style={{marginTop: '0px', fontSize: '40px', color: '#222222'}}>Deposit</div>
 
 </div>
 

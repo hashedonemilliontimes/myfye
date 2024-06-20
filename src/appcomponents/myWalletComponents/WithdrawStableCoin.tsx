@@ -328,7 +328,7 @@ function WithdrawStableCoin() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '20px', fontSize: '35px', color: '#222222'}}>Withdraw</div>
+<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>Withdraw</div>
 </div>
 
 <div>
@@ -398,7 +398,7 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
   <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
     <input
       id="USDAmount"
-      type="text"
+      type="number"
       value={amountText}
       onChange={handleAmountChange}
       onInput={handleAmountChange}

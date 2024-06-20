@@ -144,7 +144,7 @@ onClick={handleMenuClick}></img>
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '70px', fontSize: '35px', color: '#222222'}}>We're here to help</div>
+<div style={{marginTop: '0px', textAlign: 'center', fontSize: '35px', color: '#222222'}}>Get Help</div>
 
 <div>
 

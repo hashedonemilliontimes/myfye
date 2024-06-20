@@ -17,6 +17,7 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
   setShowWalletPage} from '../redux/userWalletData';
 import { getUserData } from '../helpers/getUserData';
+import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
 import { useSelector } from 'react-redux';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
@@ -47,10 +48,13 @@ function WebAppInner() {
   const { primaryWallet, user } = useDynamicContext();
   
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+  const lastNameUI = useSelector((state: any) => state.userWalletData.currentUserLastName);
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
+
+  const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
 
   const db = getFirestore();
 
@@ -60,13 +64,19 @@ function WebAppInner() {
 
   const getUserInfo = async () => {
 
-    if (primaryWallet?.address) {
+    if (primaryWallet?.address && userEmail) {
 
       const getInvestmentData = async () => {
-      const userData = await getUserData(primaryWallet?.address, dispatch);
+      const userData = await getUserData(userEmail, primaryWallet?.address, dispatch);
       }
       getInvestmentData();
 
+      const getPriceQuote = async () => {
+        const userData = await getUSDYPriceQuote(priceOfUSDYinUSDC, dispatch);
+        }
+        getPriceQuote();
+
+      
       dispatch(setWalletPubKey(primaryWallet?.address));
 
       //console.log('got wallet type', primaryWallet?.connector.name)
@@ -79,20 +89,6 @@ function WebAppInner() {
       };
 
       dispatch(addConnectedWallets(newWallet));
-
-      try {
-          let currentUserFirstName = user?.firstName
-          let currentUserLastName = user?.lastName
-          let currentUserEmail = user?.email
-
-          dispatch(setcurrentUserFirstName(currentUserFirstName!))
-          dispatch(setcurrentUserLastName(currentUserLastName!))
-          dispatch(setcurrentUserEmail(currentUserEmail!))
-
-
-      } catch (error) {
-        console.error('Error with dynamic user ', error);
-      }
       
     } 
   }
@@ -129,6 +125,24 @@ function WebAppInner() {
   }
 
   useEffect(() => {
+
+    try {
+      let currentUserFirstName = user?.firstName
+      let currentUserLastName = user?.lastName
+      let currentUserEmail = user?.email
+
+      if (currentUserEmail != userEmail) {
+        dispatch(setcurrentUserEmail(currentUserEmail!))
+      }
+      if (firstNameUI != currentUserFirstName) {
+        dispatch(setcurrentUserFirstName(currentUserFirstName!))
+      }
+      if (lastNameUI != currentUserLastName) {
+        dispatch(setcurrentUserLastName(currentUserLastName!))
+      }
+    } catch (error) {
+      console.error('Error with dynamic user ', error);
+    }
     if (primaryWallet?.address != '' && primaryWallet?.address != null) {
       dispatch(setWalletPubKey(primaryWallet!.address))
       getUserBalances();
@@ -137,11 +151,11 @@ function WebAppInner() {
       console.log('Error! primaryWallet?.address', primaryWallet?.address)
     }
     console.log('primaryWallet', primaryWallet)
-  }, [primaryWallet]);
+  }, [primaryWallet, userEmail]);
   
 
   useEffect(() => {
-    if (userEmail != '' && userEmail != null) {
+    if (userEmail != '' && userEmail != null && primaryWallet?.address != '' && primaryWallet?.address != null) {
       console.log('checkUncreatedUserBalance in Mobile App')
       checkUncreatedUserBalance(userEmail, primaryWallet!.address, dispatch)
     }

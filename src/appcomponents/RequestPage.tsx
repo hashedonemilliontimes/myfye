@@ -311,12 +311,12 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
         overflow: 'hidden'
       }}>
 
-<div style={{ width: '93vw', marginTop: '20px'}}>
+<div style={{ width: '93vw', marginTop: '0px'}}>
 
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '10px', fontSize: '35px', color: '#222222'}}>Request</div>
+<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>Request</div>
 
 </div>
 
@@ -350,7 +350,7 @@ alignItems: 'center' }}>
 <div style={{marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
 
   <input
-    id="SolanaAddress"
+    id="EmailAddress"
     type="text"
     value={addressText}
     onChange={handleAddressChange}
@@ -372,7 +372,7 @@ alignItems: 'center' }}>
 
   <input
     id="USDAmount"
-    type="tel"
+    type="number"
     value={amountText}
     onChange={handleAmountChange}
     onInput={handleAmountChange}

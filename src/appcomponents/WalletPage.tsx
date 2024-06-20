@@ -30,6 +30,7 @@ function WalletPage() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
     const [qrCodeURL, setqrCodeURL] = useState(''); 
 
     useEffect(() => {
@@ -138,7 +139,7 @@ function WalletPage() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeWalletImage} style= {{marginTop: '20px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyeWalletImage} style= {{marginTop: '0px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 </div>
 
 
@@ -199,7 +200,7 @@ function WalletPage() {
     <div style={{ fontSize: '18px' }}>
     <span style={{ fontSize: '18px' }}>$</span>
     {((usdyBalance) > 0.001) ? (
-    <span style={{ fontSize: '25px' }}>{(usdyBalance).toFixed(6)}</span>
+    <span style={{ fontSize: '25px' }}>{(usdyBalance*priceOfUSDYinUSDC).toFixed(6)}</span>
     ) : (
       <span style={{ fontSize: '25px' }}>0.00</span>
     )}
@@ -219,8 +220,8 @@ function WalletPage() {
 <div>
   <div style={{ fontSize: '18px' }}>
   <span style={{ fontSize: '18px' }}>$</span>
-  {((usdyBalance + usdcSolBalance + usdtSolBalance) > 0.001) ? (
-  <span style={{ fontSize: '25px' }}>{(usdyBalance + usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
+  {((usdyBalance*priceOfUSDYinUSDC + usdcSolBalance + usdtSolBalance) > 0.001) ? (
+  <span style={{ fontSize: '25px' }}>{(usdyBalance*priceOfUSDYinUSDC + usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
   ) : (
     <span style={{ fontSize: '25px' }}>0.00</span>
   )}
