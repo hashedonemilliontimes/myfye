@@ -113,17 +113,15 @@ function PayPage() {
     useEffect(() => {
         if (showPayPage) {
           setMenuPosition('0'); // Bring the menu into view
-          dispatch(setShouldShowBottomNav(true))
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-          dispatch(setShouldShowBottomNav(false))
         }
       }, [showPayPage]);
     
       const handleMenuClick = () => {
 
         if (showTransactionHistory) {
-          setshowTransactionHistory(false)
+          toggleShowTransactionHistory()
         } else {
           if (showPayPage) {
             dispatch(setShowPayPage(false))
@@ -138,17 +136,25 @@ function PayPage() {
 
 
     const handleSendPageClick = () => {
+      dispatch(setShouldShowBottomNav(false));
       dispatch(setShowSendPage(true));
     };
       
     const handleRequestPageClick = () => {
+      dispatch(setShouldShowBottomNav(false));
       dispatch(setShowRequestPage(true));
     };
   
     const toggleShowTransactionHistory = () => {
+      
+      if (!showTransactionHistory) {
+        dispatch(setShouldShowBottomNav(false))
+      } else {
+        dispatch(setShouldShowBottomNav(true))
+      }
       setshowTransactionHistory(!showTransactionHistory)
-    };
 
+    };
     const closeContactPopUp = () => {
       // Add your logic here for what happens when the menu is clicked
 

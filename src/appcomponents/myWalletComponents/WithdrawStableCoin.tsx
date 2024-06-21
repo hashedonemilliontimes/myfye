@@ -6,7 +6,7 @@ import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
-import { setShowWithdrawStablecoinPage } from '../../redux/userWalletData';
+import { setShowWithdrawStablecoinPage, setShouldShowBottomNav } from '../../redux/userWalletData';
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
@@ -50,6 +50,7 @@ function WithdrawStableCoin() {
       }, [showWithdrawStablecoinPage]);
     
       const handleMenuClick = () => {
+        dispatch(setShouldShowBottomNav(true));
         dispatch(setShowWithdrawStablecoinPage(false));
       };
 

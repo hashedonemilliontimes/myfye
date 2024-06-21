@@ -46,12 +46,12 @@ function EarnTransactions() {
     return (
         <div>
             {!transactionsLoaded ? (
-<div style={{marginTop: '30px'}}>
+<div style={{marginTop: window.innerHeight < 700 ? '30px' : '50px'}}>
     <LoadingAnimation/>
 </div>
 
             ) : (
-                <div>
+                <div style={{marginTop: window.innerHeight < 700 ? '15px' : '30px'}}>
                 {transactions.length == 0 ? (
                     <div>
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>

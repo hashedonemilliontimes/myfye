@@ -14,7 +14,7 @@ import { setusdySolValue } from '../redux/userWalletData';
 import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
-import { setShowEarnWithdrawPage, setTransactionStatus } from '../redux/userWalletData';
+import { setShowEarnWithdrawPage, setTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 function Withdraw() {
@@ -139,6 +139,7 @@ function Withdraw() {
 
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
+        dispatch(setShouldShowBottomNav(true))
         setreviewButtonClicked(false)
         setconfirmButtonActive(false);
         dispatch(setShowEarnWithdrawPage(false))

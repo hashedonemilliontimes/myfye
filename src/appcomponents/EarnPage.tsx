@@ -3,8 +3,6 @@ import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import backButton from '../assets/backButton3.png';
-import DepositStableCoin from './myWalletComponents/DepositStableCoin';
-import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
 import Deposit from '../appcomponents/deposit';
 import Withdraw from '../appcomponents/withdraw';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
@@ -13,9 +11,7 @@ import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
 import { setShouldShowBottomNav, setShowEarnPage,
   setShowEarnWithdrawPage, setShowEarnDepositPage } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
-import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
-import dollarSign from '../assets/dollarSign.png';
 import history from '../assets/history.png';
 import EarnTransactions from './EarnTransactions';
 
@@ -25,23 +21,13 @@ function EarnPage() {
     const [currencySelected, setcurrencySelected] = useState('');
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
-    const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
-    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
-    const [Message, setMessage] = useState('');
-    const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-    const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
-    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
-          dispatch(setShouldShowBottomNav(true))
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-          dispatch(setShouldShowBottomNav(false))
+          
           setcurrencySelected('');
         }
       }, [showMenu]);
@@ -49,7 +35,7 @@ function EarnPage() {
       const handleMenuClick = () => {
 
         if (showTransactionHistory) {
-          setshowTransactionHistory(false)
+          toggleShowTransactionHistory()
         } else {
           if (showMenu) {
             dispatch(setShowEarnPage(false))
@@ -63,14 +49,23 @@ function EarnPage() {
     };
 
     const toggleShowTransactionHistory = () => {
+      
+      if (!showTransactionHistory) {
+        dispatch(setShouldShowBottomNav(false))
+      } else {
+        dispatch(setShouldShowBottomNav(true))
+      }
       setshowTransactionHistory(!showTransactionHistory)
+
     };
   
     const handleWithdrawPageClick = () => {
+      dispatch(setShouldShowBottomNav(false))
       dispatch(setShowEarnWithdrawPage(true))
     };
 
     const handleDepositPageClick = () => {
+      dispatch(setShouldShowBottomNav(false))
       dispatch(setShowEarnDepositPage(true))
     };
       
@@ -186,17 +181,28 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 
 </div>
 
-<div style={{marginTop: '15px', textAlign: 'center', fontSize: '16px'}}>Portoflio Allocation:</div>
+<div style={{display:'flex', 
+  flexDirection: 'column', 
+  justifyContent: 'space-around',
+  height: 'calc(100vh - 300px)'}}>
+
+<div>
+<div style={{marginTop: '15px', textAlign: 'center', 
+  fontSize: '16px'}}>Portoflio Allocation:</div>
 
     <div style={{
         
     }}>
         <PieChartComponent/>
     </div>
-
+    </div>
+    
 <div>
 
-<div style={{marginTop: '30px', fontSize: '14px', textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are tokenized US treasury bonds created by Ondo Finance</div>
+<div>
+<div style={{marginTop: '30px', fontSize: '14px', 
+  textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are 
+  tokenized US treasury bonds created by Ondo Finance</div>
 
 <a href="https://ondo.finance/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
@@ -205,7 +211,8 @@ color: '#ffffff', fontWeight: 'bold', fontSize: '16px',
 backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
 </div>
 </a>
-
+</div>
+</div>
 
 </div>
   

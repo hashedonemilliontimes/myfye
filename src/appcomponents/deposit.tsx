@@ -9,7 +9,8 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY } from '../redux/userWalletData';
+  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY,
+  setShouldShowBottomNav } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -108,6 +109,7 @@ function Deposit() {
       // Add your logic here for what happens when the menu is clicked
       console.log('Selected currency: ', currencySelected)
 
+      dispatch(setShouldShowBottomNav(true))
       if (!showMenu) {
         dispatch(setShowEarnDepositPage(false))
       } else {

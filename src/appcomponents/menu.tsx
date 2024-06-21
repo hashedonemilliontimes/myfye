@@ -87,7 +87,7 @@ function Menu() {
         backgroundColor: '#ffffff',
         width: '60vw',
         transition: 'left 0.5s ease', // Animate the left property
-        height: 'calc(100vh - 40px)', 
+        height: window.innerHeight < 700 ? 'calc(100vh - 30px)' : 'calc(100vh - 30px)', 
         zIndex: 20
       }}>
 

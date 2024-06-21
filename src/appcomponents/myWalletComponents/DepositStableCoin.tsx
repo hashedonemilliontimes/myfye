@@ -8,7 +8,7 @@ import usdtSol from '../../assets/usdtSol.png';
 import pyusdSol from '../../assets/pyusdSol.png';
 import solanaLogo from '../../assets/solanaLogo.png';
 import copy from '../../assets/copy.png';
-import { setShowDepositStablecoinPage } from '../../redux/userWalletData';
+import { setShowDepositStablecoinPage, setShouldShowBottomNav } from '../../redux/userWalletData';
 
 function DepositStableCoin() {
     
@@ -73,7 +73,7 @@ function DepositStableCoin() {
     
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
-
+        dispatch(setShouldShowBottomNav(true));
         dispatch(setShowDepositStablecoinPage(false));
         
       };

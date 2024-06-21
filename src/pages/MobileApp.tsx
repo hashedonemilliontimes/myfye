@@ -15,7 +15,7 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   addConnectedWallets, setShowEarnPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
-  setShowWalletPage} from '../redux/userWalletData';
+  setShowWalletPage, setShouldShowBottomNav} from '../redux/userWalletData';
 import { getUserData } from '../helpers/getUserData';
 import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
@@ -162,10 +162,12 @@ function WebAppInner() {
   }, [userEmail]);
 
   const handleSendPageClick = () => {
+    dispatch(setShouldShowBottomNav(false));
     dispatch(setShowSendPage(true));
   };
 
   const handleRequestPageClick = () => {
+    dispatch(setShouldShowBottomNav(false));
     dispatch(setShowRequestPage(true));
   };
 
@@ -198,10 +200,11 @@ function WebAppInner() {
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
   
-          <div style={{ display: 'flex',  alignItems: 'center', height: '100vh',
-        flexDirection: 'column', color: '#222222', gap: '20px' }}>
 
-<div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px',}}>
+
+<div style={{display: 'flex', flexDirection: 'row', 
+  justifyContent: 'space-between', marginTop: '15px',
+  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px'}}>
 
 
 <div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
@@ -214,8 +217,18 @@ function WebAppInner() {
 </div>
 
 <hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '100vw', 
-maxWidth: '550px', marginTop: '-10px'}}></hr>
+maxWidth: '550px', marginTop: '10px'}}></hr>
 
+<div style={{ display: 'flex',  
+          alignItems: 'center', 
+          height: window.innerHeight < 700 ?  'calc(100vh - 180px)' : 'calc(100vh - 120px)',
+        flexDirection: 'column', 
+        color: '#222222', 
+        gap: '20px',
+        justifyContent: 'space-around' }}>
+
+<div style={{ display: 'flex',  alignItems: 'center', 
+        flexDirection: 'column', color: '#222222', gap: '20px' }}>
 <div style={{display: 'flex', marginTop: '-10px'}}>
 
   <img style={{ width: '180px', height: 'auto'}}src={myfyeBalance}/>
@@ -240,6 +253,7 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
 
 
 
+
    {/*
    <Deposit/>
     <Withdraw/>
@@ -248,7 +262,7 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
 
 <div style={{display: 'flex', alignItems: 'center', 
                 justifyContent: 'center',
-                marginTop: '0px'}}>
+                marginTop: '0px', gap: window.innerHeight < 675 ? '-10px' : '0px'}}>
             <div style={{
            color: '#ffffff', 
            background: '#2E7D32', // gray '#999999', 
@@ -267,6 +281,12 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
        </div>
        </div>
 
+       </div>
+
+
+
+       <div style={{ display: 'flex',  alignItems: 'center', 
+        flexDirection: 'column', color: '#222222', gap: '20px' }}>
 <img style={{ width: '150px', height: 'auto'}}src={myfyeEarn}/>
 
 
@@ -307,10 +327,11 @@ maxWidth: '550px', marginTop: '-10px'}}></hr>
            View Portfolio
        </div>
        </div>
+       </div>
 
 </div>
 
-{!shouldShowBottomNav && (
+{shouldShowBottomNav && (
 <div style={{position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)'}}>
   <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
   <div style={{

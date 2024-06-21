@@ -38,7 +38,6 @@ export const getUserData = async (email: string, pubKey: string, dispatch: Funct
     if (contactDocSnapshot.exists()) {
         // Access the 'emails' field in the document
         const emails = contactDocSnapshot.data().emails;
-        console.log('emails: ', emails); // This will log the array of emails to the console
         dispatch(setContacts(emails))
     } else {
         console.log("No such document!");

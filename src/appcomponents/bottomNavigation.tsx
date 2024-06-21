@@ -7,8 +7,9 @@ import wallet from '../assets/wallet.png';
 import history from '../assets/history.png';
 import cash from '../assets/cash.png';
 import { setShowPayPage, setShowEarnPage, setShowWalletPage,
-  setShowAccountHistory, setShowProfileMenu,
-  setShouldShowBottomNav
+  setShowAccountHistory, setShowProfileMenu, setShowSendPage,
+  setShowRequestPage, setShowWithdrawStablecoinPage, 
+  setShowEarnWithdrawPage, setShowEarnDepositPage
  } from '../redux/userWalletData';
 import EarnPage from '../appcomponents/EarnPage';
 import Menu from '../appcomponents/menu';
@@ -18,39 +19,74 @@ function BottomNav() {
     const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
 
     const dispatch = useDispatch()
+    const [animateEarn, setAnimateEarn] = useState(false);
+    const [animateHome, setAnimateHome] = useState(false);
+    const [animatePay, setAnimatePay] = useState(false);
+    const [animateWallet, setAnimateWallet] = useState(false);
+    const [animateProfile, setAnimateProfile] = useState(false);
+
+    useEffect(() => {
+      console.log('shouldShowBottomNav:', shouldShowBottomNav);
+    }, [shouldShowBottomNav]);
 
     const [showMenu, setShowMenu] = useState(false);
     
       const handlePayPageClick = () => {
         // Add your logic here for what happens when the menu is clicked
-        
+        setAnimatePay(true);
+        setTimeout(() => setAnimatePay(false), 500); // Animation duration
+
         dispatch(setShowPayPage(true))
+
+        dispatch(setShowProfileMenu(false))
+        dispatch(setShowEarnPage(false))
+        dispatch(setShowWalletPage(false))
       };
 
 
       const handleEarnPageClick = () => {
+        setAnimateEarn(true);
+        setTimeout(() => setAnimateEarn(false), 500); // Animation duration
         dispatch(setShowEarnPage(true))
         
+        dispatch(setShowProfileMenu(false))
+        dispatch(setShowPayPage(false))
+        dispatch(setShowWalletPage(false))
       };
 
       const handleWalletPageClick = () => {
+        setAnimateWallet(true);
+        setTimeout(() => setAnimateWallet(false), 500); // Animation duration
         dispatch(setShowWalletPage(true))
         
-      };
-
-      const handleAccountHistory = () => {
-        dispatch(setShowAccountHistory(true))
+        dispatch(setShowProfileMenu(false))
+        dispatch(setShowEarnPage(false))
+        dispatch(setShowPayPage(false))
       };
 
       const handleProfileMenuClick = () => {
+        setAnimateProfile(true);
+        setTimeout(() => setAnimateProfile(false), 500); // Animation duration
         dispatch(setShowProfileMenu(true))
+
+        dispatch(setShowPayPage(false))
+        dispatch(setShowEarnPage(false))
+        dispatch(setShowWalletPage(false))
       };
 
-      const [animate, setAnimate] = useState(false);
+
 
       const handleHomePageClick = () => {
-        setAnimate(true);
-        setTimeout(() => setAnimate(false), 500); // Animation duration
+        setAnimateHome(true);
+        setTimeout(() => setAnimateHome(false), 500); // Animation duration
+        dispatch(setShowPayPage(false))
+        dispatch(setShowEarnPage(false))
+        dispatch(setShowWalletPage(false))
+        dispatch(setShowSendPage(false))
+        dispatch(setShowRequestPage(false))
+        dispatch(setShowWithdrawStablecoinPage(false))
+        dispatch(setShowEarnWithdrawPage(false))
+        dispatch(setShowEarnDepositPage(false))
       };
     
       const animationStyle = `
@@ -77,6 +113,7 @@ function BottomNav() {
 
       return (
         <div>
+          {shouldShowBottomNav && (
         <div style={{
           position: 'fixed',
           bottom: 0,
@@ -88,24 +125,57 @@ function BottomNav() {
           alignItems: 'center',
           backgroundColor: 'white',
           borderTop: '1px solid #ccc', // Optional border for better visibility
-          zIndex: 2
+          zIndex: 5 // was 2 
         }}>
-          <div style={{
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center'}}
-            onClick={handleEarnPageClick}>
-          <img src={dollarSign} alt="Nav 1" style={{ width: '40px', height: 'auto' }}/>
-          <div>Earn</div>
-          </div>
-          <div style={{
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center'}}
-            onClick={handlePayPageClick}>
-          <img src={cash} alt="Nav 3" style={{ width: '40px', height: 'auto' }}/>
-          <div>Pay</div>
-          </div>
+
+
+<div>
+      <style>{animationStyle}</style>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0px',
+          ...(animateEarn ? { animation: 'growShrink 0.5s ease-in-out' } : {})
+        }}
+        onClick={handleEarnPageClick}
+      >
+        <img
+          src={dollarSign}
+          alt="Nav 1"
+          style={{
+            width: '40px',
+            height: 'auto'
+          }}
+        />
+        <div>Earn</div>
+      </div>
+    </div>
+
+          <div>
+      <style>{animationStyle}</style>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0px',
+          ...(animatePay ? { animation: 'growShrink 0.5s ease-in-out' } : {})
+        }}
+        onClick={handlePayPageClick}
+      >
+        <img
+          src={cash}
+          alt="Nav 2"
+          style={{
+            width: '40px',
+            height: 'auto'
+          }}
+        />
+        <div>Pay</div>
+      </div>
+    </div>
 
 
           <div>
@@ -116,7 +186,7 @@ function BottomNav() {
           flexDirection: 'column',
           alignItems: 'center',
           gap: '5px',
-          ...(animate ? { animation: 'growShrink 0.5s ease-in-out' } : {})
+          ...(animateHome ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
         onClick={handleHomePageClick}
       >
@@ -133,24 +203,56 @@ function BottomNav() {
     </div>
 
 
+          <div>
+      <style>{animationStyle}</style>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0px',
+          ...(animateWallet ? { animation: 'growShrink 0.5s ease-in-out' } : {})
+        }}
+        onClick={handleWalletPageClick}
+      >
+        <img
+          src={wallet}
+          alt="Nav 4"
+          style={{
+            width: '40px',
+            height: 'auto'
+          }}
+        />
+        <div>Wallet</div>
+      </div>
+    </div>
 
-          <div style={{
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center'}}
-            onClick={handleWalletPageClick}>
-          <img src={wallet} alt="Nav 4" style={{ width: '40px', height: 'auto' }}/>
-          <div>Wallet</div>
-          </div>
-          <div style={{
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center'}}
-            onClick={handleProfileMenuClick}>
-          <img src={userImage} alt="Nav 4" style={{ width: '40px', height: 'auto' }} />
-          <div>Profile</div>
-          </div>
+    <div>
+      <style>{animationStyle}</style>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0px',
+          ...(animateProfile ? { animation: 'growShrink 0.5s ease-in-out' } : {})
+        }}
+        onClick={handleProfileMenuClick}
+      >
+        <img
+          src={userImage}
+          alt="Nav 5"
+          style={{
+            width: '40px',
+            height: 'auto'
+          }}
+        />
+        <div>Profile</div>
+      </div>
+    </div>
+
         </div>
+        )}
         </div>
       );
 }

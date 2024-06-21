@@ -49,20 +49,16 @@ function WalletPage() {
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
-          dispatch(setShouldShowBottomNav(true))
         } else {
-          dispatch(setShouldShowBottomNav(false))
           setMenuPosition('-110vh'); // Move the menu off-screen
-
           setcurrencySelected('');
         }
       }, [showMenu]);
 
 
       const handleMenuClick = () => {
-
         if (showTransactionHistory) {
-          setshowTransactionHistory(false)
+          toggleShowTransactionHistory()
         } else {
           if (showMenu) {
             dispatch(setShowWalletPage(false))
@@ -75,28 +71,35 @@ function WalletPage() {
 
       const handleWithdrawStableCoinClick = () => {
         // Add your logic here for what happens when the menu is clicked
-
+        dispatch(setShouldShowBottomNav(false));
         dispatch(setShowWithdrawStablecoinPage(true))
         
       };
 
       const handleBanxaPopUpClick = () => {
         // Add your logic here for what happens when the menu is clicked
-
+        
         dispatch(setShowBanxaPopUp(true))
         
       };
 
       const handleDepositStableCoinClick = () => {
         // Add your logic here for what happens when the menu is clicked
-
+        dispatch(setShouldShowBottomNav(false));
         dispatch(setShowDepositStablecoinPage(true))
         
       };
       
 
       const toggleShowTransactionHistory = () => {
+        console.log()
+        if (!showTransactionHistory) {
+          dispatch(setShouldShowBottomNav(false))
+        } else {
+          dispatch(setShouldShowBottomNav(true))
+        }
         setshowTransactionHistory(!showTransactionHistory)
+
       };
       
 
@@ -130,6 +133,7 @@ function WalletPage() {
         left: 0, // Use state variable for position
         padding: '15px',
         minHeight: 'calc(100vh - 35px)',
+        height: '100%',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -282,6 +286,14 @@ justifyContent: 'space-around', width: '90vw'}}>
 </div>
 
 
+
+
+
+<div style={{display:'flex', 
+  flexDirection: 'column', 
+  justifyContent: 'space-around',
+  height: 'calc(100vh - 320px)'}}>
+<div>
 <div style={{fontSize: '25px', marginTop: '15px',}}>Crypto Wallet</div>
 
 <div style={{marginTop: '15px', 
@@ -372,13 +384,17 @@ justifyContent: 'space-around', width: '90vw'}}>
   </div>
 
 </div>
+</div>
 
+<div>
 <div style={{fontSize: '25px', marginTop: '15px',}}>Internal Wallet</div>
 
 <div style={{marginTop: '15px', marginLeft: '20px', width: '220px'}}>
 <DynamicWidget />
 </div>
+</div>
 
+</div>
 </div>
 
 

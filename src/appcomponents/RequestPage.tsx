@@ -7,7 +7,7 @@ import backButton from '../assets/backButton3.png';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { getFirestore, doc, collection, setDoc, getDoc } from 'firebase/firestore';
-import { setShowRequestPage } from '../redux/userWalletData';
+import { setShowRequestPage, setShouldShowBottomNav } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
@@ -56,6 +56,7 @@ function RequestPage() {
     }, [showRequestPage]);
   
     const handleMenuClick = () => {
+      dispatch(setShouldShowBottomNav(true));
       dispatch(setShowRequestPage(!showRequestPage));
     };
 

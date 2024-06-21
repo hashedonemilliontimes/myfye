@@ -44,10 +44,8 @@ function Support() {
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
-          dispatch(setShouldShowBottomNav(true))
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-          dispatch(setShouldShowBottomNav(false))
           setcurrencySelected('');
         }
       }, [showMenu]);
@@ -111,7 +109,7 @@ function Support() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-<img src={questionMarkImage} style={{width: '30px', height: '30px'}}
+<img src={questionMarkImage} style={{width: '35px', height: '35px'}}
 onClick={handleMenuClick}></img>
 
 { showMenu && (
