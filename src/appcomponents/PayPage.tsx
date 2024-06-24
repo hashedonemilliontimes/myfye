@@ -12,7 +12,7 @@ import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyePay from '../assets/myfyePay.png';
 import { setShouldShowBottomNav, setShowPayPage, 
   setShowSendPage, setShowRequestPage,
-  setContacts } from '../redux/userWalletData';
+  setContacts, setSelectedContactEmail } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
@@ -135,16 +135,36 @@ function PayPage() {
     };
 
 
-    const handleSendPageClick = () => {
-      dispatch(setShouldShowBottomNav(false));
-      dispatch(setShowSendPage(true));
-    };
+    const handleSendPageClick = (eventOrContact: React.MouseEvent<HTMLDivElement> | string = '') => {
+      if (typeof eventOrContact === 'string') {
+          const selectedContact = eventOrContact;
+          // Handle the case where a string is passed
+          dispatch(setShouldShowBottomNav(false));
+          dispatch(setShowSendPage(true));
+          dispatch(setSelectedContactEmail(selectedContact));
+      } else {
+          const event = eventOrContact;
+          // Handle the case where the event is passed
+          dispatch(setShouldShowBottomNav(false));
+          dispatch(setShowSendPage(true));
+      }
+  };
       
-    const handleRequestPageClick = () => {
-      dispatch(setShouldShowBottomNav(false));
-      dispatch(setShowRequestPage(true));
-    };
-  
+  const handleRequestPageClick = (eventOrContact: React.MouseEvent<HTMLDivElement> | string = '') => {
+    if (typeof eventOrContact === 'string') {
+        const selectedContact = eventOrContact;
+        // Handle the case where a string is passed
+        dispatch(setShouldShowBottomNav(false));
+        dispatch(setShowRequestPage(true));
+        dispatch(setSelectedContactEmail(selectedContact));
+    } else {
+        const event = eventOrContact;
+        // Handle the case where the event is passed
+        dispatch(setShouldShowBottomNav(false));
+        dispatch(setShowRequestPage(true));
+    }
+};
+
     const toggleShowTransactionHistory = () => {
       
       if (!showTransactionHistory) {
@@ -512,12 +532,12 @@ position: 'fixed',
 top: '30vh',
 left: 0,
 width: '100vw',
-height: '110px',
+height: '120px',
 background: '#ffffff',
 zIndex: 61
 }}> 
 
-<div style={{textAlign: 'center', fontSize: '22px', marginTop: '5px'}}>
+<div style={{textAlign: 'center', fontSize: '22px', marginTop: '15px'}}>
 {currentUserContacts[contactIndex]}
 </div>
 
@@ -537,7 +557,7 @@ justifyContent: 'center', // Centers the text horizontally inside the button
 alignItems: 'center',// Centers the text vertically inside the button
 cursor: 'pointer',
 fontSize: '20px',
-}} onClick={handleSendPageClick}>
+}} onClick={() => handleSendPageClick(currentUserContacts[contactIndex])}>
 Send
 </div>
 
@@ -556,7 +576,7 @@ alignItems: 'center',// Centers the text vertically inside the button
 cursor: 'pointer',
 fontSize: '20px',
 }} 
-onClick={handleRequestPageClick}>
+onClick={() => handleRequestPageClick(currentUserContacts[contactIndex])}>
 Request
 </div>
 

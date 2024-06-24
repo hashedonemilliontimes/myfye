@@ -97,7 +97,7 @@ function EarnPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: 'calc(100vh - 35px)',
+        minHeight: 'calc(100% + 35px)',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -200,9 +200,9 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 <div>
 
 <div>
-<div style={{marginTop: '30px', fontSize: '14px', 
+<div style={{marginTop: '15px', fontSize: '14px', 
   textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are 
-  tokenized US treasury bonds created by Ondo Finance</div>
+  tokenized US treasury bonds by Ondo Finance</div>
 
 <a href="https://ondo.finance/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>

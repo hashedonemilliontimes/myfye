@@ -44,6 +44,7 @@ interface UserWalletDataState {
   showEarnDepositPage: boolean,
   priceOfUSDYinUSDC: number,
   contacts: string[]
+  selectedContactEmail: string,
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -87,7 +88,8 @@ const initialUserWalletData: UserWalletDataState = {
   showEarnWithdrawPage: false,
   showEarnDepositPage: false,
   priceOfUSDYinUSDC: 0,
-  contacts: []
+  contacts: [],
+  selectedContactEmail: '',
 };
 
 
@@ -241,6 +243,9 @@ export const userWalletDataSlice = createSlice({
   setContacts: (state, action: PayloadAction<string[]>) => {
     state.contacts = action.payload;
   },
+  setSelectedContactEmail: (state, action: PayloadAction<string>) => {
+    state.selectedContactEmail = action.payload;
+  },
   },
 });
 
@@ -262,7 +267,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setNewUserHasPreviousBalance, setShowRequestPage,
   setShowProfileMenu, setShowEarnWithdrawPage,
   setShowEarnDepositPage, setHotBalanceUSDY,
-  setPriceOfUSDYinUSDC, setContacts
+  setPriceOfUSDYinUSDC, setContacts, setSelectedContactEmail
   
 } = userWalletDataSlice.actions;
 

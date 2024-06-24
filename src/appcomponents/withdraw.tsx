@@ -314,7 +314,7 @@ function Withdraw() {
 
 {withdrawalInProgress ? (
   <>
-        <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '-20px' }}>
+        <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
         <LoadingAnimation/>
 
       </div>

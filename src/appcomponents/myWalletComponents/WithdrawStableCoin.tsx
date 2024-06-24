@@ -68,11 +68,11 @@ function WithdrawStableCoin() {
 
 
       const handleQuarterButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
           const newDeposit = (0.25 * balanceSelectedInUSD);
           console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newDeposit));
         } else {
             setAmountText("$ 0.0")
@@ -81,11 +81,11 @@ function WithdrawStableCoin() {
       };
       
       const handleHalfButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
           const newDeposit = (0.5 * balanceSelectedInUSD);
           console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newDeposit));
         }else {
             setAmountText("$ 0.0")
@@ -94,11 +94,11 @@ function WithdrawStableCoin() {
       };
       
       const handleTwoThirdsButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
           const newDeposit = (0.75 * balanceSelectedInUSD);
           console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newDeposit));
         } else {
             setAmountText("$ 0.0")
@@ -107,11 +107,11 @@ function WithdrawStableCoin() {
       };
       
       const handleAllButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
           const newDeposit = (1.0 * balanceSelectedInUSD);
           console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newDeposit));
         } else {
             setAmountText("$ 0.0")
@@ -378,7 +378,9 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
 
 
         <div style={{ marginTop: '30px'}}>
-  <div style={{marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
+  <div style={{marginBottom: '15px', display: 'flex', 
+    flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
+      
     <input
       id="SolanaAddress"
       type="text"
@@ -396,7 +398,14 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
       placeholder="Solana Address"
     />
   </div>
-  <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
+  <div style={{ marginBottom: '15px', display: 'flex', 
+    flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
+          <span style={{
+      position: 'absolute',
+      fontSize: '20px',
+      transform: 'translateY(+37%) translateX(+70%)',
+      color: '#444444',
+    }}>$</span>
     <input
       id="USDAmount"
       type="number"
@@ -409,7 +418,7 @@ padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={(
         fontSize: '20px',
         border: 'none', // Remove the border
         borderRadius: '5px', // Rounded edges
-        padding: '10px 10px', // Adjust padding as needed
+        padding: '10px 30px', // Adjust padding as needed
       }}
       placeholder="Amount"
     />

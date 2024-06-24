@@ -176,8 +176,8 @@ backgroundColors.push('#7ed785');
 
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
-      marginTop: '13px',color: '#333333', flexDirection: window.innerWidth < 600 ? 'column' : 'row' }}>
-  <div style={{ width: '60%', maxWidth: '200px', aspectRatio: '1/1', position: 'relative', zIndex: 0}}>
+      marginTop: '5px',color: '#333333', flexDirection: window.innerWidth < 600 ? 'column' : 'row' }}>
+  <div style={{ width: '45vw', maxWidth: '200px', aspectRatio: '1/1', position: 'relative', zIndex: 0}}>
       <Pie data={data} options={options} />
   </div>
 

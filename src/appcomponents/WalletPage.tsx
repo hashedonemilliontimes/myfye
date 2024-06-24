@@ -132,10 +132,11 @@ function WalletPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        minHeight: 'calc(100vh - 35px)',
+        minHeight: 'calc(100% + 35px)',
         height: '100%',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '94vw',
+        overflowX: 'hidden',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 3
       }}>

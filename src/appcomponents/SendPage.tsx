@@ -7,8 +7,10 @@ import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { getFirestore, doc, collection, setDoc, getDoc, addDoc } from 'firebase/firestore';
-import { setShowSendPage, setShouldShowBottomNav } from '../redux/userWalletData';
+import { getFirestore, doc, collection, setDoc, 
+  getDoc, addDoc, arrayUnion } from 'firebase/firestore';
+import { setShowSendPage, setShouldShowBottomNav, 
+  setSelectedContactEmail } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
@@ -25,11 +27,13 @@ function SendPage() {
     const [menuPosition, setMenuPosition] = useState('-130vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const selectedContactEmail = useSelector((state: any) => state.userWalletData.selectedContactEmail);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
     const [amountText, setAmountText] = useState('');
     const [stableCoinBalance, setStableCoinBalance] = useState(0);
+    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const walletName = useSelector((state: any) => state.userWalletData.type);
@@ -67,6 +71,14 @@ function SendPage() {
 
 
     useEffect(() => {
+      if (selectedContactEmail) {
+        setAddressText(selectedContactEmail)
+      } else {
+        setAddressText('')
+      }
+    }, [selectedContactEmail]);
+
+    useEffect(() => {
       if (showSendPage) {
         setMenuPosition('0'); // Bring the menu into view
       } else {
@@ -77,6 +89,9 @@ function SendPage() {
     const handleMenuClick = () => {
       dispatch(setShouldShowBottomNav(true))
       dispatch(setShowSendPage(!showSendPage));
+      if (selectedContactEmail) {
+        dispatch(setSelectedContactEmail(''));
+      }
     };
 
     useEffect(() => {
@@ -97,54 +112,54 @@ function SendPage() {
       };
   }, [sendInProgress]);
 
-    const handleQuarterButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.25 * stableCoinBalance);
+  const handleQuarterButtonClick = () => {
+    console.log("Handling button click", stableCoinBalance);
+    if (stableCoinBalance > 0.0001) {
+        const newDeposit = (0.25 * stableCoinBalance).toFixed(2).toString().replace(/\.?0+$/, '');
         console.log("Setting deposit to:", newDeposit); // Added logging
-      setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-      checkForValidInput(addressText, String(newDeposit));
-      } else {
-          setAmountText("$ 0.0")
-      }
-      setselectedPortion('25%');
-    };
+        setAmountText(`${newDeposit}`);
+        checkForValidInput(addressText, newDeposit);
+    } else {
+        setAmountText("$ 0.0");
+    }
+    setselectedPortion('25%');
+};
     
     const handleHalfButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.5 * stableCoinBalance);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
-      }else {
-          setAmountText("$ 0.0")
+      console.log("Handling button click", stableCoinBalance);
+      if (stableCoinBalance > 0.0001) {
+          const newDeposit = (0.5 * stableCoinBalance).toFixed(2).toString().replace(/\.?0+$/, '');
+          console.log("Setting deposit to:", newDeposit); // Added logging
+          setAmountText(`${newDeposit}`);
+          checkForValidInput(addressText, newDeposit);
+      } else {
+          setAmountText("$ 0.0");
       }
       setselectedPortion('50%');
     };
     
     const handleTwoThirdsButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (0.75 * stableCoinBalance);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
+      console.log("Handling button click", stableCoinBalance);
+      if (stableCoinBalance > 0.0001) {
+          const newDeposit = (0.75 * stableCoinBalance).toFixed(2).toString().replace(/\.?0+$/, '');
+          console.log("Setting deposit to:", newDeposit); // Added logging
+          setAmountText(`${newDeposit}`);
+          checkForValidInput(addressText, newDeposit);
       } else {
-          setAmountText("$ 0.0")
+          setAmountText("$ 0.0");
       }
       setselectedPortion('75%');
     };
     
     const handleAllButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-      if (stableCoinBalance>0.0001) {
-        const newDeposit = (1.0 * stableCoinBalance);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
+      console.log("Handling button click", stableCoinBalance);
+      if (stableCoinBalance > 0.0001) {
+          const newDeposit = (1.0 * stableCoinBalance).toFixed(2).toString().replace(/\.?0+$/, '');
+          console.log("Setting deposit to:", newDeposit); // Added logging
+          setAmountText(`${newDeposit}`);
+          checkForValidInput(addressText, newDeposit);
       } else {
-          setAmountText("$ 0.0")
+          setAmountText("$ 0.0");
       }
       setselectedPortion('100%');
     };
@@ -245,7 +260,9 @@ function SendPage() {
         console.log('Got transaction status: ', transactionSuccess)
         if (transactionSuccess) {
           sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
-          saveTransaction(amountToNumber, cleanedAddress);
+          const updateTransactionsPromise = saveTransaction(amountToNumber, cleanedAddress);
+          const updateContactsPromise = saveContact(cleanedAddress);
+          await Promise.all([updateTransactionsPromise, updateContactsPromise]);
           setSendInProgress(false);
 
           if (sendToPublicKey == 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn') {
@@ -364,6 +381,27 @@ async function saveTransaction(amount: number, address: string) {
       console.log("Error saving update balance", error);
       throw new Error("Failed to save update: " + error);  // Reject the promise with an error
   }
+}
+
+async function saveContact(sendToAddress: string) {
+  /*
+  Perform a write every time
+  even if the contacts already know eachother
+  TO DO:
+  make it more efficient
+  */
+  const contactCollectionRef = collection(db, 'contacts');
+  const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+  const updateContactOne = await setDoc(contactDocRef, {
+    emails: arrayUnion(sendToAddress)
+}, { merge: true });
+
+const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
+const updateContactTwo = await setDoc(contactDocRefTwo, {
+  emails: arrayUnion(currentUserEmail)
+}, { merge: true });
+
+  await Promise.all([updateContactOne, updateContactTwo]);
 }
 
   const styles = {
@@ -495,7 +533,7 @@ async function saveTransaction(amount: number, address: string) {
 {sendInProgress ? (
 
 <div style={{ marginBottom: '15px', display: 'flex', 
-flexDirection: 'column', marginTop: '-20px',
+flexDirection: 'column', marginTop: '20px',
 alignItems: 'center' }}>
 <LoadingAnimation/>
 
@@ -569,6 +607,12 @@ alignItems: 'center' }}>
 
 <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
 
+<span style={{
+      position: 'absolute',
+      fontSize: '20px',
+      transform: 'translateY(+37%) translateX(+70%)',
+      color: '#444444',
+    }}>$</span>
   <input
     id="USDAmount"
     type="number"
@@ -581,9 +625,9 @@ alignItems: 'center' }}>
       fontSize: '20px',
       border: 'none', // Remove the border
       borderRadius: '5px', // Rounded edges
-      padding: '10px 10px', // Adjust padding as needed
+      padding: '10px 30px', // Adjust padding as needed
     }}
-    placeholder="Amount"
+    placeholder="0"
   />
 </div>
 

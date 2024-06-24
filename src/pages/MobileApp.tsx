@@ -186,7 +186,7 @@ function WebAppInner() {
     return (
 
       
-        <div style={{overflowX: 'hidden', backgroundColor: 'white'}}>
+        <div style={{overflow: 'hidden', backgroundColor: 'white'}}>
 
 {userDataLoaded ? (
   <>
@@ -219,23 +219,25 @@ function WebAppInner() {
 <hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '100vw', 
 maxWidth: '550px', marginTop: '10px'}}></hr>
 
+<div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
-          height: window.innerHeight < 700 ?  'calc(100vh - 180px)' : 'calc(100vh - 120px)',
+          height: window.innerHeight < 620 ? 'calc(100vh - 230px)' : 'calc(100vh - 240px)',
         flexDirection: 'column', 
         color: '#222222', 
-        gap: '20px',
-        justifyContent: 'space-around' }}>
+        justifyContent: 'space-around',
+        overflow: 'hidden' }}>
 
 <div style={{ display: 'flex',  alignItems: 'center', 
-        flexDirection: 'column', color: '#222222', gap: '20px' }}>
-<div style={{display: 'flex', marginTop: '-10px'}}>
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '0px' : '20px'  }}>
+<div style={{display: 'flex', marginTop: '0px'}}>
 
   <img style={{ width: '180px', height: 'auto'}}src={myfyeBalance}/>
 
 </div>
 
-<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
+<div style={{ display: 'flex', alignItems: 'center', 
+  justifyContent: 'center', flexDirection: 'column',}}>
 
 
     <label htmlFor="deposit" style={{ fontSize: '20px', 
@@ -286,7 +288,7 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
 
 
        <div style={{ display: 'flex',  alignItems: 'center', 
-        flexDirection: 'column', color: '#222222', gap: '20px' }}>
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '5px' : '20px' }}>
 <img style={{ width: '150px', height: 'auto'}}src={myfyeEarn}/>
 
 
@@ -368,6 +370,7 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
                     
                 
                     <BottomNav/>
+                        </div>
                         </div>
   </>
 ) : (<>

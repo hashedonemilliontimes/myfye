@@ -244,44 +244,40 @@ function Deposit() {
       };
 
       const handleQuarterButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.25 * balanceSelectedInUSD);
+          const newDeposit = (0.25 * balanceSelectedInUSD).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
-        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        setDeposit(newDeposit)
         checkForDepositFieldComplete(String(newDeposit));
         }
         setselectedDepositPortion('25%');
       };
       
       const handleHalfButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.5 * balanceSelectedInUSD);
+          const newDeposit = (0.5 * balanceSelectedInUSD).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
-        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        setDeposit(newDeposit)
         checkForDepositFieldComplete(String(newDeposit));
         }
         setselectedDepositPortion('50%');
       };
       
       const handleTwoThirdsButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.75 * balanceSelectedInUSD);
+          const newDeposit = (0.75 * balanceSelectedInUSD).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
-        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        setDeposit(newDeposit)
         checkForDepositFieldComplete(String(newDeposit));
         }
         setselectedDepositPortion('75%');
       };
       
       const handleAllButtonClick = () => {
-        console.log("Handling quarter button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (1.0 * balanceSelectedInUSD);
+          const newDeposit = (1.0 * balanceSelectedInUSD).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
-        setDeposit("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
+        setDeposit(newDeposit)
         checkForDepositFieldComplete(String(newDeposit));
         }
         setselectedDepositPortion('100%');
@@ -679,6 +675,7 @@ $ <span style={{ fontSize: '35px' }}>
   }} 
 />
 </label>
+
 <input
   id="deposit"
   type="number"

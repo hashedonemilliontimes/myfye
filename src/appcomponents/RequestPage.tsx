@@ -6,8 +6,9 @@ import { useDispatch } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { getFirestore, doc, collection, setDoc, getDoc } from 'firebase/firestore';
-import { setShowRequestPage, setShouldShowBottomNav } from '../redux/userWalletData';
+import { getFirestore, doc, 
+  collection, setDoc, getDoc, arrayUnion } from 'firebase/firestore';
+import { setShowRequestPage, setShouldShowBottomNav, setSelectedContactEmail } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
@@ -24,6 +25,7 @@ function RequestPage() {
     const [menuPosition, setMenuPosition] = useState('-130vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const selectedContactEmail = useSelector((state: any) => state.userWalletData.selectedContactEmail);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
@@ -33,6 +35,7 @@ function RequestPage() {
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [confirmSend, setconfirmSend] = useState(false);
+    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
 
     const dispatch = useDispatch();
 
@@ -48,6 +51,14 @@ function RequestPage() {
 
 
     useEffect(() => {
+      if (selectedContactEmail) {
+        setAddressText(selectedContactEmail)
+      } else {
+        setAddressText('')
+      }
+    }, [selectedContactEmail]);
+    
+    useEffect(() => {
       if (showRequestPage) {
         setMenuPosition('0'); // Bring the menu into view
       } else {
@@ -58,6 +69,9 @@ function RequestPage() {
     const handleMenuClick = () => {
       dispatch(setShouldShowBottomNav(true));
       dispatch(setShowRequestPage(!showRequestPage));
+      if (selectedContactEmail) {
+        dispatch(setSelectedContactEmail(''));
+      }
     };
 
     useEffect(() => {
@@ -79,38 +93,26 @@ function RequestPage() {
   }, [sendInProgress]);
 
     const handleQuarterButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-        const newDeposit = (1);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-      setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-      checkForValidInput(addressText, String(newDeposit));
+      setAmountText('1')
+      checkForValidInput(addressText, String(1));
       setselectedPortion('$1');
     };
     
     const handleHalfButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-        const newDeposit = (10);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
-        setselectedPortion('$10');
+      setAmountText('10')
+      checkForValidInput(addressText, String(10));
+      setselectedPortion('$10');
     };
     
     const handleTwoThirdsButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-        const newDeposit = (100);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
+      setAmountText('100')
+      checkForValidInput(addressText, String(10));
       setselectedPortion('$100');
     };
     
     const handleAllButtonClick = () => {
-      console.log("Handling quarter button click", stableCoinBalance);
-        const newDeposit = (1000);
-        console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText("$ " + String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
+      setAmountText('1000')
+      checkForValidInput(addressText, String(10));
       setselectedPortion('$1,000');
     };
 
@@ -175,7 +177,9 @@ function RequestPage() {
       } else {
         setAmountText('');
         setAddressText('')
+
         sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
+        await saveContact(cleanedAddress);
         setErrorMessage(`Invoice sent to ${cleanedAddress}`)
     }
   };
@@ -199,6 +203,27 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
           console.log(error);
       });
 };
+
+async function saveContact(sendToAddress: string) {
+  /*
+  Perform a write every time
+  even if the contacts already know eachother
+  TO DO:
+  make it more efficient
+  */
+  const contactCollectionRef = collection(db, 'contacts');
+  const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+  const updateContactOne = await setDoc(contactDocRef, {
+    emails: arrayUnion(sendToAddress)
+}, { merge: true });
+
+const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
+const updateContactTwo = await setDoc(contactDocRefTwo, {
+  emails: arrayUnion(currentUserEmail)
+}, { merge: true });
+
+  await Promise.all([updateContactOne, updateContactTwo]);
+}
 
   const styles = {
     tradeTimeframeButtonRow: {
@@ -340,15 +365,17 @@ alignItems: 'center' }}>
 ) : (
 
 <div>
-<div style={{marginTop: '60px', fontSize: '23px'}}>
+<div style={{marginTop: '50px', fontSize: '24px'}}>
 
-<div>Send an invoice to get paid</div>
+<div style={{color: '#2E7D32'}}>They get an email... you<br/> get paid</div>
+
 </div>
 
-<div style={{ marginTop: '60px'}}>
+<div style={{ marginTop: '50px'}}>
 
 
-<div style={{marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
+<div style={{marginBottom: '15px', display: 'flex', 
+  flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
 
   <input
     id="EmailAddress"
@@ -369,8 +396,15 @@ alignItems: 'center' }}>
   />
 </div>
 
-<div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
-
+<div style={{ marginBottom: '15px', display: 'flex', 
+  flexDirection: 'column', opacity: sendInProgress ? '0' : '1' }}>
+    
+    <span style={{
+      position: 'absolute',
+      fontSize: '20px',
+      transform: 'translateY(+37%) translateX(+70%)',
+      color: '#444444',
+    }}>$</span>
   <input
     id="USDAmount"
     type="number"
@@ -383,9 +417,9 @@ alignItems: 'center' }}>
       fontSize: '20px',
       border: 'none', // Remove the border
       borderRadius: '5px', // Rounded edges
-      padding: '10px 10px', // Adjust padding as needed
+      padding: '10px 30px', // Adjust padding as needed
     }}
-    placeholder="Amount"
+    placeholder="0"
   />
 </div>
 

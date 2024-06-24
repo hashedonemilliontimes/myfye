@@ -74,34 +74,32 @@ function PayTransactions() {
                 {transactions.map((transaction) => (
 
                     
-                    <div key={transaction.id} style={{ paddingTop: '20px' }}>
+                    <div key={transaction.id} style={{ paddingTop: '20px', marginLeft: '-10px' }}>
     <div style={{display: 'flex', alignItems: 'center', justifyContent:'center'}}>
     <hr style={{height: '1px', backgroundColor: '#999999', border: 'none', width: '85vw', 
 maxWidth: '550px', marginTop: '-10px'}}></hr>
 </div>
 
-                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <div style={{width: '140px'}}>
-                            {transaction.receiverEmail == userEmail ? (
-                                <div style={{color: '#007E0D'}}>Received</div>
-                            ) : (
-                                <div style={{color: '#7E0000'}}>Sent</div>
-                            )}
-                        </div>
-                        <div style={{width: '140px', fontWeight: 'bold'}}>
-                            ${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-
-                        <div style={{marginLeft: '70px'}}>
-                        {transaction.receiverEmail == userEmail ? (
-                                <div style={{color: '#000000'}}>{transaction.senderEmail}</div>
-                            ) : (
-                                <div style={{color: '#000000'}}>{transaction.receiverEmail}</div>
-                            )}
-                        </div>
-
-                        
-                        </div>
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0px' }}>
+    <div style={{ width: '80px', textAlign: 'center' }}>
+        {transaction.receiverEmail === userEmail ? (
+            <div style={{ color: '#007E0D' }}>Received</div>
+        ) : (
+            <div style={{ color: '#7E0000' }}>Sent</div>
+        )}
+    </div>
+    <div style={{ width: '100px', textAlign: 'center', fontWeight: 'bold' }}>
+        ${transaction.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    </div>
+    <div style={{ flex: '1', padding: '0 0px', overflow: 'hidden', 
+        textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '14px'  }}>
+        {transaction.receiverEmail === userEmail ? (
+            <div style={{ color: '#000000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.senderEmail}</div>
+        ) : (
+            <div style={{ color: '#000000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{transaction.receiverEmail}</div>
+        )}
+    </div>
+</div>
 
                         <div style={{whiteSpace: 'nowrap', 
                             textAlign: 'right', 
