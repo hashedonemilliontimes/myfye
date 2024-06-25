@@ -11,6 +11,7 @@ import { ComputeBudgetProgram, PublicKey, Connection, Keypair, LAMPORTS_PER_SOL,
 const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // Mainnet USDC mint address
 const USDT_MINT_ADDRESS = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'; // Replace with actual USDT mint address on Solana
 const USDY_MINT_ADDRESS = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
+const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
 
 const MYFYE_SERVER_ADDRESS = "DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn"
 
@@ -107,7 +108,7 @@ export const fetchPYUSDBalance = async (address: string): Promise<number> => {
   const connection = new Connection(QUICKNODE_RPC);
   
   // The mint address for USDC on Solana's mainnet
-  const usdcMintAddress = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
+  const pyusdMintAddress = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
 
   try {
     const publicKey = new PublicKey(address);
@@ -121,7 +122,7 @@ export const fetchPYUSDBalance = async (address: string): Promise<number> => {
       const mintAddress = account.account.data.parsed.info.mint;
 
       // Check if the mint address matches that of USDC
-      if (mintAddress === usdcMintAddress) {
+      if (mintAddress === pyusdMintAddress) {
         const usdcBalance = account.account.data.parsed.info.tokenAmount.uiAmount;
         // console.log(`Balance of ${address} got : ${usdcBalance} USDC `);
         return usdcBalance;
@@ -258,6 +259,8 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
           mintAddress = USDT_MINT_ADDRESS;
       } else if (currencySelected === 'usdySol') {
         mintAddress = USDY_MINT_ADDRESS;
+      } else if (currencySelected === 'pyusdSol') {
+        mintAddress = PYUSD_MINT_ADDRESS;
       }
 
  
@@ -411,6 +414,8 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
         mintAddress = USDT_MINT_ADDRESS;
     } else if (currencySelected === 'usdySol') {
       mintAddress = USDY_MINT_ADDRESS;
+    } else if (currencySelected === 'pyusdSol') {
+      mintAddress = PYUSD_MINT_ADDRESS;
     }
 
       const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -594,6 +599,8 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
             mintAddress = USDT_MINT_ADDRESS;
         } else if (currencySelected === 'usdySol') {
           mintAddress = USDY_MINT_ADDRESS;
+        } else if (currencySelected === 'pyusdSol') {
+          mintAddress = PYUSD_MINT_ADDRESS;
         }
   
    
@@ -703,6 +710,8 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
           mintAddress = USDT_MINT_ADDRESS;
       } else if (currencySelected === 'usdySol') {
         mintAddress = USDY_MINT_ADDRESS;
+      } else if (currencySelected === 'pyusdSol') {
+        mintAddress = PYUSD_MINT_ADDRESS;
       }
   
         const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(

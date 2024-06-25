@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
+import pyusdSol from '../../assets/pyusdSol.png';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
 import { setShowWithdrawStablecoinPage, setShouldShowBottomNav } from '../../redux/userWalletData';
@@ -22,6 +23,7 @@ function WithdrawStableCoin() {
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [selectedPortion, setselectedPortion] = useState('');
@@ -36,8 +38,11 @@ function WithdrawStableCoin() {
 
     useEffect(() => {
 
+      if (currencySelected == 'usdcSol') {
         setbalanceSelectedInUSD(usdcSolBalance)
-      }, [usdcSolBalance, usdtSolBalance]);
+      }
+        
+      }, [usdcSolBalance]);
 
       
 
@@ -60,8 +65,10 @@ function WithdrawStableCoin() {
         setcurrencySelected(selection)
         if (selection == 'usdcSol') {
             setbalanceSelectedInUSD(usdcSolBalance);
-        } else {
+        } else if (selection == 'usdtSol')  {
             setbalanceSelectedInUSD(usdtSolBalance);
+        } else if (selection == 'pyusdSol')  {
+          setbalanceSelectedInUSD(pyusdSolBalance);
         }
 
       };
@@ -344,18 +351,26 @@ function WithdrawStableCoin() {
 <div style={{ display: 'flex', alignItems: 'center', 
                 background: (currencySelected == 'usdcSol') ? '#444444' : '#ffffff', 
                 color: (currencySelected == 'usdcSol') ? '#ffffff' : '#000000',  
-padding: '10px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('usdcSol')}>
-                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '50px', height: 'auto' }} />
-                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>USDC</div> {/* Adjust marginLeft as needed */}
+padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('usdcSol')}>
+                    <img id="usdcSolIcon" src={usdcSol} style={{ width: '40px', height: 'auto' }} />
+                    <div id="usdcSolTicker" style={{ marginLeft: '8px' }}>USDC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', 
+                background: (currencySelected == 'pyusdSol') ? '#444444' : '#ffffff', 
+                color: (currencySelected == 'pyusdSol') ? '#ffffff' : '#000000',  
+padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('pyusdSol')}>
+                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '37px', height: 'auto' }} />
+                    <div id="usdcSolTicker" style={{ marginLeft: '5px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', 
                 background: (currencySelected == 'usdtSol') ? '#444444' : '#ffffff', 
                 color: (currencySelected == 'usdtSol') ? '#ffffff' : '#000000', 
-                padding: '10px', borderRadius: '10px', 
+                padding: '7px', borderRadius: '10px', 
                 border: '1px solid black', }} onClick={() => handleCurrencySelection('usdtSol')}>
-                    <img  src={usdtSol} style={{ width: '50px', height: 'auto' }} ></img>
-                    <div style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
+                    <img  src={usdtSol} style={{ width: '40px', height: 'auto' }} ></img>
+                    <div style={{ marginLeft: '8px' }}>USDT</div> {/* Adjust marginLeft as needed */}
                     
                 </div>
                 </div>

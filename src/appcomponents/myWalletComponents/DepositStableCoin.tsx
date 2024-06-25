@@ -27,6 +27,7 @@ function DepositStableCoin() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
+    
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
 
     const handleCopyAddress = () => {
@@ -153,7 +154,7 @@ function DepositStableCoin() {
                 <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
     
 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '70px', height: 'auto' }} />
+                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '65px', height: 'auto' }} />
                     <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
                 </div>
 

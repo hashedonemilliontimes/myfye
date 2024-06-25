@@ -13,6 +13,7 @@ import { setShowSendPage, setShouldShowBottomNav,
   setSelectedContactEmail } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
+import pyusdSol from '../assets/pyusdSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
 
 function SendPage() {
@@ -27,6 +28,7 @@ function SendPage() {
     const [menuPosition, setMenuPosition] = useState('-130vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
     const selectedContactEmail = useSelector((state: any) => state.userWalletData.selectedContactEmail);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
@@ -61,13 +63,18 @@ function SendPage() {
     }
 
     useEffect(() => {
+      if (pyusdSolBalance > usdtSolBalance && pyusdSolBalance > usdcSolBalance) {
+        setStableCoinBalance(pyusdSolBalance)
+        setcurrencySelected('pyusdSol')
+      }
       if (usdtSolBalance > usdcSolBalance) {
         setStableCoinBalance(usdtSolBalance)
         setcurrencySelected('usdtSol')
       } else {
         setStableCoinBalance(usdcSolBalance)
+        setcurrencySelected('usdcSol')
       }
-    }, [usdcSolBalance, usdtSolBalance]);
+    }, [usdcSolBalance, usdtSolBalance, pyusdSolBalance]);
 
 
     useEffect(() => {
@@ -547,28 +554,50 @@ alignItems: 'center' }}>
 <div>
 <div style={{marginTop: '60px', fontSize: '25px'}}>
 
-  {stableCoinBalance > 0.01 ? (
+
     <div style={{display: 'flex', justifyContent: 'space-between', width: '80vw'}}>
+    {stableCoinBalance > 0.01 ? (
     <div>Balance: ${(stableCoinBalance.toFixed(2)).toLocaleString()}</div>
-    {(usdtSolBalance > usdcSolBalance) ? (
+  ) : (
+    <div>Balance: $0.00</div>
+  )}
+    {(currencySelected == 'usdtSol') && (
       <div>
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
         <div style={{fontSize: '15px'}}>USDT</div>
         <img 
-          style={{ width: 'auto', height: '30px', background: 'white' }} 
+          style={{ width: 'auto', height: '30px', 
+            background: 'white', marginTop: '3px' }} 
           src={usdtSol}
           onClick={handleMenuClick} 
           alt="Exit" 
         />
       </div>
     </div>
-    ) : (
+    )}
+    {(currencySelected == 'usdcSol') && (
       <div>
         <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
           <div style={{fontSize: '15px'}}>USDC</div>
           <img 
-            style={{ width: 'auto', height: '30px', background: 'white' }} 
+            style={{ width: 'auto', height: '30px', 
+              background: 'white', marginTop: '3px' }} 
             src={usdcSol}
+            onClick={handleMenuClick} 
+            alt="Exit" 
+          />
+        </div>
+      </div>
+    )}
+    {(currencySelected == 'pyusdSol') && (
+      <div>
+        <div style={{display: 'flex', flexDirection: 'row', 
+          alignItems: 'center', gap: '5px', justifyContent: 'center'}}>
+          <div style={{fontSize: '15px'}}>PYUSD</div>
+          <img 
+            style={{ width: 'auto', height: '30px', 
+              background: 'white', marginTop: '3px' }} 
+            src={pyusdSol}
             onClick={handleMenuClick} 
             alt="Exit" 
           />
@@ -577,9 +606,7 @@ alignItems: 'center' }}>
     )}
 
     </div>
-  ) : (
-    <div>$0.00</div>
-  )}
+
 </div>
 
 <div style={{ marginTop: '60px'}}>

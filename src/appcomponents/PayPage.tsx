@@ -3,12 +3,6 @@ import menuIcon from '../assets/menuIcon.png';
 import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import backButton from '../assets/backButton3.png';
-import DepositStableCoin from './myWalletComponents/DepositStableCoin';
-import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
-import SendPage from './SendPage';
-import Withdraw from '../appcomponents/withdraw';
-import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
-import PieChartComponent from '../components/dashboardTiles/pieChart';
 import myfyePay from '../assets/myfyePay.png';
 import { setShouldShowBottomNav, setShowPayPage, 
   setShowSendPage, setShowRequestPage,

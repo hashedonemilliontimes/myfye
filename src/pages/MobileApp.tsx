@@ -51,6 +51,7 @@ function WebAppInner() {
   const lastNameUI = useSelector((state: any) => state.userWalletData.currentUserLastName);
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+  const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
 
@@ -245,7 +246,7 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
     $ <span style={{ fontSize: '35px' }}>
       
     <div>
-    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
+    {((usdcSolBalance + usdtSolBalance + pyusdSolBalance).toFixed(2)).toLocaleString('en-US')}
   </div>
 
     </span>

@@ -47,6 +47,7 @@ function Withdraw() {
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [shouldNotify, setShouldNotify] = useState(false);
     const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
+    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
 
     useEffect(() => {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -307,11 +308,14 @@ function Withdraw() {
         zIndex: 4
       }}>
 
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '10px', fontSize: '35px', color: '#222222',
+}}>Withdraw</div>
+
+</div>
+
 <div style={{display:'flex', justifyContent: 'space-between', flexDirection: 'column', height: '80vh'}}>
   <div>
-<div style={{marginTop: '60px', fontSize: '45px', color: '#222222'}}>Withdraw</div>
-
-
 {withdrawalInProgress ? (
   <>
         <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
@@ -323,7 +327,7 @@ function Withdraw() {
 <div>
 <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
 alignItems: 'center'}}> 
-<div style={{fontSize: '18px', color: 'black'}}>Account Value: $ {usdyBalance.toFixed(6).split('.')[0].toLocaleString() + '.' + usdyBalance.toFixed(6).split('.')[1]}</div>
+<div style={{fontSize: '18px', color: 'black'}}>Account Value: $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
 </div>
       <div style={{marginTop: '20px', display: 'flex'}}>
 
@@ -344,7 +348,7 @@ alignItems: 'center'}}>
       <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
       alignItems: 'center', justifyContent:'center'}}> 
       <div style={{marginLeft: '20px'}}>$ </div>
-      <div style={{ fontSize: '36px'}}>{(usdyBalance-feeAmount).toFixed(6).split('.')[0].toLocaleString() + '.' + (usdyBalance-feeAmount).toFixed(6).split('.')[1]}</div>
+      <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)-feeAmount).toFixed(4).toLocaleString()}</div>
       </div>
       )}
       </div>

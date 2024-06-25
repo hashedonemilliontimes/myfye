@@ -9,13 +9,14 @@ import { requestNewSolanaTransaction } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY,
+  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY, setpyusdSolValue,
   setShouldShowBottomNav } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
+import pyusdSol from '../assets/pyusdSol.png';
 import wallet from '../helpers/walletDataType';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
@@ -23,6 +24,8 @@ import FailImage from '../assets/FailImage.png';
 import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
 
 function Deposit() {
+
+    const MINIMUM_DEPOSIT_VALUE = 1.0
 
     const functions = getFunctions();
     const db = getFirestore();
@@ -39,6 +42,7 @@ function Deposit() {
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
     const busdSolBalance = useSelector((state: any) => state.userWalletData.busdSolBalance);
     const usdcEthBalance = useSelector((state: any) => state.userWalletData.usdcEthBalance);
     const usdtEthBalance = useSelector((state: any) => state.userWalletData.usdtEthBalance);
@@ -49,6 +53,7 @@ function Deposit() {
 
     const [animateShowAddressUsdcSol, setanimateShowAddressUsdcSol] = useState(false); 
     const [animateShowAddressUsdtSol, setanimateShowAddressUsdtSol] = useState(false); 
+    const [animateShowAddressPyusdSol, setanimateShowAddressPyusdSol] = useState(false); 
 
     const [solanaWalletConnected, setsolanaWalletConnected] = useState(false); 
     const [ethereumWalletConnected, setethereumWalletConnected] = useState(false); 
@@ -83,22 +88,16 @@ function Deposit() {
       } else {
         setMenuPosition('-100vh'); // Move the menu off-screen
 
-        if (usdcSolBalance && !usdtSolBalance) {
-          setcurrencySelected('usdcSol')
-          setbalanceSelectedInUSD(usdcSolBalance);
-        } else if (!usdcSolBalance && usdtSolBalance){
-          setcurrencySelected('usdtSol')
-          setbalanceSelectedInUSD(usdtSolBalance);
-        } else {
-          setcurrencySelected('')
-        }
 
-        if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
+        if (usdcSolBalance >= MINIMUM_DEPOSIT_VALUE && (usdtSolBalance < 0.01 && pyusdSolBalance < 0.01)) {
           setcurrencySelected('usdcSol')
           setbalanceSelectedInUSD(usdcSolBalance);
-        } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
+        } else if (usdtSolBalance >= MINIMUM_DEPOSIT_VALUE && usdcSolBalance < 0.01 && pyusdSolBalance < 0.01) {
           setcurrencySelected('usdtSol')
           setbalanceSelectedInUSD(usdtSolBalance);
+        } else if (pyusdSolBalance >= MINIMUM_DEPOSIT_VALUE && usdtSolBalance < 0.01 && usdcSolBalance < 0.01) {
+          setcurrencySelected('pyusdSol')
+          setbalanceSelectedInUSD(pyusdSolBalance);
         } else {
           setcurrencySelected('')
         }
@@ -183,29 +182,6 @@ function Deposit() {
       }
     }, [transactionStatus]);
 
-
-    /*
-    useEffect(() => {
-
-      console.log('usdcSolBalance: ', usdcSolBalance)
-      console.log('usdtSolBalance: ', usdtSolBalance)
-
-      if (usdcSolBalance && !usdtSolBalance) {
-        setcurrencySelected('usdcSol')
-      } else if (!usdcSolBalance && usdtSolBalance){
-        setcurrencySelected('usdtSol')
-      } else {
-        if (usdcSolBalance > 0.01 && usdtSolBalance < 0.01) {
-          setcurrencySelected('usdcSol')
-        } else if (usdcSolBalance < 0.01 && usdtSolBalance > 0.01) {
-          setcurrencySelected('usdtSol')
-        }
-      }
-      
-
-    }, [usdcSolBalance, usdtSolBalance]);
-    */
-
     const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newDeposit = event.target.value;
         if (newDeposit.length == 1 && (newDeposit[0] != '$')) {
@@ -221,7 +197,7 @@ function Deposit() {
         const cleanedDeposit = newDeposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
         const depositToNumber = Number(cleanedDeposit);
       
-        if (!isNaN(depositToNumber) && depositToNumber > 0.9) {
+        if (!isNaN(depositToNumber) && depositToNumber > MINIMUM_DEPOSIT_VALUE) {
           if (depositToNumber <= balanceSelectedInUSD) {
             setDepositButtonActive(true);
             setErrorMessage('')
@@ -288,7 +264,7 @@ function Deposit() {
 
           switch (currency) {
             case 'usdcSol':
-                if (usdcSolBalance < 0.9) {
+                if (usdcSolBalance < MINIMUM_DEPOSIT_VALUE) {
                   copyAddressFor(usdcSol);
                   document.getElementById('usdcSol')?.classList.add('animate-close-open');
                   document.getElementById('usdcSolLabel')?.classList.add('animate-fade-in-out');
@@ -308,8 +284,27 @@ function Deposit() {
                   setcurrencySelected(currency)
                 }
               break;
+            case 'pyusdSol':
+              if (pyusdSolBalance < MINIMUM_DEPOSIT_VALUE) {
+                copyAddressFor('pyusdSol');
+                document.getElementById('pyusdSol')?.classList.add('animate-close-open');
+                document.getElementById('pyusdSolLabel')?.classList.add('animate-fade-in-out');
+                setTimeout(() => {
+                  setanimateShowAddressPyusdSol(true);
+                }, 1000);
+
+                setTimeout(() => {
+                document.getElementById('pyusdSol')?.classList.remove('animate-close-open');
+                document.getElementById('pyusdSolLabel')?.classList.remove('animate-fade-in-out');
+                setanimateShowAddressPyusdSol(false);
+                }, 5000);
+              } else {
+                setbalanceSelectedInUSD(pyusdSolBalance);
+                setcurrencySelected(currency)
+              }
+              break;
             case 'usdtSol':
-                if (usdtSolBalance < 0.9) {
+                if (usdtSolBalance < MINIMUM_DEPOSIT_VALUE) {
                   copyAddressFor(usdtSol);
                   document.getElementById('usdtSol')?.classList.add('animate-close-open');
                   document.getElementById('usdtSolLabel')?.classList.add('animate-fade-in-out');
@@ -417,6 +412,8 @@ function Deposit() {
           dispatch(setusdcSolValue(newUSDBalance));
         } else if (currencySelected == "usdtSol") {
           dispatch(setusdtSolValue(newUSDBalance));
+        } else if (currencySelected == "pyusdSol") {
+          dispatch(setpyusdSolValue(newUSDBalance));
         }
         
         console.log('setPrincipalInvested', currentValue+newDepositAmount)
@@ -580,14 +577,22 @@ function Deposit() {
         padding: '15px',
         height: 'calc(100vh - 35px)',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '95vw',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 4,
       }}>
 
-<div style={{ width: '80vw', marginTop: '60px'}}>
 
-<div style={{marginTop: '10px', fontSize: '45px', color: '#222222'}}>Deposit</div>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '0px', fontSize: '45px', color: '#222222',
+}}>Deposit</div>
+
+</div>
+
+<div style={{ width: '80vw', marginTop: '0px'}}>
+
+
+
 
 {transactionStatus == 'Fail' && (
   <div>
@@ -647,20 +652,22 @@ marginBottom: '15px', display: 'flex', alignItems: 'center', }}>
 $ <span style={{ fontSize: '35px' }}>
     {currencySelected == 'usdcSol' && usdcSolBalance}
     {currencySelected == 'usdtSol' && usdtSolBalance}
-    {currencySelected == 'busdSol' && busdSolBalance}
+    {currencySelected == 'pyusdSol' && pyusdSolBalance}
 
     {currencySelected == 'usdcEth' && usdcEthBalance}
     {currencySelected == 'usdtEth' && usdtEthBalance}
     {currencySelected == 'busdEth' && busdEthBalance}
   </span>   
 
+<div style={{marginLeft: '5px'}}>
 {currencySelected == 'usdcSol' && (<>USDC</>)}
 {currencySelected == 'usdtSol' && (<>USDT</>)}
-{currencySelected == 'busdSol' && (<>BUSD</>)}
+{currencySelected == 'pyusdSol' && (<>PYUSD</>)}
 
 {currencySelected == 'usdcEth' && (<>USDC</>)}
 {currencySelected == 'usdtEth' && (<>USDT</>)}
 {currencySelected == 'busdEth' && (<>BUSD</>)}
+</div>
 
 <img 
   src={ networkSelected === 'solana' ? solIcon : solIcon} 
@@ -692,7 +699,7 @@ $ <span style={{ fontSize: '35px' }}>
     borderRadius: '5px', // Rounded edges
     padding: '10px 10px', // Adjust padding as needed
   }}
-  placeholder="0 USDC"
+  placeholder="0"
 />
 </div>
 
@@ -763,6 +770,22 @@ $ <span style={{ fontSize: '35px' }}>
         {networkSelected == 'solana' && (
             <div>
 
+              {!currencySelected && (
+                <>
+                {(pyusdSolBalance + usdcSolBalance + usdtSolBalance < MINIMUM_DEPOSIT_VALUE) ? (
+                  <>
+              <div style={{paddingBottom: '15px', color: '#2E7D32'}}>Minimum investment: ${MINIMUM_DEPOSIT_VALUE}</div>
+                  </>
+                ) : (
+                  <>
+              <div style={{paddingBottom: '15px', color: '#2E7D32'}}>Minimum investment: ${MINIMUM_DEPOSIT_VALUE}</div>
+                  </>   
+                )}
+
+              </>
+              )}
+
+
             {(animateShowAddressUsdcSol && !solanaWalletConnected) ? (
               <>
                 <div id="usdcSol" style={{
@@ -820,7 +843,7 @@ $ <span style={{ fontSize: '35px' }}>
                       <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
                       <div style={{fontWeight: 'bold'}}>
                         {publicKey.length >= 6
-                          ? `${publicKey.substring(0, 3)}...${publicKey.substring(publicKey.length - 3)}`
+                          ? `${publicKey.substring(0, 3)}...`
                           : publicKey}
                       </div>
                       </div>
@@ -830,6 +853,72 @@ $ <span style={{ fontSize: '35px' }}>
                 </div>
                 </>
             ) }
+
+
+{(animateShowAddressPyusdSol && !solanaWalletConnected) ? (
+              <>
+                <div id="pyusdSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('pyusdSol')}
+                >
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="pyusdSolIcon" src={pyusdSol} style={{ width: '67px', height: 'auto' }} />
+                    <div id="pyusdSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="pyusdSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
+                  Add a Solana Wallet
+                </div>
+                </div>
+                </>
+            ) : (
+              <>
+                <div id="pyusdSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('pyusdSol')}
+                >
+                  
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="pyusdSolIcon" src={pyusdSol} style={{ width: '67px', height: 'auto' }} />
+                    <div id="pyusdSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="pyusdSolLabel">
+                  {animateShowAddressPyusdSol ? (<div>
+                    <div style = {{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'center'}}>
+                      <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
+                      <div style={{fontWeight: 'bold'}}>
+                        {publicKey.length >= 6
+                          ? `${publicKey.substring(0, 3)}...`
+                          : publicKey}
+                      </div>
+                      </div>
+                  </div>) : (
+                      <div style = {{marginRight: '15px'}}>${pyusdSolBalance}</div>)}
+                </div>
+                </div>
+                </>
+)}
 
 
 
@@ -849,8 +938,6 @@ $ <span style={{ fontSize: '35px' }}>
                 }}
                 onClick={() => handleCurrencySelection('usdtSol')}
                 >
-
-                {/* Grouping image and "USDC" together in a div */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <img id="usdtSolIcon" src={usdtSol} style={{ width: '70px', height: 'auto' }} />
                     <div id="usdtSolTicker" style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
@@ -877,7 +964,7 @@ $ <span style={{ fontSize: '35px' }}>
                 }}
                 onClick={() => handleCurrencySelection('usdtSol')}
                 >
-                {/* Grouping image and "USDC" together in a div */}
+                  
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <img id="usdtSolIcon" src={usdtSol} style={{ width: '70px', height: 'auto' }} />
                     <div id="usdtSolTicker" style={{ marginLeft: '15px' }}>USDT</div> {/* Adjust marginLeft as needed */}
@@ -889,7 +976,7 @@ $ <span style={{ fontSize: '35px' }}>
                       <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
                       <div style={{fontWeight: 'bold'}}>
                         {publicKey.length >= 6
-                          ? `${publicKey.substring(0, 3)}...${publicKey.substring(publicKey.length - 3)}`
+                          ? `${publicKey.substring(0, 3)}...`
                           : publicKey}
                       </div>
                       </div>
