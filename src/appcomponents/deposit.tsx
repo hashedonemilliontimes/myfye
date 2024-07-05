@@ -197,7 +197,7 @@ function Deposit() {
         const cleanedDeposit = newDeposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
         const depositToNumber = Number(cleanedDeposit);
       
-        if (!isNaN(depositToNumber) && depositToNumber > MINIMUM_DEPOSIT_VALUE) {
+        if (!isNaN(depositToNumber) && depositToNumber >= MINIMUM_DEPOSIT_VALUE) {
           if (depositToNumber <= balanceSelectedInUSD) {
             setDepositButtonActive(true);
             setErrorMessage('')
@@ -583,16 +583,37 @@ function Deposit() {
       }}>
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center',
+  marginLeft: '-15px',
+}}>
 <div style={{marginTop: '0px', fontSize: '45px', color: '#222222',
 }}>Deposit</div>
 
 </div>
 
-<div style={{ width: '80vw', marginTop: '0px'}}>
 
+{depositInProgress && (
+      <div style={{ marginBottom: '15px', 
+      display: 'flex', 
+      flexDirection: 'column',
+       marginTop: '20px',
+       alignItems: 'center',
+       justifyContent: 'center',
+       marginLeft: '-15px',
+        }}>
+        <LoadingAnimation/>
 
+      </div>
+    )}
 
+<div style={{       display: 'flex', 
+      flexDirection: 'column',
+       marginTop: '20px',
+       alignItems: 'center',
+       justifyContent: 'center',
+       marginLeft: '-15px', }}>
+
+<div style={{width: '85vw'}}>
 
 {transactionStatus == 'Fail' && (
   <div>
@@ -636,13 +657,7 @@ function Deposit() {
 
     <div>
 
-
-{depositInProgress ? (
-      <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
-        <LoadingAnimation/>
-
-      </div>
-    ) : (
+ {!depositInProgress && (
       <div>
 
 <div style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column', marginTop: '30px' }}>
@@ -1004,10 +1019,9 @@ $ <span style={{ fontSize: '35px' }}>
 
 
                   </div> 
-
+                  </div>
                   </div>
     )
 }
 
 export default Deposit;
-

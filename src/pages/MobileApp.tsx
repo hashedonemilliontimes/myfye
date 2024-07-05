@@ -62,13 +62,14 @@ function WebAppInner() {
   const dispatch = useDispatch();
 
   const [userDataLoaded, setUserDataLoaded] = useState(false);
+  const ANNOUNCMENT_MESSAGE = 'PYUSD transactions are down at the moment'
 
   const getUserInfo = async () => {
 
     if (primaryWallet?.address && userEmail) {
 
       const getInvestmentData = async () => {
-      const userData = await getUserData(userEmail, primaryWallet?.address, dispatch);
+      const userData = await getUserData(userEmail, user!.phoneNumber!, primaryWallet?.address, dispatch);
       }
       getInvestmentData();
 
@@ -131,6 +132,8 @@ function WebAppInner() {
       let currentUserFirstName = user?.firstName
       let currentUserLastName = user?.lastName
       let currentUserEmail = user?.email
+      let currentUserPhoneNumber = user?.phoneNumber
+      
 
       if (currentUserEmail != userEmail) {
         dispatch(setcurrentUserEmail(currentUserEmail!))
@@ -141,26 +144,34 @@ function WebAppInner() {
       if (lastNameUI != currentUserLastName) {
         dispatch(setcurrentUserLastName(currentUserLastName!))
       }
+      if (currentUserPhoneNumber != null) {
+        console.log(currentUserPhoneNumber)
+      }
+
     } catch (error) {
       console.error('Error with dynamic user ', error);
     }
     if (primaryWallet?.address != '' && primaryWallet?.address != null) {
+      console.log('primaryWallet?.address', primaryWallet?.address);
       dispatch(setWalletPubKey(primaryWallet!.address))
       getUserBalances();
-      getUserInfo();
+      if (user != null) {
+        getUserInfo();
+      }
     } else {
-      console.log('Error! primaryWallet?.address', primaryWallet?.address)
+      console.log('Error! primaryWallet?.address', primaryWallet?.address, 'primaryWallet?', primaryWallet)
     }
     console.log('primaryWallet', primaryWallet)
+    console.log('userEmail', userEmail)
   }, [primaryWallet, userEmail]);
   
 
   useEffect(() => {
     if (userEmail != '' && userEmail != null && primaryWallet?.address != '' && primaryWallet?.address != null) {
-      console.log('checkUncreatedUserBalance in Mobile App')
-      checkUncreatedUserBalance(userEmail, primaryWallet!.address, dispatch)
+      console.log('checkUncreatedUserBalance in Mobile App with email', userEmail, 'and phone number', user?.phoneNumber)
+      checkUncreatedUserBalance(userEmail, primaryWallet!.address, dispatch, user?.phoneNumber)
     }
-  }, [userEmail]);
+  }, [userEmail, user?.phoneNumber]);
 
   const handleSendPageClick = () => {
     dispatch(setShouldShowBottomNav(false));
@@ -201,7 +212,13 @@ function WebAppInner() {
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
   
-
+  {ANNOUNCMENT_MESSAGE && (
+  <div style={{textAlign: 'center', fontSize: '14px', 
+    color: '#ffffff', whiteSpace: 'nowrap', 
+    width: '100vw', 
+    background: '#2E7D32',
+  marginBottom: '-10px'}}>{ANNOUNCMENT_MESSAGE}</div>
+  )}
 
 <div style={{display: 'flex', flexDirection: 'row', 
   justifyContent: 'space-between', marginTop: '15px',

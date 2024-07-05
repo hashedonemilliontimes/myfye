@@ -204,6 +204,7 @@ function WithdrawStableCoin() {
               setErrorMessage('');
               // this is a rough workaround to save the change to redux and reload the page
               setTimeout(() =>  dispatch(setShowWithdrawStablecoinPage(false)), 10);
+              dispatch(setShouldShowBottomNav(true))
 
               
             } else {

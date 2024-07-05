@@ -60,14 +60,15 @@ function SendPage() {
       wallet?: string;
       walletPublicKey?: string;
       wallets?: Array<unknown>; // Specify the type if you know what it contains
+      phoneNumber?: string,
+      phoneCountryCode?: string,
     }
 
     useEffect(() => {
       if (pyusdSolBalance > usdtSolBalance && pyusdSolBalance > usdcSolBalance) {
         setStableCoinBalance(pyusdSolBalance)
         setcurrencySelected('pyusdSol')
-      }
-      if (usdtSolBalance > usdcSolBalance) {
+      } else if (usdtSolBalance > usdcSolBalance) {
         setStableCoinBalance(usdtSolBalance)
         setcurrencySelected('usdtSol')
       } else {
@@ -195,15 +196,19 @@ function SendPage() {
       const cleanedAmount = removeWhitespace(preCleanedAmount);
       const amountToNumber = Number(cleanedAmount);
       const cleanedAddress = removeWhitespace(newAddress);
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-      const isValidEmailAddress = regex.test(cleanedAddress);
+      const cleanedPhoneNumber = removeWhitespace(cleanedAddress).replace(/[-()]/g, '');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      const isValidEmailAddress = emailRegex.test(cleanedAddress);
+      const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
   
       if (cleanedAmount === '' || cleanedAddress === '') {
           setSendButtonActive(false);
           setErrorMessage('Please fill in all fields');
-      } else if (!isValidEmailAddress) {
+      } else if (!isValidEmailAddress && !isValidPhoneNumber) {
         setSendButtonActive(false);
-        setErrorMessage('Please enter a valid email address');
+        setErrorMessage('Please enter a valid email address or phone number');
       } else if (isNaN(amountToNumber) && amountToNumber < 0.00001) {
         setSendButtonActive(false);
         setErrorMessage('Please enter a valid number');
@@ -223,6 +228,29 @@ function SendPage() {
       const cleanedAddress = removeWhitespace(addressText)
       const cleanedAmount = amountText.replace(/[\s$,!#%&*()A-Za-z]/g, '');
       const amountToNumber = Number(cleanedAmount);
+      const cleanedPhoneNumber = removeWhitespace(addressText).replace(/[-()]/g, '');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      const isValidEmailAddress = emailRegex.test(cleanedAddress);
+      const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
+
+      let dataType = ""
+      let receiverData = ""
+
+      if (!isValidEmailAddress && isValidPhoneNumber) {
+        // sending by phone number
+        dataType = "phone"
+        receiverData = cleanedPhoneNumber
+      } else if (isValidEmailAddress && !isValidPhoneNumber) {
+        // sending by email
+        dataType = "email"
+        receiverData = cleanedAddress
+      } else {
+        setErrorMessage('Problem with address or phone number input');
+        return
+      }
+
       if (isNaN(amountToNumber)) {
         setErrorMessage('Invalid amount');
       } else if (amountToNumber > stableCoinBalance) {
@@ -237,25 +265,29 @@ function SendPage() {
         const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
         setSendButtonActive(false); // Deactivate button here
         console.log('Requesting new transaction')
+        
+        // get the potential matches
+        const users = await getDynamicUsers(receiverData, dataType);  
 
+        let locatedUser: User | null = null;
 
-        const users = await getDynamicUsers(cleanedAddress); // Get all the dynamic users on the SOL network
-        const sendToDynamicUserPublicKey = await getUserInfoFromEmail(users, cleanedAddress);
-
-
-        console.log('sendToPublicKey', sendToDynamicUserPublicKey)
-
+        if (dataType == 'email') {
+          locatedUser = await cleanDynamicUserDataWithEmail(users, cleanedAddress);
+        } else if (dataType == 'phone') {
+          locatedUser =  await cleanDynamicUserDataWithPhone(users, cleanedAddress);
+        }
         /*
-        If there is a myfye user with this email, send to their public key, else
-        send to the server address and send the user an email letting them
-        know that they have money on MyFye. When the users comes to make an
-        account, send them the money.
+        If there is a myfye user with this email or phone number, send to 
+        their public key, else send to the server address and send the user 
+        an email ot text letting them know that they have money on MyFye. 
+        When the users comes to make an account, send them the money.
         */
 
-        let sendToPublicKey 
+        let sendToPublicKey
 
-        if (sendToDynamicUserPublicKey) {
-          sendToPublicKey = sendToDynamicUserPublicKey
+        if (locatedUser && locatedUser?.walletPublicKey) {
+          console.log('found the user with publicKey', locatedUser?.walletPublicKey)
+          sendToPublicKey = locatedUser?.walletPublicKey
         } else {
           sendToPublicKey = 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn'
         }
@@ -266,10 +298,18 @@ function SendPage() {
 
         console.log('Got transaction status: ', transactionSuccess)
         if (transactionSuccess) {
-          sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
-          const updateTransactionsPromise = saveTransaction(amountToNumber, cleanedAddress);
-          const updateContactsPromise = saveContact(cleanedAddress);
-          await Promise.all([updateTransactionsPromise, updateContactsPromise]);
+
+          if (dataType == 'email') {
+            sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
+            const updateTransactionsPromise = saveTransaction(amountToNumber, cleanedAddress);
+            const updateContactsPromise = saveEmailContact(cleanedAddress);
+            await Promise.all([updateTransactionsPromise, updateContactsPromise]);
+          } else if (dataType == 'phone') {
+            sendText(locatedUser, currentUserFirstName, cleanedPhoneNumber, amountToNumber)
+            const updateTransactionsPromise = saveTransaction(amountToNumber, cleanedPhoneNumber);
+            const updateContactsPromise = savePhoneContact(cleanedPhoneNumber);
+            await Promise.all([updateTransactionsPromise, updateContactsPromise]);
+          }
           setSendInProgress(false);
 
           if (sendToPublicKey == 'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn') {
@@ -279,7 +319,7 @@ function SendPage() {
 
           setErrorMessage('');
           // this is a rough workaround to save the change to redux and reload the page
-          setTimeout(() =>  setErrorMessage(`Sent USD to ${addressText}`), 20);
+          setTimeout(() =>  setErrorMessage(`Sent USD to ${addressText}`), 30);
       } else {
         setSendInProgress(false);
         setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
@@ -288,11 +328,11 @@ function SendPage() {
   };
 }
 
-const getDynamicUsers = async (emailAddress: string) => {
+const getDynamicUsers = async (receiverData: string, dataType: string) => {
   const functions = getFunctions();
   const getUserDataFn = httpsCallable(functions, 'getDynamicUsers');
 
-  return getUserDataFn({emailAddress: emailAddress}).then((result) => {
+  return getUserDataFn({receiverData: receiverData, dataType: dataType}).then((result) => {
     // Assuming the result follows the structure { data: { users: User[] } }
     const usersData = result as HttpsCallableResult<{ users: User[] }>;
     console.log("usersData", usersData);
@@ -304,14 +344,35 @@ const getDynamicUsers = async (emailAddress: string) => {
 };
 
 
-const getUserInfoFromEmail = async (data: { users: User[] }, sendToEmail: string) => {
+const cleanDynamicUserDataWithEmail = async (data: { users: User[] }, sendToEmail: string) => {
   if (data && data.users) {
     for (const user of data.users) {
       const email = user.email ?? "No email provided";
       const walletPublicKey = user.walletPublicKey ?? "No public key provided";
       console.log(`Email: ${email}, Wallet Public Key: ${walletPublicKey}`);
       if (sendToEmail === email && walletPublicKey !== "No public key provided") {
-        return walletPublicKey;  // This will return the walletPublicKey from the function
+        return user;  // This will return the walletPublicKey from the function
+      }
+    }
+    console.log("No matching user found");
+    return null;  // Optionally return null if no matching email is found
+  } else {
+    console.log("No user data available");
+    return null;  // Return null if data or users array is not valid
+  }
+};
+
+const cleanDynamicUserDataWithPhone = async (data: { users: User[] }, sendToPhoneNumber: string) => {
+  if (data && data.users) {
+    for (const user of data.users) {
+      const phoneNumber = user.phoneNumber ?? "No email provided";
+      const phoneCountryCode = user.phoneCountryCode ?? "No country code provided";
+      const walletPublicKey = user.walletPublicKey ?? "No public key provided";
+      if (sendToPhoneNumber === phoneNumber && walletPublicKey !== "No public key provided") {
+        console.log(`phoneNumber: ${phoneNumber}, 
+          Country code: ${phoneCountryCode}, 
+          Wallet Public Key: ${walletPublicKey}`);
+        return user;  // This will return the walletPublicKey from the function
       }
     }
     console.log("No matching user found");
@@ -366,6 +427,11 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
       });
 };
 
+const sendText = async (user: User | null, firstName: string, email: string, amount: number) => {
+
+  console.log('sending text!')
+};
+
 async function saveTransaction(amount: number, address: string) {
   const transactionsCollectionRef = collection(db, 'payTransactions');
   try {
@@ -390,7 +456,7 @@ async function saveTransaction(amount: number, address: string) {
   }
 }
 
-async function saveContact(sendToAddress: string) {
+async function saveEmailContact(sendToAddress: string) {
   /*
   Perform a write every time
   even if the contacts already know eachother
@@ -406,6 +472,27 @@ async function saveContact(sendToAddress: string) {
 const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
 const updateContactTwo = await setDoc(contactDocRefTwo, {
   emails: arrayUnion(currentUserEmail)
+}, { merge: true });
+
+  await Promise.all([updateContactOne, updateContactTwo]);
+}
+
+async function savePhoneContact(sendToAddress: string) {
+  /*
+  Perform a write every time
+  even if the contacts already know eachother
+  TO DO:
+  make it more efficient
+  */
+  const contactCollectionRef = collection(db, 'contacts');
+  const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+  const updateContactOne = await setDoc(contactDocRef, {
+    phoneNumbers: arrayUnion(sendToAddress)
+}, { merge: true });
+
+const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
+const updateContactTwo = await setDoc(contactDocRefTwo, {
+  phoneNumbers: arrayUnion(currentUserEmail)
 }, { merge: true });
 
   await Promise.all([updateContactOne, updateContactTwo]);
@@ -628,7 +715,7 @@ alignItems: 'center' }}>
       borderRadius: '5px', // Rounded edges
       padding: '10px 10px', // Adjust padding as needed
     }}
-    placeholder="Email Address"
+    placeholder="Email Address Or Phone Number"
   />
 </div>
 

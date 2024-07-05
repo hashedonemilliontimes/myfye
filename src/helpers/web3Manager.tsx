@@ -108,24 +108,28 @@ export const fetchPYUSDBalance = async (address: string): Promise<number> => {
   const connection = new Connection(QUICKNODE_RPC);
   
   // The mint address for USDC on Solana's mainnet
-  const pyusdMintAddress = "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo";
+  const pyusdMintAddress = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
 
   try {
     const publicKey = new PublicKey(address);
 
     // Fetch all SPL token accounts owned by the wallet address
     const parsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
-      programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') // SPL Token program ID
+      programId: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb') // Token program 2022
     });
+    for (const account of parsedTokenAccounts.value) {
+     console.log(account)
+    }
 
     for (const account of parsedTokenAccounts.value) {
+
       const mintAddress = account.account.data.parsed.info.mint;
 
       // Check if the mint address matches that of USDC
       if (mintAddress === pyusdMintAddress) {
-        const usdcBalance = account.account.data.parsed.info.tokenAmount.uiAmount;
+        const pyusdBalance = account.account.data.parsed.info.tokenAmount.uiAmount;
         // console.log(`Balance of ${address} got : ${usdcBalance} USDC `);
-        return usdcBalance;
+        return pyusdBalance;
       }
     }
 
@@ -253,6 +257,7 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
       const destinationPublicKey = new PublicKey(MYFYE_SERVER_ADDRESS);
 
       let mintAddress: string;
+      let programId: string = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
       if (currencySelected === 'usdcSol') {
           mintAddress = USDC_MINT_ADDRESS;
       } else if (currencySelected === 'usdtSol') {
@@ -261,12 +266,13 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
         mintAddress = USDY_MINT_ADDRESS;
       } else if (currencySelected === 'pyusdSol') {
         mintAddress = PYUSD_MINT_ADDRESS;
+        programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
       }
 
  
       const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
         senderPublicKey,
-        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+        { programId: new PublicKey(programId) }
       );
 
       //currencySelected = usdcSol or usdtSol
@@ -282,7 +288,7 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
 
       const receiverParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
         destinationPublicKey,
-        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+        { programId: new PublicKey(programId) }
       );
 
       const receiverUsdcAccountInfo = receiverParsedTokenAccounts.value.find(
@@ -306,7 +312,7 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
       const receiverUsdcTokenAccount = new PublicKey(receiverUsdcAccountInfo.pubkey);
 
       const transferInstruction = Token.createTransferInstruction(
-        new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+        new PublicKey(programId),
         senderUsdcTokenAccount,
         receiverUsdcTokenAccount,
         payer,
@@ -408,6 +414,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
     const destinationPublicKey = new PublicKey(MYFYE_SERVER_ADDRESS);
 
     let mintAddress: string;
+    let programId: string = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
     if (currencySelected === 'usdcSol') {
         mintAddress = USDC_MINT_ADDRESS;
     } else if (currencySelected === 'usdtSol') {
@@ -416,11 +423,12 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
       mintAddress = USDY_MINT_ADDRESS;
     } else if (currencySelected === 'pyusdSol') {
       mintAddress = PYUSD_MINT_ADDRESS;
+      programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
     }
 
       const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
         senderPublicKey,
-        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+        { programId: new PublicKey(programId) }
       );
 
       //currencySelected = usdcSol or usdtSol
@@ -436,7 +444,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
 
       const receiverParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
         destinationPublicKey,
-        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+        { programId: new PublicKey(programId) }
       );
 
       const receiverUsdcAccountInfo = receiverParsedTokenAccounts.value.find(
@@ -460,7 +468,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
       const receiverUsdcTokenAccount = new PublicKey(receiverUsdcAccountInfo.pubkey);
 
       const transferInstruction = Token.createTransferInstruction(
-        new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+        new PublicKey(programId),
         senderUsdcTokenAccount,
         receiverUsdcTokenAccount,
         payer,
@@ -593,6 +601,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         const destinationPublicKey = new PublicKey(receiverPubKey);
   
         let mintAddress: string;
+        let programId: string = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
         if (currencySelected === 'usdcSol') {
             mintAddress = USDC_MINT_ADDRESS;
         } else if (currencySelected === 'usdtSol') {
@@ -601,12 +610,13 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
           mintAddress = USDY_MINT_ADDRESS;
         } else if (currencySelected === 'pyusdSol') {
           mintAddress = PYUSD_MINT_ADDRESS;
+          programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
         }
   
    
         const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
           senderPublicKey,
-          { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+          { programId: new PublicKey(programId) }
         );
   
         //currencySelected = usdcSol or usdtSol
@@ -622,7 +632,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   
         const receiverParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
           destinationPublicKey,
-          { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+          { programId: new PublicKey(programId) }
         );
   
         const receiverUsdcAccountInfo = receiverParsedTokenAccounts.value.find(
@@ -646,7 +656,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         const receiverUsdcTokenAccount = new PublicKey(receiverUsdcAccountInfo.pubkey);
   
         const transferInstruction = Token.createTransferInstruction(
-          new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+          new PublicKey(programId),
           senderUsdcTokenAccount,
           receiverUsdcTokenAccount,
           payer,
@@ -702,8 +712,9 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
       const senderPublicKey = new PublicKey(payerPubKey);
       console.log('receiverPubKey', receiverPubKey)
       const destinationPublicKey = new PublicKey(receiverPubKey);
-  
+
       let mintAddress: string;
+      let programId: string = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
       if (currencySelected === 'usdcSol') {
           mintAddress = USDC_MINT_ADDRESS;
       } else if (currencySelected === 'usdtSol') {
@@ -712,19 +723,21 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         mintAddress = USDY_MINT_ADDRESS;
       } else if (currencySelected === 'pyusdSol') {
         mintAddress = PYUSD_MINT_ADDRESS;
+        programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
       }
   
+      console.log('Searching with program id: ', programId)
         const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
           senderPublicKey,
-          { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+          { programId: new PublicKey(programId) }
         );
   
         //currencySelected = usdcSol or usdtSol
-        const payerUsdcAccountInfo = payerParsedTokenAccounts.value.find(
+        const payerAccountInfo = payerParsedTokenAccounts.value.find(
           (accountInfo: { account: { data: { parsed: { info: { mint: string } } } } }) => accountInfo.account.data.parsed.info.mint === mintAddress
         );
         
-        if (!payerUsdcAccountInfo) {
+        if (!payerAccountInfo) {
           throw new Error(currencySelected + " account not found for payer.");
         } else {
           console.log(currencySelected + " account found for payer.");
@@ -732,39 +745,59 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   
         const receiverParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
           destinationPublicKey,
-          { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+          { programId: new PublicKey(programId) }
         );
   
-        const receiverUsdcAccountInfo = receiverParsedTokenAccounts.value.find(
+        let receiverAccountInfo = receiverParsedTokenAccounts.value.find(
           (accountInfo: { account: { data: { parsed: { info: { mint: string } } } } }) => accountInfo.account.data.parsed.info.mint === mintAddress
         );
-  
-        if (!receiverUsdcAccountInfo) {
-          throw new Error(currencySelected + " account not found for receiver.");
+        
+
+        if (!receiverAccountInfo) {
+          const functions = getFunctions();
+          const newTokenAccount = httpsCallable(functions, 'createNewTokenAccount');
+        
+          try {
+            const result = await newTokenAccount({
+              payerPubKey: payerPubKey,
+              receiverPubKey: receiverPubKey,
+              mintAddress: mintAddress!,
+              programId: programId,
+            });
+        
+            console.log("Got the new token account from fucntions! result", result);
+
+            // Assuming the function returns the needed account info in result.data
+            receiverAccountInfo = result.data;
+            
+
+          } catch (error) {
+            console.error("Failed to create or fetch the token account:", error);
+          }
         } else {
           console.log(currencySelected + " account found for receiver.");
         }
   
-        if (!payerUsdcAccountInfo || !receiverUsdcAccountInfo) {
+        if (!payerAccountInfo || !receiverAccountInfo) {
           throw new Error(currencySelected + " account not found for payer or receiver.");
         }
   
         // console.log("payerUsdcAccountInfo", JSON.stringify(payerUsdcAccountInfo, null, 2));
         // console.log("receiverUsdcAccountInfo", JSON.stringify(receiverUsdcAccountInfo, null, 2));
   
-        const senderUsdcTokenAccount = new PublicKey(payerUsdcAccountInfo.pubkey);
-        const receiverUsdcTokenAccount = new PublicKey(receiverUsdcAccountInfo.pubkey);
+        const senderTokenAccount = new PublicKey(payerAccountInfo.pubkey);
+        const receiverTokenAccount = new PublicKey(receiverAccountInfo.pubkey);
   
+        const programIdKey = new PublicKey(programId);
+
         const transferInstruction = Token.createTransferInstruction(
-          new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
-          senderUsdcTokenAccount,
-          receiverUsdcTokenAccount,
+          programIdKey,
+          senderTokenAccount,
+          receiverTokenAccount,
           payer,
           [],
           amountSmallestDenomination
         );
-
-        const blockhashInfo2 = await connection.getRecentBlockhash();
 
         // Create the base transaction
         const txBase = new Transaction();
@@ -784,7 +817,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
   
         console.log('Sender address: ', payerPubKey);
         console.log('amountSmallestDenomination: ', amountSmallestDenomination);
-        console.log("Retrieved blockhash:", blockhashInfo2.blockhash);
+        
   
       try {
 
@@ -798,8 +831,6 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
         const transactionID = await connection.sendRawTransaction(transactionBuffer.serialize());
 
         if (transactionID) {
-
-
           let transactionConfirmed = false
           for (let attempt = 1; attempt <= 3 && !transactionConfirmed; attempt++) {
             try {
@@ -819,7 +850,7 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
             console.log("Transaction Uncomfirmed");
             return false
         } else {
-          console.log("Transaction Failed: Unknown error");
+          console.log("Transaction Failed: transactionID: ", transactionID);
           return false;
         }
   

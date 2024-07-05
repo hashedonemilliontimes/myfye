@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import crypto from '../helpers/cryptoDataType';  // Assuming cryptoDataType exports a type named CryptoType
 import wallet from '../helpers/walletDataType';
+import User from '../helpers/User';
 
 interface UserWalletDataState {
   currentUserFirstName: string;
@@ -43,7 +44,7 @@ interface UserWalletDataState {
   showEarnWithdrawPage: boolean,
   showEarnDepositPage: boolean,
   priceOfUSDYinUSDC: number,
-  contacts: string[]
+  contacts: (User | string)[];
   selectedContactEmail: string,
 }
 
@@ -240,8 +241,13 @@ export const userWalletDataSlice = createSlice({
   setPriceOfUSDYinUSDC: (state, action: PayloadAction<number>) => {
     state.priceOfUSDYinUSDC = action.payload;
   },
-  setContacts: (state, action: PayloadAction<string[]>) => {
-    state.contacts = action.payload;
+  setContacts: (state, action: PayloadAction<(User | string)[]>) => {
+    // Merge new contacts with existing contacts
+    state.contacts = [...state.contacts, ...action.payload];
+  },
+  clearContacts: (state) => {
+    // Clear all contacts
+    state.contacts = [];
   },
   setSelectedContactEmail: (state, action: PayloadAction<string>) => {
     state.selectedContactEmail = action.payload;
@@ -267,7 +273,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setNewUserHasPreviousBalance, setShowRequestPage,
   setShowProfileMenu, setShowEarnWithdrawPage,
   setShowEarnDepositPage, setHotBalanceUSDY,
-  setPriceOfUSDYinUSDC, setContacts, setSelectedContactEmail
+  setPriceOfUSDYinUSDC, setContacts, clearContacts, setSelectedContactEmail
   
 } = userWalletDataSlice.actions;
 

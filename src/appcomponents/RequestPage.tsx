@@ -134,21 +134,24 @@ function RequestPage() {
       return str.replace(/\s/g, '');
     };
 
-
     const checkForValidInput = (newAddress: string, newAmount: string) => {
       const preCleanedAmount = newAmount.replace(/[\s$,!#%&*()A-Za-z]/g, '');
       const cleanedAmount = removeWhitespace(preCleanedAmount);
       const amountToNumber = Number(cleanedAmount);
       const cleanedAddress = removeWhitespace(newAddress);
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-      const isValidEmailAddress = regex.test(cleanedAddress);
+      const cleanedPhoneNumber = removeWhitespace(cleanedAddress).replace(/[-()]/g, '');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      const isValidEmailAddress = emailRegex.test(cleanedAddress);
+      const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
   
       if (cleanedAmount === '' || cleanedAddress === '') {
           setSendButtonActive(false);
           setErrorMessage('Please fill in all fields');
-      } else if (!isValidEmailAddress) {
+      } else if (!isValidEmailAddress && !isValidPhoneNumber) {
         setSendButtonActive(false);
-        setErrorMessage('Please enter a valid email address');
+        setErrorMessage('Please enter a valid email address or phone number');
       } else if (isNaN(amountToNumber) && amountToNumber < 0.00001) {
         setSendButtonActive(false);
         setErrorMessage('Please enter a valid number');
@@ -166,9 +169,18 @@ function RequestPage() {
   const handleSendButtonClick = async () => {
     if (sendButtonActive) {
       const cleanedAddress = removeWhitespace(addressText)
+      const cleanedPhoneNumber = cleanedAddress.replace(/[-()]/g, '');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      const isValidEmailAddress = emailRegex.test(cleanedAddress);
+      const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
+
       const cleanedAmount = amountText.replace(/[\s$,!#%&*()A-Za-z]/g, '');
       const amountToNumber = Number(cleanedAmount);
-      if (isNaN(amountToNumber)) {
+      if (!isValidEmailAddress && !isValidPhoneNumber) {
+        setErrorMessage('Please enter a valid email or phone number');
+      } else if (isNaN(amountToNumber)) {
         setErrorMessage('Invalid amount');
       } else if (amountToNumber > 10000) {
         setErrorMessage('Maximum $10,000');
@@ -178,12 +190,37 @@ function RequestPage() {
         setAmountText('');
         setAddressText('')
 
-        sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
-        await saveContact(cleanedAddress);
+        if (isValidPhoneNumber) {
+          sendPhoneText(currentUserFirstName, cleanedAddress, amountToNumber)
+          await savePhoneContact(cleanedAddress);
+        } else if (isValidEmailAddress) {
+          sendEmail(currentUserFirstName, cleanedAddress, amountToNumber)
+          await saveEmailContact(cleanedAddress);
+        }
+
         setErrorMessage(`Invoice sent to ${cleanedAddress}`)
     }
   };
 }
+
+
+const sendPhoneText = async (firstName: string, phoneNumber: string, amount: number) => {
+
+  const functions = getFunctions();
+
+  const message = `${firstName} requested $${amount} with Myfye! Hop on to https://myfye.com to pay and connect with ${firstName}. Don't know why you are receiving this message? Don't worry, you can safely ignore it.`
+  const sendTextMessageFn = httpsCallable(functions, 
+    'sendTextMessage');
+    sendTextMessageFn({ message: message, phoneNumber: phoneNumber})
+    .then((result) => {
+        // Read result of the Cloud Function.
+        console.log(result);
+    })
+    .catch((error) => {
+        // Getting the Error details.
+        console.log(error);
+    });
+};
 
 const sendEmail = async (firstName: string, email: string, amount: number) => {
 
@@ -204,7 +241,7 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
       });
 };
 
-async function saveContact(sendToAddress: string) {
+async function saveEmailContact(sendToAddress: string) {
   /*
   Perform a write every time
   even if the contacts already know eachother
@@ -220,6 +257,27 @@ async function saveContact(sendToAddress: string) {
 const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
 const updateContactTwo = await setDoc(contactDocRefTwo, {
   emails: arrayUnion(currentUserEmail)
+}, { merge: true });
+
+  await Promise.all([updateContactOne, updateContactTwo]);
+}
+
+async function savePhoneContact(sendToAddress: string) {
+  /*
+  Perform a write every time
+  even if the contacts already know eachother
+  TO DO:
+  make it more efficient
+  */
+  const contactCollectionRef = collection(db, 'contacts');
+  const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+  const updateContactOne = await setDoc(contactDocRef, {
+    phoneNumbers: arrayUnion(sendToAddress)
+}, { merge: true });
+
+const contactDocRefTwo = doc(contactCollectionRef, sendToAddress);
+const updateContactTwo = await setDoc(contactDocRefTwo, {
+  phoneNumbers: arrayUnion(currentUserEmail)
 }, { merge: true });
 
   await Promise.all([updateContactOne, updateContactTwo]);
@@ -367,7 +425,7 @@ alignItems: 'center' }}>
 <div>
 <div style={{marginTop: '50px', fontSize: '24px'}}>
 
-<div style={{color: '#2E7D32'}}>They get an email... you<br/> get paid</div>
+<div style={{color: '#2E7D32'}}>They get a message, you<br/> get paid</div>
 
 </div>
 
@@ -391,7 +449,7 @@ alignItems: 'center' }}>
       borderRadius: '5px', // Rounded edges
       padding: '10px 10px', // Adjust padding as needed
     }}
-    placeholder="Email Address"
+    placeholder="Email Or Phone Number"
     autoCapitalize="none"
   />
 </div>

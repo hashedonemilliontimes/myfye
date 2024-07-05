@@ -16,9 +16,11 @@ import { getFirestore, collection, addDoc,
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import history from '../assets/history.png';
 import PayTransactions from './PayTransactions';
+import User from '../helpers/User';
 
 function PayPage() {
   
+  const [showContactPage, setshowContactPage] = useState(false);
   const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
@@ -30,19 +32,14 @@ function PayPage() {
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
     const currentUserFirstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
     const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
-    const [email, setEmail] = useState('');
+    const [referral, setReferral] = useState('');
     const [contactIndex, setContactIndex] = useState(0);
     const [showContactPopup, setShowContactPopup] = useState(false);
     const db = getFirestore();
-    interface Contact {
-      email: string;
-      firstName: string;
-      publicKey: string;
-  }
-
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newEmail = event.target.value;
-      setEmail(newEmail.toLowerCase());
+    
+    const handleReferralChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newReferral = event.target.value;
+      setReferral(newReferral.toLowerCase());
     };
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -52,38 +49,48 @@ function PayPage() {
     };
 
     const handleReferButtonPressed= async () => {
-      const cleanedEmail = removeWhitespace(email)
-      if (cleanedEmail === '') {
+      const cleanedReferral = removeWhitespace(referral)
+      const cleanedPhoneNumber = cleanedReferral.replace(/[-()]/g, '');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRegex = /^\d{10}$/;
+
+      const isValidEmailAddress = emailRegex.test(cleanedReferral);
+      const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
+
+      if (cleanedReferral === '') {
         setErrorMessage('Please enter an email address');
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedEmail)) {
-          setErrorMessage('Please enter a valid email address');
+      } else if (!isValidEmailAddress && !isValidPhoneNumber) {
+          setErrorMessage('Please enter a valid email address or phone number');
       } else {
-
-      const contactCollectionRef = collection(db, 'contacts');
-      const contactDocRef = doc(contactCollectionRef, currentUserEmail);
-      const updateContactInvites = await setDoc(contactDocRef, {
-        emails: arrayUnion(cleanedEmail)
-    }, { merge: true });
-
-      const sendEmailCall = await sendEmail(currentUserFirstName, email);
-      await Promise.all([updateContactInvites, sendEmailCall]);
-
-      if (cleanedEmail in currentUserContacts) {
-
-      }
-      setErrorMessage(`Invite sent to ${email}`)
-      setEmail('');
-
-
+        if (isValidEmailAddress) {
+          const contactCollectionRef = collection(db, 'contacts');
+          const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+          const updateContactInvites = await setDoc(contactDocRef, {
+            emails: arrayUnion(cleanedReferral)
+          }, { merge: true });
+  
+          const sendEmailCall = await sendEmail(currentUserFirstName, cleanedReferral);
+          await Promise.all([updateContactInvites, sendEmailCall]);
+  
+          setErrorMessage(`Invite sent to ${cleanedReferral}`)
+          setReferral('');
+        } else if (isValidPhoneNumber) {
+          const contactCollectionRef = collection(db, 'contacts');
+          const contactDocRef = doc(contactCollectionRef, currentUserEmail);
+          const updateContactInvites = await setDoc(contactDocRef, {
+            phoneNumbers: arrayUnion(cleanedPhoneNumber)
+          }, { merge: true });
+  
+          const sendPhoneTextCall = await sendPhoneText(currentUserFirstName, cleanedReferral);
+          await Promise.all([updateContactInvites, sendPhoneTextCall]);
+  
+          setErrorMessage(`Invite sent to ${cleanedReferral}`)
+          setReferral('');
+        }
       }
     };
 
     const sendEmail = async (firstName: string, email: string) => {
-
-      const requestData = {
-          emailAddress: email,
-          firstName: firstName,
-        };
 
         const functions = getFunctions();
 
@@ -101,7 +108,24 @@ function PayPage() {
               console.log(error);
           });
 
+    };
 
+    const sendPhoneText = async (firstName: string, phoneNumber: string) => {
+
+        const functions = getFunctions();
+
+        const message = `${firstName} invited you to join MyFye! Hop on to https://myfye.com`
+        const sendTextMessageFn = httpsCallable(functions, 
+          'sendTextMessage');
+          sendTextMessageFn({ message: message, phoneNumber: phoneNumber})
+          .then((result) => {
+              // Read result of the Cloud Function.
+              console.log(result);
+          })
+          .catch((error) => {
+              // Getting the Error details.
+              console.log(error);
+          });
     };
 
     useEffect(() => {
@@ -139,6 +163,7 @@ function PayPage() {
       } else {
           const event = eventOrContact;
           // Handle the case where the event is passed
+          dispatch(setSelectedContactEmail(currentUserContacts[contactIndex].email));
           dispatch(setShouldShowBottomNav(false));
           dispatch(setShowSendPage(true));
       }
@@ -154,6 +179,7 @@ function PayPage() {
     } else {
         const event = eventOrContact;
         // Handle the case where the event is passed
+        dispatch(setSelectedContactEmail(currentUserContacts[contactIndex].email));
         dispatch(setShouldShowBottomNav(false));
         dispatch(setShowRequestPage(true));
     }
@@ -181,6 +207,11 @@ function PayPage() {
       setShowContactPopup(true)
       setContactIndex(index)
     };
+
+    const browseAllContactsClicked= async () => {
+      console.log(currentUserContacts)
+      setshowContactPage(true)
+    }
 
     const errorLabelText = () => {
       if (errorMessage) {
@@ -331,7 +362,11 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
-            {currentUserContacts[0].charAt(0).toUpperCase()}
+            {
+              typeof currentUserContacts[0] === 'string'
+                ? currentUserContacts[0].charAt(0).toUpperCase()
+                : `${currentUserContacts[0].firstName.charAt(0).toUpperCase()}`
+            }
         </div>
 
         <div style={{
@@ -345,7 +380,11 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
-            {currentUserContacts[0]}
+            {
+              typeof currentUserContacts[0] === 'string'
+                ? currentUserContacts[0]
+                : `${currentUserContacts[0].firstName} ${currentUserContacts[0].lastName}`
+            }
         </div>
 
     </div>
@@ -372,7 +411,14 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
-            {currentUserContacts[1].charAt(0).toUpperCase()}
+          
+          <div>
+            {
+              typeof currentUserContacts[1] === 'string'
+                ? currentUserContacts[1].charAt(0).toUpperCase()
+                : `${currentUserContacts[1].firstName.charAt(0).toUpperCase()}`
+            }
+          </div>
         </div>
 
         <div style={{
@@ -386,7 +432,11 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
-            {currentUserContacts[1]}
+            {
+              typeof currentUserContacts[1] === 'string'
+                ? currentUserContacts[1]
+                : `${currentUserContacts[1].firstName} ${currentUserContacts[1].lastName}`
+            }
         </div>
 
     </div>
@@ -412,7 +462,11 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
-            {currentUserContacts[2].charAt(0).toUpperCase()}
+            {
+              typeof currentUserContacts[2] === 'string'
+                ? currentUserContacts[2].charAt(0).toUpperCase()
+                : `${currentUserContacts[2].firstName.charAt(0).toUpperCase()}`
+            }
         </div>
 
         <div style={{
@@ -426,24 +480,34 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
-            {currentUserContacts[2]}
+            {
+              typeof currentUserContacts[2] === 'string'
+                ? currentUserContacts[2]
+                : `${currentUserContacts[2].firstName} ${currentUserContacts[2].lastName}`
+            }
         </div>
 
     </div>
     )}
         
+{/*
+        <div onClick={browseAllContactsClicked}>Contacts</div>
+*/}
   </div>
+
+
 )}
+
 
 
 <div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>Refer a friend!</div>
 
     <input
-      id="email"
+      id="emailOrPhone"
       type="text"
-      value={email}
-      onChange={handleEmailChange}
-      onInput={handleEmailChange}
+      value={referral}
+      onChange={handleReferralChange}
+      onInput={handleReferralChange}
       style={{
         backgroundColor: '#EEEEEE', // Slightly lighter gray
         color: '#444444',
@@ -454,7 +518,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
         marginTop: '15px',
         width: '85vw',
       }}
-      placeholder="Email"
+      placeholder="Email Or Phone Number"
     />
 
 
@@ -532,7 +596,13 @@ zIndex: 61
 }}> 
 
 <div style={{textAlign: 'center', fontSize: '22px', marginTop: '15px'}}>
-{currentUserContacts[contactIndex]}
+  
+{
+typeof currentUserContacts[contactIndex] === 'string'
+                ? currentUserContacts[contactIndex]
+                : `${currentUserContacts[contactIndex].firstName} ${currentUserContacts[contactIndex].lastName}`
+}
+
 </div>
 
 <div style={{display: 'flex', alignItems: 'center', 
