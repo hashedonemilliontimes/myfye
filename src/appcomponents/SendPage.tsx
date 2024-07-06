@@ -307,7 +307,7 @@ function SendPage() {
             const updateContactsPromise = saveEmailContact(cleanedAddress);
             await Promise.all([updateTransactionsPromise, updateContactsPromise]);
           } else if (dataType == 'phone') {
-            sendText(locatedUser, currentUserFirstName, cleanedPhoneNumber, amountToNumber)
+            sendPhoneText(currentUserFirstName, cleanedPhoneNumber, amountToNumber)
             const updateTransactionsPromise = saveTransaction(amountToNumber, cleanedPhoneNumber);
             const updateContactsPromise = savePhoneContact(cleanedPhoneNumber);
             await Promise.all([updateTransactionsPromise, updateContactsPromise]);
@@ -429,9 +429,22 @@ const sendEmail = async (firstName: string, email: string, amount: number) => {
       });
 };
 
-const sendText = async (user: User | null, firstName: string, email: string, amount: number) => {
+const sendPhoneText = async (firstName: string, phoneNumber: string, amount: number) => {
 
-  console.log('sending text!')
+  const functions = getFunctions();
+
+  const message = `${firstName} paid you $${amount} with Myfye! Hop on to https://myfye.com to pay and connect with ${firstName}. Don't know why you are receiving this message? Don't worry, you can safely ignore it.`
+  const sendTextMessageFn = httpsCallable(functions, 
+    'sendTextMessage');
+    sendTextMessageFn({ message: message, phoneNumber: phoneNumber})
+    .then((result) => {
+        // Read result of the Cloud Function.
+        console.log(result);
+    })
+    .catch((error) => {
+        // Getting the Error details.
+        console.log(error);
+    });
 };
 
 async function saveTransaction(amount: number, address: string) {
