@@ -79,6 +79,7 @@ function SendPage() {
 
 
     useEffect(() => {
+      console.log('selectedContactEmail', selectedContactEmail)
       if (selectedContactEmail) {
         setAddressText(selectedContactEmail)
       } else {
@@ -95,11 +96,12 @@ function SendPage() {
     }, [showSendPage]);
   
     const handleMenuClick = () => {
+      console.log('handle menu click')
       dispatch(setShouldShowBottomNav(true))
       dispatch(setShowSendPage(!showSendPage));
-      if (selectedContactEmail) {
-        dispatch(setSelectedContactEmail(''));
-      }
+      dispatch(setSelectedContactEmail(''));
+      setAddressText('');
+      
     };
 
     useEffect(() => {

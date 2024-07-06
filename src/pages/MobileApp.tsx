@@ -15,7 +15,8 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   addConnectedWallets, setShowEarnPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
-  setShowWalletPage, setShouldShowBottomNav} from '../redux/userWalletData';
+  setShowWalletDepositPage, setShouldShowBottomNav, 
+  setShowWithdrawStablecoinPage, setShowWalletPage} from '../redux/userWalletData';
 import { getUserData } from '../helpers/getUserData';
 import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
@@ -27,6 +28,7 @@ import { Buffer } from 'buffer';
 import LoadingAnimation from '../components/loadingAnimation';
 import timerImage from '../assets/timer.png';
 import WalletPage from '../appcomponents/WalletPage';
+import WalletDepositPage from '../appcomponents/myWalletComponents/WalletDeposit';
 import myfyeEarn from '../assets/myfyeEarn.png';
 import myfyeBalance from '../assets/myfyeBalance.png';
 import EarnPage from '../appcomponents/EarnPage';
@@ -62,7 +64,7 @@ function WebAppInner() {
   const dispatch = useDispatch();
 
   const [userDataLoaded, setUserDataLoaded] = useState(false);
-  const ANNOUNCMENT_MESSAGE = 'PYUSD transactions are down at the moment'
+  const ANNOUNCMENT_MESSAGE = ''
 
   const getUserInfo = async () => {
 
@@ -188,11 +190,17 @@ function WebAppInner() {
     
   };
 
-  const handleWalletPageClick = () => {
-    dispatch(setShowWalletPage(true))
+  const handleWalletDepositPageClick = () => {
+    dispatch(setShouldShowBottomNav(false))
+    dispatch(setShowWalletDepositPage(true))
   };
 
-  
+  const handleWithdrawStableCoinClick = () => {
+    // Add your logic here for what happens when the menu is clicked
+    dispatch(setShouldShowBottomNav(false));
+    dispatch(setShowWithdrawStablecoinPage(true))
+    
+  };
 
   if (primaryWallet !== null || user) {
     return (
@@ -208,6 +216,7 @@ function WebAppInner() {
   <RequestPage/>
   <EarnPage/>
   <WalletPage/>
+  <WalletDepositPage/>
   <AccountHistory/>
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
@@ -280,24 +289,39 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
            <HoldingsPortfolio/>
   */}
 
-<div style={{display: 'flex', alignItems: 'center', 
-                justifyContent: 'center',
-                marginTop: '0px', gap: window.innerHeight < 675 ? '-10px' : '0px'}}>
+<div style={{display: 'flex', 
+alignItems: 'center', 
+                justifyContent: 'space-around',
+                marginTop: '0px',
+                width: '95vw'}}>
+
             <div style={{
            color: '#ffffff', 
            background: '#2E7D32', // gray '#999999', 
            borderRadius: '10px', 
            border: '2px solid #2E7D32', 
            fontWeight: 'bold',
-           height: '40px', 
-           width: '210px',
-           display: 'flex',        // Makes this div also a flex container
-           justifyContent: 'center', // Centers the text horizontally inside the button
-           alignItems: 'center',// Centers the text vertically inside the button
            cursor: 'pointer',
-           fontSize: '20px'     
-       }} onClick={handleWalletPageClick}>
-           View Wallet
+           fontSize: '20px',
+           padding: '9px',
+           width: '120px',
+           textAlign: 'center'
+       }} onClick={handleWalletDepositPageClick}>
+           Deposit
+       </div>
+       <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+            padding: '9px',
+           cursor: 'pointer',
+           fontSize: '20px',     
+           width: '120px',
+           textAlign: 'center'
+       }} onClick={handleWithdrawStableCoinClick}>
+           Withdraw
        </div>
        </div>
 

@@ -89,15 +89,12 @@ function Deposit() {
         setMenuPosition('-100vh'); // Move the menu off-screen
 
 
-        if (usdcSolBalance >= MINIMUM_DEPOSIT_VALUE && (usdtSolBalance < 0.01 && pyusdSolBalance < 0.01)) {
+        if (usdcSolBalance >= MINIMUM_DEPOSIT_VALUE && (usdtSolBalance < 0.01)) {
           setcurrencySelected('usdcSol')
           setbalanceSelectedInUSD(usdcSolBalance);
-        } else if (usdtSolBalance >= MINIMUM_DEPOSIT_VALUE && usdcSolBalance < 0.01 && pyusdSolBalance < 0.01) {
+        } else if (usdtSolBalance >= MINIMUM_DEPOSIT_VALUE && usdcSolBalance < 0.01) {
           setcurrencySelected('usdtSol')
           setbalanceSelectedInUSD(usdtSolBalance);
-        } else if (pyusdSolBalance >= MINIMUM_DEPOSIT_VALUE && usdtSolBalance < 0.01 && usdcSolBalance < 0.01) {
-          setcurrencySelected('pyusdSol')
-          setbalanceSelectedInUSD(pyusdSolBalance);
         } else {
           setcurrencySelected('')
         }

@@ -153,36 +153,34 @@ function PayPage() {
     };
 
 
-    const handleSendPageClick = (eventOrContact: React.MouseEvent<HTMLDivElement> | string = '') => {
-      if (typeof eventOrContact === 'string') {
-          const selectedContact = eventOrContact;
-          // Handle the case where a string is passed
-          dispatch(setShouldShowBottomNav(false));
-          dispatch(setShowSendPage(true));
-          dispatch(setSelectedContactEmail(selectedContact));
+    const handleSendPageClick = (contact: User | string) => {
+      let email: string;
+
+      if (typeof contact === 'string') {
+        email = contact;
       } else {
-          const event = eventOrContact;
-          // Handle the case where the event is passed
-          dispatch(setSelectedContactEmail(currentUserContacts[contactIndex].email));
-          dispatch(setShouldShowBottomNav(false));
-          dispatch(setShowSendPage(true));
-      }
+        email = contact.email!;
+      } 
+    
+      dispatch(setSelectedContactEmail(email));
+      dispatch(setShouldShowBottomNav(false));
+      dispatch(setShowSendPage(true));
+      
   };
       
-  const handleRequestPageClick = (eventOrContact: React.MouseEvent<HTMLDivElement> | string = '') => {
-    if (typeof eventOrContact === 'string') {
-        const selectedContact = eventOrContact;
-        // Handle the case where a string is passed
-        dispatch(setShouldShowBottomNav(false));
-        dispatch(setShowRequestPage(true));
-        dispatch(setSelectedContactEmail(selectedContact));
+  const handleRequestPageClick = (contact: User | string) => {
+    let email: string;
+
+    if (typeof contact === 'string') {
+      email = contact;
     } else {
-        const event = eventOrContact;
-        // Handle the case where the event is passed
-        dispatch(setSelectedContactEmail(currentUserContacts[contactIndex].email));
-        dispatch(setShouldShowBottomNav(false));
-        dispatch(setShowRequestPage(true));
-    }
+      email = contact.email!;
+    } 
+  
+    dispatch(setSelectedContactEmail(email));
+    dispatch(setShouldShowBottomNav(false));
+    dispatch(setShowRequestPage(true));
+    
 };
 
     const toggleShowTransactionHistory = () => {
@@ -318,7 +316,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={handleSendPageClick}>Send</div>
+    }} onClick={() => handleSendPageClick('')}>Send</div>
     <div style={{
       color: '#ffffff', 
       background: '#2E7D32', // gray '#999999', 
@@ -332,17 +330,17 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={handleRequestPageClick}>Request</div>
+    }} onClick={() => handleRequestPageClick('')}>Request</div>
   </div>
 </div>
 
 {currentUserContacts && currentUserContacts[0] && currentUserContacts.length > 0 && (
-  <div style= {{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+  <div style= {{display: 'flex', flexDirection: 'column', gap: '10px',}}>
     <div style={{fontSize: '25px', 
       fontWeight: 'bold', 
       marginTop: '15px'}}>Top Contacts</div>
 
-
+<div style= {{display: 'flex', flexDirection: 'column', gap: '10px', marginLeft: '15px'}}>
     <div style={{ display: 'flex', 
     alignItems: 'center', 
     justifyContent: 'left',
@@ -490,12 +488,27 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     </div>
     )}
         
-{/*
-        <div onClick={browseAllContactsClicked}>Contacts</div>
-*/}
+        <div style={{display: 'flex', alignItems: 'center', 
+          justifyContent: 'center', marginLeft: '-15px'}}>
+        <div style={{
+          backgroundColor: '#007AFF',
+          color: '#ffffff',
+          padding: '10px 20px',
+          fontSize: '25px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          borderRadius: '10px',
+          border: '1px solid transparent',
+          cursor: 'pointer',
+          marginTop: '5px',
+          maxWidth: '220px'
+        }}
+        onClick={browseAllContactsClicked}>Contacts</div>
+        </div>
+
   </div>
 
-
+  </div>
 )}
 
 

@@ -127,7 +127,7 @@ function DepositStableCoin() {
 
 
 
-<div style={{ marginTop: '45px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px', gap: '30px' }}>
+<div style={{ marginTop: '85px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px', gap: '30px' }}>
 
 <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
     
@@ -151,26 +151,7 @@ function DepositStableCoin() {
                 </div>
 
 
-                <div style={{ display: 'flex', flexDirection: 'row', paddingLeft: '15px', paddingRight: '15px', justifyContent: 'space-between', alignItems: 'center' }}>
-    
-<div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '65px', height: 'auto' }} />
-                    <div id="usdcSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
-                </div>
 
-<div style={{fontWeight: 'bold', fontSize: '20px'}}>
-    {pyusdSolBalance > 0.00001 ? (
-        <>
-        {pyusdSolBalance}
-        </>
-
-    ) : (
-<>
-0.0
-</>
-    )}
-</div>
-                </div>
 
 
 

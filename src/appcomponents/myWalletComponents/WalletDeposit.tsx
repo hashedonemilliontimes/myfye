@@ -1,0 +1,391 @@
+import React, { useState, useEffect } from 'react';
+import menuIcon from '../../assets/menuIcon.png';
+import xIcon from '../../assets/xIconGray2.png';
+import { useSelector, useDispatch } from 'react-redux';
+import backButton from '../../assets/backButton3.png';
+import DepositStableCoin from './DepositStableCoin';
+import WithdrawStableCoin from './WithdrawStableCoin';
+import ShowBanxaPopUp from './ShowBanxaPopUp';
+import myfyeWalletImage from '../../assets/myfyeWallet.png';
+import QRCode from 'qrcode.react';
+import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
+  setShowBanxaPopUp, setShowDepositStablecoinPage,
+setShowWalletPage, setShowWalletDepositPage } from '../../redux/userWalletData';
+import history from '../../assets/history.png';
+import WalletTransactions from '../WalletTransactions';
+import Banxa from '../../assets/Banxa.png';
+import { useFunding } from "@dynamic-labs/sdk-react-core";
+
+function WalletDepositPage() {
+    const showMenu = useSelector((state: any) => state.userWalletData.showWalletDepositPage);
+
+    const dispatch = useDispatch()
+    const [currencySelected, setcurrencySelected] = useState('');
+    const [toggleFiat, setToggleFiat] = useState(true);
+    const [addressCopied, setAddressCopied] = useState(false);
+    const [showTransactionHistory, setshowTransactionHistory] = useState(false);
+    const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
+    const [Message, setMessage] = useState('');
+    const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
+    const [showQRCode, setshowQRCode] = useState(false);
+    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
+    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
+    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
+    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+    const [qrCodeURL, setqrCodeURL] = useState(''); 
+    const { enabled, openFunding } = useFunding();
+
+    useEffect(() => {
+      const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
+      const params = new URLSearchParams({
+        size: "150x150", // Size of the QR code
+        data: publicKey, // Data to encode
+      });
+      setqrCodeURL(`${baseUrl}?${params.toString()}`);
+    }, [publicKey]);
+
+    const removeWhitespace = (str: string) => {
+        return str.replace(/\s/g, '');
+      };
+
+    useEffect(() => {
+        if (showMenu) {
+          setMenuPosition('0'); // Bring the menu into view
+        } else {
+          setMenuPosition('-110vh'); // Move the menu off-screen
+          setcurrencySelected('');
+        }
+      }, [showMenu]);
+
+
+      const handleMenuClick = () => {
+        if (showTransactionHistory) {
+          toggleShowTransactionHistory()
+        } else {
+          if (showMenu) {
+            dispatch(setShowWalletDepositPage(false))
+            dispatch(setShouldShowBottomNav(true))
+          }
+        }
+        
+      };
+
+      const handleBanxaClick = () => {
+        openFunding({
+          token: "USDC",
+          address: publicKey,
+        }).then(() => window.alert("Exiting Crypto On Ramp!"));
+      };
+
+      const handleToggleFiat = () => {
+        setToggleFiat(!toggleFiat)
+      };
+
+      const handleWithdrawStableCoinClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+        dispatch(setShowWithdrawStablecoinPage(true))
+        
+      };
+
+      const handleDepositStableCoinClick = () => {
+        // Add your logic here for what happens when the menu is clicked
+        dispatch(setShowDepositStablecoinPage(true))
+        
+      };
+      
+
+      const toggleShowTransactionHistory = () => {
+        console.log()
+        setshowTransactionHistory(!showTransactionHistory)
+
+      };
+
+      const handleWalletClick = () => {
+        dispatch(setShowWalletDepositPage(false))
+        dispatch(setShouldShowBottomNav(true))
+        dispatch(setShowWalletPage(true))
+      };
+
+      function copyWalletAddress() {
+        navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
+            .then(() => {
+                setAddressCopied(true);
+                setTimeout(() => {
+                    setAddressCopied(false);
+                }, 2000); // Set addressCopied to false after 2 seconds
+            })
+            .catch(err => {
+                console.error('Failed to copy the address: ', err);
+            });
+    }
+      
+
+    return (
+        <div style={{ backgroundColor: 'white' }}>
+
+{ showMenu && (
+<div style={{ 
+      position: 'absolute', // Position it relative to the viewport
+      top: 0,              // Align to the top of the viewport
+      left: 0,            // Align to the right of the viewport
+      padding: '15px',
+      cursor: 'pointer',
+      zIndex: 4
+    }}>
+
+            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
+                currencySelected ? backButton : showTransactionHistory ? backButton : xIcon) : menuIcon }
+            onClick={handleMenuClick} alt="Exit" />
+            </div>)}
+
+
+
+       <WithdrawStableCoin/>
+       <ShowBanxaPopUp/>
+       <DepositStableCoin/>
+       
+      <div style={{
+        position: 'absolute',
+        top: menuPosition,
+        left: 0, // Use state variable for position
+        padding: '15px',
+        minHeight: 'calc(100% + 35px)',
+        height: '100%',
+        backgroundColor: 'white',
+        width: '94vw',
+        overflowX: 'hidden',
+        transition: 'top 0.5s ease', // Animate the left property
+        zIndex: 3
+      }}>
+
+
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<div style={{marginTop: '0px', fontSize: '45px', color: '#222222',
+}}>Deposit</div>
+</div>
+
+
+
+
+{!showTransactionHistory ? (
+<div>
+
+<div style={{
+        position: 'absolute', // Position it relative to the viewport
+        top: 0,              // Align to the top of the viewport
+        right: 0,            // Align to the right of the viewport
+        padding: '15px',
+        cursor: 'pointer',
+        zIndex: 4    
+}}>
+</div>
+
+
+
+
+<div>
+
+
+<div style={{display: 'flex', 
+alignItems: 'center', 
+                justifyContent: 'space-around',
+                marginTop: '15px',
+                width: '100vw', 
+                marginLeft: '-15px'}}>
+
+<div style={{
+    color: toggleFiat ? '#2E7D32' : '#222222',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '16px',
+    padding: '9px',
+    width: '155px',
+    textAlign: 'center',
+    borderBottom: toggleFiat ? '3px solid #2E7D32' : '3px solid #222222'
+}} onClick={handleToggleFiat}>
+    Credit/ Debit card
+</div>
+<div style={{
+    color: !toggleFiat ? '#2E7D32' : '#222222',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '16px',
+    padding: '9px',
+    width: '155px',
+    textAlign: 'center',
+    borderBottom: !toggleFiat ? '3px solid #2E7D32' : '3px solid #222222'
+}} onClick={handleToggleFiat}>
+    Crypto
+</div>
+       </div>
+
+
+
+{toggleFiat ? (
+<div style={{display: 'flex', 
+  justifyContent: 'space-around', 
+  flexDirection: 'column',
+  alignItems: 'center', height: '60vh'}}>
+
+<div>
+  <div>
+Depoist via credit or debit card directly
+</div>
+<div style={{display: 'flex', alignItems: 'center'}}>
+  <div>into your Myfye account with </div>
+    <img src={Banxa} style={{height: '30px', width: 'auto', marginLeft: '5px', marginTop: '2px'}}/>
+    </div>
+    </div>
+
+
+    <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '120px',
+           textAlign: 'center'
+       }} onClick={handleBanxaClick}>
+           Deposit
+       </div>
+
+
+
+
+
+
+<></>
+
+<div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC or </span><br/><span style={{fontWeight: 'bold'}}>USDT</span> on the Solana network!</div>
+</div>
+) : (
+<div>
+
+<div style={{display: 'flex', 
+  justifyContent: 'space-around', 
+  flexDirection: 'column',
+  alignItems: 'center', height: '60vh'}}>
+
+<div style={{width: '110px', height: '110px'}} onClick={() => setshowQRCode(true)}>
+<QRCode value={publicKey} size={110} level="H" />
+</div>
+
+<></>
+
+
+<div>
+<div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '180px',
+           textAlign: 'center'
+       }} onClick={copyWalletAddress}>
+           {addressCopied ? (
+<>Copied!</>
+           ) : (
+<>Copy Address</>
+           )}
+       </div>
+
+       <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '180px',
+           textAlign: 'center',
+           marginTop: '15px'
+       }} onClick={handleWalletClick}>
+           View Wallet Info
+       </div>
+</div>
+
+</div>
+  
+</div>
+) }
+
+
+
+
+
+
+<div>{showQRCode && (
+<div       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10 // Ensure it's above other content
+      }} onClick={() => setshowQRCode(false)}>
+
+
+<div style={{
+        position: 'fixed',
+        top: '30vh',
+        left: 0,
+        width: '100vw',
+        height: '210px',
+        background: '#ffffff',
+        zIndex: 11
+}}> 
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '5px'}}>
+<div style={{width: '200px', height: '200px'}} onClick={() => setshowQRCode(true)}>
+<QRCode value={publicKey} size={200} level="H" />
+</div>
+</div>
+
+
+</div>
+</div>)}
+</div>
+
+
+
+</div>
+
+
+
+
+</div>
+) : (
+
+  <div>
+<WalletTransactions/>
+  </div>
+)}
+
+
+
+                  </div> 
+
+
+        </div>
+    )
+}
+export default WalletDepositPage;

@@ -357,13 +357,6 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
                     <div id="usdcSolTicker" style={{ marginLeft: '8px' }}>USDC</div> {/* Adjust marginLeft as needed */}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', 
-                background: (currencySelected == 'pyusdSol') ? '#444444' : '#ffffff', 
-                color: (currencySelected == 'pyusdSol') ? '#ffffff' : '#000000',  
-padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('pyusdSol')}>
-                    <img id="usdcSolIcon" src={pyusdSol} style={{ width: '37px', height: 'auto' }} />
-                    <div id="usdcSolTicker" style={{ marginLeft: '5px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
-                </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', 
                 background: (currencySelected == 'usdtSol') ? '#444444' : '#ffffff', 
