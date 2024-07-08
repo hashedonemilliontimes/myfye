@@ -11,7 +11,7 @@ import QRCode from 'qrcode.react';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
   setShowBanxaPopUp, setShowDepositStablecoinPage,
-setShowWalletPage } from '../redux/userWalletData';
+setShowWalletPage, setShowWalletDepositPage } from '../redux/userWalletData';
 import history from '../assets/history.png';
 import WalletTransactions from './WalletTransactions';
 
@@ -70,24 +70,17 @@ function WalletPage() {
 
 
 
-      const handleWithdrawStableCoinClick = () => {
+      const handleWithdrawButtonClick = () => {
         // Add your logic here for what happens when the menu is clicked
         dispatch(setShouldShowBottomNav(false));
         dispatch(setShowWithdrawStablecoinPage(true))
         
       };
 
-      const handleBanxaPopUpClick = () => {
-        // Add your logic here for what happens when the menu is clicked
-        
-        dispatch(setShowBanxaPopUp(true))
-        
-      };
-
-      const handleDepositStableCoinClick = () => {
+      const handleDepositButtonClick = () => {
         // Add your logic here for what happens when the menu is clicked
         dispatch(setShouldShowBottomNav(false));
-        dispatch(setShowDepositStablecoinPage(true))
+        dispatch(setShowWalletDepositPage(true))
         
       };
       
@@ -172,16 +165,20 @@ function WalletPage() {
 
 
 
-<div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', paddingLeft: '15px', paddingRight: '15px' }}>
+<div style={{
+display: 'flex', alignItems: 'center', 
+justifyContent: 'center', gap: '60px',
+width: '90vw', height: '65vh', flexDirection: 'column'}}>
 
-  <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+
+  <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '15px'}}>
     
     <div style= {{fontSize: '18px', marginTop: '6px'}}>Wallet balance:</div>
     <div>
     <div style={{ fontSize: '18px' }}>
     <span style={{ fontSize: '18px' }}>$</span>
-    {((usdcSolBalance + usdtSolBalance + pyusdSolBalance) > 0.00001) ? (
-    <span style={{ fontSize: '25px' }}>{(usdcSolBalance + usdtSolBalance + pyusdSolBalance).toFixed(6)}</span>
+    {((usdcSolBalance + usdtSolBalance) > 0.00001) ? (
+    <span style={{ fontSize: '25px' }}>{(usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
     ) : (
       <span style={{ fontSize: '25px' }}>0.00</span>
     )}
@@ -192,57 +189,13 @@ function WalletPage() {
 
       </div>
 
-      <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px'}}>
-
-  <div style= {{fontSize: '18px', marginTop: '6px'}}>Earn balance:</div>
-
-{updatingBalance ? (
-<div style={{ fontSize: '25px' }}>
-  Updating
-</div>
-
-) : (
-  <div>
-    <div style={{ fontSize: '18px' }}>
-    <span style={{ fontSize: '18px' }}>$</span>
-    {((usdyBalance) > 0.001) ? (
-    <span style={{ fontSize: '25px' }}>{(usdyBalance*priceOfUSDYinUSDC).toFixed(6)}</span>
-    ) : (
-      <span style={{ fontSize: '25px' }}>0.00</span>
-    )}
-</div>
-      
-      </div>
-)}
 
 
-</div>
 
-
-<div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '15px'}}>
-
-<div style= {{fontSize: '18px', marginTop: '6px', fontWeight: 'bold'}}>Total balance:</div>
-
-<div>
-  <div style={{ fontSize: '18px' }}>
-  <span style={{ fontSize: '18px' }}>$</span>
-  {((usdyBalance*priceOfUSDYinUSDC + usdcSolBalance + usdtSolBalance + pyusdSolBalance) > 0.001) ? (
-  <span style={{ fontSize: '25px' }}>{(usdyBalance*priceOfUSDYinUSDC + usdcSolBalance + usdtSolBalance + pyusdSolBalance).toFixed(6)}</span>
-  ) : (
-    <span style={{ fontSize: '25px' }}>0.00</span>
-  )}
-</div>
-    
-    </div>
-
-</div>
-
-</div>
-
-
-<div style={{marginTop: '15px', 
+<div style={{
 display: 'flex', alignItems: 'center', 
-justifyContent: 'space-around', width: '90vw'}}>
+justifyContent: 'space-around', 
+width: '90vw',}}>
 
 
 
@@ -259,7 +212,7 @@ justifyContent: 'space-around', width: '90vw'}}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px',
-  }} onClick={handleBanxaPopUpClick}  >
+  }} onClick={handleDepositButtonClick}  >
       Deposit
   </div>
 
@@ -280,123 +233,16 @@ justifyContent: 'space-around', width: '90vw'}}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-  }} onClick={handleWithdrawStableCoinClick}>
+  }} onClick={handleWithdrawButtonClick}>
       Withdraw
   </div>
        </div>
 
 </div>
-
-
-
-
-
-<div style={{display:'flex', 
-  flexDirection: 'column', 
-  justifyContent: 'space-around',
-  height: 'calc(100vh - 320px)'}}>
-<div>
-<div style={{fontSize: '25px', marginTop: '15px',}}>Crypto Wallet</div>
-
-<div style={{marginTop: '15px', 
-display: 'flex', alignItems: 'center', 
-justifyContent: 'space-around', width: '90vw'}}>
-
-<div style={{width: '70px', height: '70px'}} onClick={() => setshowQRCode(true)}>
-<QRCode value={publicKey} size={70} level="H" />
-</div>
-
-</div>
-
-
-<div>{showQRCode && (
-<div       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10 // Ensure it's above other content
-      }} onClick={() => setshowQRCode(false)}>
-
-
-<div style={{
-        position: 'fixed',
-        top: '30vh',
-        left: 0,
-        width: '100vw',
-        height: '210px',
-        background: '#ffffff',
-        zIndex: 11
-}}> 
-
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '5px'}}>
-<div style={{width: '200px', height: '200px'}} onClick={() => setshowQRCode(true)}>
-<QRCode value={publicKey} size={200} level="H" />
-</div>
-</div>
-</div>
-</div>)}
 </div>
 
 
 
-
-<div style={{marginTop: '15px', 
-display: 'flex', alignItems: 'center', 
-justifyContent: 'space-around', width: '90vw'}}>
-
-<div style={{
-      color: 'white', 
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-  }} onClick={handleDepositStableCoinClick}>
-      Deposit
-  </div>
-
-
-<div style={{
-      color: 'white', 
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-  }} onClick={handleWithdrawStableCoinClick}>
-      Withdraw
-  </div>
-
-</div>
-</div>
-
-<div>
-<div style={{fontSize: '25px', marginTop: '15px',}}>Internal Wallet</div>
-
-<div style={{marginTop: '15px', marginLeft: '20px', width: '220px'}}>
-<DynamicWidget />
-</div>
-</div>
-
-</div>
 </div>
 
 

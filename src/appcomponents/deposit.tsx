@@ -182,7 +182,7 @@ function Deposit() {
     const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newDeposit = event.target.value;
         if (newDeposit.length == 1 && (newDeposit[0] != '$')) {
-          setDeposit("$ " + newDeposit);
+          setDeposit(newDeposit);
         } else {
           setDeposit(newDeposit);
         }

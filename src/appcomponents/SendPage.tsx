@@ -65,10 +65,13 @@ function SendPage() {
     }
 
     useEffect(() => {
+      /*
       if (pyusdSolBalance > usdtSolBalance && pyusdSolBalance > usdcSolBalance) {
         setStableCoinBalance(pyusdSolBalance)
         setcurrencySelected('pyusdSol')
-      } else if (usdtSolBalance > usdcSolBalance) {
+      } else
+       
+      */ if (usdtSolBalance > usdcSolBalance) {
         setStableCoinBalance(usdtSolBalance)
         setcurrencySelected('usdtSol')
       } else {
@@ -433,7 +436,7 @@ const sendPhoneText = async (firstName: string, phoneNumber: string, amount: num
 
   const functions = getFunctions();
 
-  const message = `${firstName} paid you $${amount} with Myfye! Hop on to https://myfye.com to pay and connect with ${firstName}. Don't know why you are receiving this message? Don't worry, you can safely ignore it.`
+  const message = `${firstName} paid you $${amount} with Myfye! Hop on to https://myfye.com to claim this cash. Don't know why you are receiving this message? Don't worry, you can safely ignore it.`
   const sendTextMessageFn = httpsCallable(functions, 
     'sendTextMessage');
     sendTextMessageFn({ message: message, phoneNumber: phoneNumber})

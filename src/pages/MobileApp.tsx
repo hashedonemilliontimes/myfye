@@ -30,7 +30,7 @@ import timerImage from '../assets/timer.png';
 import WalletPage from '../appcomponents/WalletPage';
 import WalletDepositPage from '../appcomponents/myWalletComponents/WalletDeposit';
 import myfyeEarn from '../assets/myfyeEarn.png';
-import myfyeBalance from '../assets/myfyeBalance.png';
+import myfyeWallet from '../assets/myfyeWallet2.png';
 import EarnPage from '../appcomponents/EarnPage';
 import userImage from '../assets/user.png';
 import ProfileMenu from '../appcomponents/menu';
@@ -259,7 +259,7 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '0px' : '20px'  }}>
 <div style={{display: 'flex', marginTop: '0px'}}>
 
-  <img style={{ width: '180px', height: 'auto'}}src={myfyeBalance}/>
+  <img style={{ width: '180px', height: 'auto'}}src={myfyeWallet}/>
 
 </div>
 
@@ -272,7 +272,7 @@ maxWidth: '550px', marginTop: '10px'}}></hr>
     $ <span style={{ fontSize: '35px' }}>
       
     <div>
-    {((usdcSolBalance + usdtSolBalance + pyusdSolBalance).toFixed(2)).toLocaleString('en-US')}
+    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
   </div>
 
     </span>
