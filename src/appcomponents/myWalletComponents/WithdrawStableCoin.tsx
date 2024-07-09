@@ -7,7 +7,13 @@ import usdtSol from '../../assets/usdtSol.png';
 import pyusdSol from '../../assets/pyusdSol.png';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
-import { setShowWithdrawStablecoinPage, setShouldShowBottomNav } from '../../redux/userWalletData';
+import { setShowWithdrawStablecoinPage, 
+  setShouldShowBottomNav,
+  setRecentlyUsedSolanaAddresses } from '../../redux/userWalletData';
+  import { getFirestore, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+
+
+
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
@@ -33,7 +39,9 @@ function WithdrawStableCoin() {
     const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
     const [amountText, setAmountText] = useState('');
-
+    const recentlyUsedSolanaAddresses = useSelector((state: any) => state.userWalletData.recentlyUsedSolanaAddresses);
+    const [showAddressesDropdown, setShowAddressesDropdown] = useState(false);
+    const db = getFirestore();
 
 
     useEffect(() => {
@@ -140,6 +148,13 @@ function WithdrawStableCoin() {
         
       };
 
+      const handleAddressClick = (newAddress: string) => {
+        setAddressText(newAddress);
+        setShowAddressesDropdown(false); // Hide dropdown after selection
+        checkForValidInput(newAddress, amountText);
+    };
+
+
     const removeWhitespace = (str: string) => {
         return str.replace(/\s/g, '');
       };
@@ -179,6 +194,7 @@ function WithdrawStableCoin() {
           } else {
             setAmountText('');
             setAddressText('')
+            saveRecentlyUsedSolanaAddress(cleanedAddress);
             setWithdrawalInProgress(true);
             setErrorMessage('Check your wallet');
             const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
@@ -218,6 +234,22 @@ function WithdrawStableCoin() {
         }
       };
     }
+
+    const saveRecentlyUsedSolanaAddress = async (address: string) => {
+      const publicKeyDoc = doc(db, 'pubKeys', publicKey); // `publicKey` should be defined in your scope or passed to the function
+    
+      if (!recentlyUsedSolanaAddresses.includes(address)) {
+      try {
+        await updateDoc(publicKeyDoc, {
+          recentlyUsedAddresses: arrayUnion(address)
+        });
+        setRecentlyUsedSolanaAddresses([...recentlyUsedSolanaAddresses, address]);
+        console.log('Address added to recently used addresses.');
+      } catch (error) {
+        console.error('Error updating document: ', error);
+      }
+    }
+    };
 
 
     const errorLabelText = () => {
@@ -376,7 +408,7 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
 
 <div
     style={{
-        width: '90%',
+      width: '90%',
         padding: '20px',
         borderRadius: '10px',
         marginBottom: '40px',
@@ -390,6 +422,7 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
   <div style={{marginBottom: '15px', display: 'flex', 
     flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
       
+      <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
     <input
       id="SolanaAddress"
       type="text"
@@ -403,10 +436,54 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
         border: 'none', // Remove the border
         borderRadius: '5px', // Rounded edges
         padding: '10px 10px', // Adjust padding as needed
+        width: recentlyUsedSolanaAddresses ? '80%' : ''
       }}
       placeholder="Solana Address"
+      autoComplete='off'
     />
+<div style={{
+    color: '#ffffff',
+    cursor: 'pointer',
+    marginLeft: '10px',
+    fontSize: '20px',
+    backgroundColor: '#4C7A34',
+    borderRadius: '50%',
+    width: '40px',
+    height: '40px',
+    display: 'inline-flex',  // Changed to inline-flex to respect width and height
+    alignItems: 'center',    // Vertically center the content
+    justifyContent: 'center' // Horizontally center the content
+}}
+onClick={() => setShowAddressesDropdown(!showAddressesDropdown)}>
+    @
+</div>
+      
+    </div>
+
+
+    {showAddressesDropdown && (
+                <div style={{
+                  backgroundColor: '#EEEEEE', borderRadius: '5px',
+                  color: '#444444', padding: '10px', marginTop: '5px',}}>
+                  <div style={{ fontStyle: 'italic', fontWeight: 'bold' }}>Recently Used</div>
+                    {recentlyUsedSolanaAddresses.map((address: string, index: number) => (
+                        <div
+                            key={index}
+                            onClick={() => handleAddressClick(address)}
+                            style={{
+                                cursor: 'pointer',
+                                marginBottom: '5px',
+                                borderRadius: '5px', marginLeft: '10px', marginTop: '10px'
+                            }}
+                        >
+                            {`${address.slice(0, 4)}...${address.slice(-4)}`}
+                        </div>
+                    ))}
+                </div>
+            )}
   </div>
+
+  
   <div style={{ marginBottom: '15px', display: 'flex', 
     flexDirection: 'column', opacity: withdrawalInProgress ? '0' : '1' }}>
           <span style={{

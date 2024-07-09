@@ -47,6 +47,7 @@ interface UserWalletDataState {
   priceOfUSDYinUSDC: number,
   contacts: (User | string)[];
   selectedContactEmail: string,
+  recentlyUsedSolanaAddresses: string[];
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -93,6 +94,7 @@ const initialUserWalletData: UserWalletDataState = {
   priceOfUSDYinUSDC: 0,
   contacts: [],
   selectedContactEmail: '',
+  recentlyUsedSolanaAddresses: []
 };
 
 
@@ -256,6 +258,10 @@ export const userWalletDataSlice = createSlice({
   setSelectedContactEmail: (state, action: PayloadAction<string>) => {
     state.selectedContactEmail = action.payload;
   },
+  setRecentlyUsedSolanaAddresses: (state, action: PayloadAction<string[]>) => {
+    state.recentlyUsedSolanaAddresses = action.payload;
+  },
+  
   },
 });
 
@@ -277,7 +283,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setNewUserHasPreviousBalance, setShowRequestPage,
   setShowProfileMenu, setShowEarnWithdrawPage,
   setShowEarnDepositPage, setHotBalanceUSDY,
-  setPriceOfUSDYinUSDC, setContacts, clearContacts, setSelectedContactEmail
+  setPriceOfUSDYinUSDC, setContacts, clearContacts, 
+  setSelectedContactEmail, setRecentlyUsedSolanaAddresses
   
 } = userWalletDataSlice.actions;
 

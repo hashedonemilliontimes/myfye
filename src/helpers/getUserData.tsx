@@ -3,7 +3,7 @@ import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, 
 import { setPrincipalInvested, setPrincipalInvestedHistory, 
     setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
     settotalInvestingValue, setHotBalanceUSDY, clearContacts,
-    setPriceOfUSDYinUSDC, setContacts } from '../redux/userWalletData';
+    setPriceOfUSDYinUSDC, setContacts, setRecentlyUsedSolanaAddresses } from '../redux/userWalletData';
 import { valueAtTime } from './growthPercentage';
 import User from './User';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
@@ -29,6 +29,10 @@ export const getUserData = async (email: string, phoneNumber: string,
             dispatch(setHotBalanceUSDY(data.hotBalanceUSDY))
         } else {
             dispatch(setHotBalanceUSDY(0))
+        }
+
+        if (data.recentlyUsedAddresses) {
+            dispatch(setRecentlyUsedSolanaAddresses(data.recentlyUsedAddresses))
         }
     }
    // to do get contacts from the phoneNumber field

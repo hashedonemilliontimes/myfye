@@ -104,11 +104,12 @@ function WalletDepositPage() {
 
       };
 
-      const handleWalletClick = () => {
-        dispatch(setShowWalletDepositPage(false))
-        dispatch(setShouldShowBottomNav(true))
-        dispatch(setShowWalletPage(true))
-      };
+      const handleWalletInfoClick = () => {
+        const url = `https://solscan.io/account/${publicKey}`;
+        window.open(url, '_blank'); // Opens the link in a new tab
+    };
+
+      
 
       function copyWalletAddress() {
         navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
@@ -275,7 +276,7 @@ Depoist via credit or debit card directly
   flexDirection: 'column',
   alignItems: 'center', height: '60vh'}}>
 
-<div style={{width: '110px', height: '110px'}} onClick={() => setshowQRCode(true)}>
+<div style={{width: '110px', height: '110px'}}>
 <QRCode value={publicKey} size={110} level="H" />
 </div>
 
@@ -314,7 +315,7 @@ Depoist via credit or debit card directly
            width: '180px',
            textAlign: 'center',
            marginTop: '15px'
-       }} onClick={handleWalletClick}>
+       }} onClick={handleWalletInfoClick}>
            View Wallet Info
        </div>
 </div>
