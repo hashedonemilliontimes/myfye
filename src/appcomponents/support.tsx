@@ -53,7 +53,15 @@ function Support() {
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
 
-        setShowMenu(!showMenu);
+        if (showMenu) {
+          dispatch(setShouldShowBottomNav(true))
+          setShowMenu(!showMenu);
+        } else {
+          dispatch(setShouldShowBottomNav(false))
+          setShowMenu(!showMenu);
+        }
+
+        
         
       };
 

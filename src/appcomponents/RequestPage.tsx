@@ -8,7 +8,7 @@ import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/funct
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { getFirestore, doc, 
   collection, setDoc, getDoc, arrayUnion } from 'firebase/firestore';
-import { setShowRequestPage, setShouldShowBottomNav, setSelectedContactEmail } from '../redux/userWalletData';
+import { setShowRequestPage, setShouldShowBottomNav, setSelectedContact } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
@@ -25,7 +25,7 @@ function RequestPage() {
     const [menuPosition, setMenuPosition] = useState('-130vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const selectedContactEmail = useSelector((state: any) => state.userWalletData.selectedContactEmail);
+    const selectedContact = useSelector((state: any) => state.userWalletData.selectedContact);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
@@ -51,12 +51,12 @@ function RequestPage() {
 
 
     useEffect(() => {
-      if (selectedContactEmail) {
-        setAddressText(selectedContactEmail)
+      if (selectedContact) {
+        setAddressText(selectedContact)
       } else {
         setAddressText('')
       }
-    }, [selectedContactEmail]);
+    }, [selectedContact]);
     
     useEffect(() => {
       if (showRequestPage) {
@@ -69,8 +69,8 @@ function RequestPage() {
     const handleMenuClick = () => {
       dispatch(setShouldShowBottomNav(true));
       dispatch(setShowRequestPage(!showRequestPage));
-      if (selectedContactEmail) {
-        dispatch(setSelectedContactEmail(''));
+      if (selectedContact) {
+        dispatch(setSelectedContact(''));
       }
     };
 

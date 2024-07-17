@@ -16,8 +16,9 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
   setShowWalletDepositPage, setShouldShowBottomNav, 
-  setShowWithdrawStablecoinPage, setShowWalletPage} from '../redux/userWalletData';
-import { getUserData } from '../helpers/getUserData';
+  setShowWithdrawStablecoinPage, setShowWalletPage,
+clearContacts} from '../redux/userWalletData';
+import { getUserData, getAllDynamicUsers, getUserContacts } from '../helpers/getUserData';
 import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
 import { useSelector } from 'react-redux';
@@ -56,9 +57,11 @@ function WebAppInner() {
   const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
-
+  const allDynamicUsers = useSelector((state: any) => state.userWalletData.allUsers);
   const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
-
+  const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
+  const [gotUserContacts, setGotUserContacts] = useState(false);
+  const [gotAllUsers, setGotAllUsers] = useState(false);
   const db = getFirestore();
 
   const dispatch = useDispatch();
@@ -70,10 +73,14 @@ function WebAppInner() {
 
     if (primaryWallet?.address && userEmail) {
 
+
       const getInvestmentData = async () => {
       const userData = await getUserData(userEmail, user!.phoneNumber!, primaryWallet?.address, dispatch);
       }
+
       getInvestmentData();
+
+
 
       const getPriceQuote = async () => {
         const userData = await getUSDYPriceQuote(priceOfUSDYinUSDC, dispatch);
@@ -94,6 +101,7 @@ function WebAppInner() {
 
       dispatch(addConnectedWallets(newWallet));
       
+
     } 
   }
 
@@ -165,8 +173,26 @@ function WebAppInner() {
     }
     console.log('primaryWallet', primaryWallet)
     console.log('userEmail', userEmail)
-  }, [primaryWallet, userEmail]);
+
+    // Get all users 
+    if (!gotAllUsers && (!allDynamicUsers || allDynamicUsers.length === 0)) {
+      setGotAllUsers(true)
+      console.log('Getting all dynamic users')
+      getAllDynamicUsers(dispatch)
+    }
+
+  }, [primaryWallet, userEmail, gotAllUsers]);
   
+
+  useEffect(() => {
+    // Get contacts
+    if (primaryWallet?.address != null && (!currentUserContacts || currentUserContacts.length === 0)
+      && userEmail != null && userEmail != '' && !gotUserContacts) {
+        setGotUserContacts(true)
+        console.log('Getting User Contacts')
+      getUserContacts(userEmail, user!.phoneNumber!, primaryWallet!.address, dispatch);
+    }
+  }, [primaryWallet, userEmail, currentUserContacts, gotUserContacts]);
 
   useEffect(() => {
     if (userEmail != '' && userEmail != null && primaryWallet?.address != '' && primaryWallet?.address != null) {
@@ -206,7 +232,7 @@ function WebAppInner() {
     return (
 
       
-        <div style={{overflow: 'hidden', backgroundColor: 'white'}}>
+        <div style={{overflow: 'hidden', backgroundColor: '#ffffff',}}>
 
 {userDataLoaded ? (
   <>
@@ -230,11 +256,19 @@ function WebAppInner() {
   )}
 
 <div style={{display: 'flex', flexDirection: 'row', 
-  justifyContent: 'space-between', marginTop: '15px',
-  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px'}}>
+  justifyContent: 'space-between', marginTop: '15px', marginLeft: '10px',
+  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px',
+  maxWidth: '90vw',
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '10px',}}>
 
 
-<div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',}}>Welcome, {firstNameUI}</div>
+<div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',
+  
+}}>Welcome, {firstNameUI}</div>
 
 <div style={{display: 'flex',}}>
   
@@ -243,20 +277,28 @@ function WebAppInner() {
 </div>
 </div>
 
-<hr style={{height: '2px', backgroundColor: '#222222', border: 'none', width: '100vw', 
-maxWidth: '550px', marginTop: '10px'}}></hr>
+
 
 <div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
-          height: window.innerHeight < 620 ? 'calc(100vh - 230px)' : 'calc(100vh - 240px)',
+          height: window.innerHeight < 620 ? 'calc(100vh - 190px)' : 'calc(100vh - 190px)',
         flexDirection: 'column', 
         color: '#222222', 
         justifyContent: 'space-around',
         overflow: 'hidden' }}>
 
+
+<div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '20px',
+  width: '90vw'
+}}>
 <div style={{ display: 'flex',  alignItems: 'center', 
-        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '0px' : '20px'  }}>
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
 <div style={{display: 'flex', marginTop: '0px'}}>
 
   <img style={{ width: '180px', height: 'auto'}}src={myfyeWallet}/>
@@ -326,11 +368,23 @@ alignItems: 'center',
        </div>
 
        </div>
+       </div>
 
 
 
+
+
+
+       <div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '20px',
+  width: '90vw'
+}}>
        <div style={{ display: 'flex',  alignItems: 'center', 
-        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '5px' : '20px' }}>
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px' }}>
 <img style={{ width: '150px', height: 'auto'}}src={myfyeEarn}/>
 
 
@@ -374,10 +428,20 @@ alignItems: 'center',
        </div>
 
 </div>
+</div>
 
-{shouldShowBottomNav && (
-<div style={{position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)'}}>
-  <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
+
+
+<div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '20px',
+  paddingTop: '20px',
+  width: '90vw'
+}}>
+<div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
   <div style={{
       color: '#ffffff', 
       background: '#2E7D32', // gray '#999999', 
@@ -406,10 +470,8 @@ alignItems: 'center',
       cursor: 'pointer',
       fontSize: '20px'     
     }} onClick={handleRequestPageClick}>Request</div>
-  </div>
-</div>
-)}
-                    
+  </div>          
+  </div> 
                 
                     <BottomNav/>
                         </div>

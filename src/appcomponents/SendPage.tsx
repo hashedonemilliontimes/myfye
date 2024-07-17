@@ -10,11 +10,12 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { getFirestore, doc, collection, setDoc, 
   getDoc, addDoc, arrayUnion } from 'firebase/firestore';
 import { setShowSendPage, setShouldShowBottomNav, 
-  setSelectedContactEmail } from '../redux/userWalletData';
+  setSelectedContact } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import pyusdSol from '../assets/pyusdSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
+import User from '../helpers/User';
 
 function SendPage() {
 
@@ -29,7 +30,7 @@ function SendPage() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
-    const selectedContactEmail = useSelector((state: any) => state.userWalletData.selectedContactEmail);
+    const selectedContact = useSelector((state: any) => state.userWalletData.selectedContact);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
     const [addressText, setAddressText] = useState('');
@@ -43,26 +44,6 @@ function SendPage() {
 
     const dispatch = useDispatch();
 
-    interface User {
-      chain?: string;
-      createdAt?: string;
-      email?: string;
-      firstName?: string;
-      firstVisit?: string;
-      id?: string;
-      lastName?: string;
-      lastVisit?: string;
-      metadata?: Record<string, unknown>; // Or a more specific type if you know the structure
-      oauthAccounts?: Array<unknown>; // Specify the type if you know what it contains
-      projectEnvironmentId?: string;
-      sessions?: Array<unknown>; // Specify the type if you know what it contains
-      updatedAt?: string;
-      wallet?: string;
-      walletPublicKey?: string;
-      wallets?: Array<unknown>; // Specify the type if you know what it contains
-      phoneNumber?: string,
-      phoneCountryCode?: string,
-    }
 
     useEffect(() => {
       /*
@@ -82,13 +63,18 @@ function SendPage() {
 
 
     useEffect(() => {
-      console.log('selectedContactEmail', selectedContactEmail)
-      if (selectedContactEmail) {
-        setAddressText(selectedContactEmail)
+      console.log('selectedContactEmail', selectedContact)
+      if (selectedContact) {
+        if (typeof selectedContact === 'string') {
+          setAddressText(selectedContact)
+        } else {
+          setAddressText(`@${user?.username!}`)
+        }
+
       } else {
         setAddressText('')
       }
-    }, [selectedContactEmail]);
+    }, [selectedContact]);
 
     useEffect(() => {
       if (showSendPage) {
@@ -102,7 +88,7 @@ function SendPage() {
       console.log('handle menu click')
       dispatch(setShouldShowBottomNav(true))
       dispatch(setShowSendPage(!showSendPage));
-      dispatch(setSelectedContactEmail(''));
+      dispatch(setSelectedContact(''));
       setAddressText('');
       
     };

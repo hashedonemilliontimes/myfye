@@ -6,7 +6,7 @@ import backButton from '../assets/backButton3.png';
 import myfyePay from '../assets/myfyePay.png';
 import { setShouldShowBottomNav, setShowPayPage, 
   setShowSendPage, setShowRequestPage,
-  setContacts, setSelectedContactEmail } from '../redux/userWalletData';
+  setContacts, setSelectedContact } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
@@ -17,6 +17,9 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import history from '../assets/history.png';
 import PayTransactions from './PayTransactions';
 import User from '../helpers/User';
+import ContactsPage from './ContactsPage';
+import phoneIconWhite from '../assets/phoneIconWhite.png';
+import mailIconWhite from '../assets/mailIconWhite.png';
 
 function PayPage() {
   
@@ -24,7 +27,7 @@ function PayPage() {
   const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const [menuPosition, setMenuPosition] = useState('-135vh'); 
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -132,7 +135,7 @@ function PayPage() {
         if (showPayPage) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-110vh'); // Move the menu off-screen
+          setMenuPosition('-135vh'); // Move the menu off-screen
         }
       }, [showPayPage]);
     
@@ -140,6 +143,8 @@ function PayPage() {
 
         if (showTransactionHistory) {
           toggleShowTransactionHistory()
+        } else if (showContactPage) {
+          setshowContactPage(false)
         } else {
           if (showPayPage) {
             dispatch(setShowPayPage(false))
@@ -154,15 +159,7 @@ function PayPage() {
 
 
     const handleSendPageClick = (contact: User | string) => {
-      let email: string;
-
-      if (typeof contact === 'string') {
-        email = contact;
-      } else {
-        email = contact.email!;
-      } 
-    
-      dispatch(setSelectedContactEmail(email));
+      dispatch(setSelectedContact(contact));
       dispatch(setShouldShowBottomNav(false));
       dispatch(setShowSendPage(true));
       
@@ -177,7 +174,7 @@ function PayPage() {
       email = contact.email!;
     } 
   
-    dispatch(setSelectedContactEmail(email));
+    dispatch(setSelectedContact(email));
     dispatch(setShouldShowBottomNav(false));
     dispatch(setShowRequestPage(true));
     
@@ -261,10 +258,10 @@ function PayPage() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 3    
+      zIndex: 3, 
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src= {showTransactionHistory ? backButton : xIcon}
+            <img style={{width: 'auto', height: '45px', background: 'white'}} src= {showTransactionHistory ? backButton : showContactPage ? backButton : xIcon}
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -273,7 +270,7 @@ function PayPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        minHeight: '100vh',
+        minHeight: '130vh',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -285,9 +282,14 @@ function PayPage() {
 
 </div>
 
+
+
 {!showTransactionHistory ? (
 <div>
 
+
+{!showContactPage ? (
+<div>
 <div style={{
         position: 'absolute', // Position it relative to the viewport
         top: 0,              // Align to the top of the viewport
@@ -298,6 +300,16 @@ function PayPage() {
 }}>
 <img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
 </div>
+
+
+<div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '20px',
+  marginTop: '15px'
+}}>
 
 <div style={{marginTop: currentUserContacts ? '20px' : '40px', 
 display: 'flex', alignItems: 'center', 
@@ -334,7 +346,36 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   </div>
 </div>
 
+<div style={{display: 'flex', alignItems: 'center', 
+          justifyContent: 'center', marginTop: '15px'}}>
+        <div style={{
+          backgroundColor: '#2E7D32',
+          color: '#ffffff',
+          padding: '10px 20px',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          borderRadius: '10px',
+          border: '1px solid transparent',
+          cursor: 'pointer',
+          marginTop: '5px',
+          maxWidth: '300px',
+          width: '68vw'
+        }}
+        onClick={browseAllContactsClicked}>Contacts</div>
+        </div>
+</div>
+
+
 {currentUserContacts && currentUserContacts[0] && currentUserContacts.length > 0 && (
+  <div style={{
+    background: '#ffffff',
+    borderRadius: '20px',
+    boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+    padding: '10px',
+    paddingBottom: '20px',
+    marginTop: '15px'
+  }}>
   <div style= {{display: 'flex', flexDirection: 'column', gap: '10px',}}>
     <div style={{fontSize: '25px', 
       fontWeight: 'bold', 
@@ -347,44 +388,62 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     gap: '0px' }}
     onClick={() => openContactPopUp(0)}>
         <div style={{
-            width: '30px',
-            height: '30px',
+            width: '40px',
+            height: '40px',
             backgroundColor: '#007AFF',
             borderRadius: '50%',
             color: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '17px',
+            fontSize: '27px',
             fontWeight: 'bold',
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
-            {
-              typeof currentUserContacts[0] === 'string'
-                ? currentUserContacts[0].charAt(0).toUpperCase()
-                : `${currentUserContacts[0].firstName.charAt(0).toUpperCase()}`
-            }
+{
+  typeof currentUserContacts[0] === 'string'
+    ? (/^\d+$/.test(currentUserContacts[0]) // Simple check if the string contains only digits
+        ? <img src={phoneIconWhite} style={{width: '22px', height: '22px'}}/>
+        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUserContacts[0]) // Very basic email check
+          ? <img src={mailIconWhite} style={{width: '22px', height: '22px'}}/>
+          : (currentUserContacts[0].charAt(0).toUpperCase())) // Fallback or other handling
+    : `${currentUserContacts[0].firstName.charAt(0).toUpperCase()}`
+}
         </div>
 
+
+
         <div style={{
-            backgroundColor: '#E5E5E5', // Light gray background
-            padding: '5px 20px', // Padding to give some space inside the div
+            padding: '5px 10px', // Padding to give some space inside the div
             borderRadius: '0 20px 20px 0', // Rounded border on the right side
             display: 'flex',
             alignItems: 'center',
             fontSize: '17px',
-            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            marginLeft: '0px', // Negative margin to make it visually continuous with the circle
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
+
+<div style={{display: 'flex', flexDirection: 'column'}}>
+<div>
             {
               typeof currentUserContacts[0] === 'string'
                 ? currentUserContacts[0]
                 : `${currentUserContacts[0].firstName} ${currentUserContacts[0].lastName}`
             }
-        </div>
+            </div>
 
+            <div style={{color: '#666666', fontSize: '15px'}}>
+            {
+              (typeof currentUserContacts[0] != 'string' && currentUserContacts[0].username)
+                ? (`@${currentUserContacts[0].username}`) : (
+                  <div style={{marginTop: '15px'}}></div>
+                )
+            }
+            </div>
+        </div>
+        </div>
     </div>
 
 
@@ -396,45 +455,63 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     gap: '0px' }}
     onClick={() => openContactPopUp(1)}>
         <div style={{
-            width: '30px',
-            height: '30px',
+            width: '40px',
+            height: '40px',
             backgroundColor: '#007AFF',
             borderRadius: '50%',
             color: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '17px',
+            fontSize: '27px',
             fontWeight: 'bold',
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
           
           <div>
-            {
-              typeof currentUserContacts[1] === 'string'
-                ? currentUserContacts[1].charAt(0).toUpperCase()
-                : `${currentUserContacts[1].firstName.charAt(0).toUpperCase()}`
-            }
+          {
+  typeof currentUserContacts[1] === 'string'
+    ? (/^\d+$/.test(currentUserContacts[1]) // Simple check if the string contains only digits
+        ? <img src={phoneIconWhite} style={{width: '22px', height: '22px'}}/>
+        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUserContacts[1]) // Very basic email check
+          ? <img src={mailIconWhite} style={{width: '22px', height: '22px'}}/>
+          : (currentUserContacts[1].charAt(0).toUpperCase())) // Fallback or other handling
+    : `${currentUserContacts[1].firstName.charAt(0).toUpperCase()}`
+}
           </div>
         </div>
 
         <div style={{
-            backgroundColor: '#E5E5E5', // Light gray background
-            padding: '5px 20px', // Padding to give some space inside the div
+            padding: '5px 10px', // Padding to give some space inside the div
             borderRadius: '0 20px 20px 0', // Rounded border on the right side
             display: 'flex',
             alignItems: 'center',
             fontSize: '17px',
-            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            marginLeft: '0px', // Negative margin to make it visually continuous with the circle
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
+
+<div style={{display: 'flex', flexDirection: 'column'}}>
+<div>
             {
               typeof currentUserContacts[1] === 'string'
                 ? currentUserContacts[1]
                 : `${currentUserContacts[1].firstName} ${currentUserContacts[1].lastName}`
             }
+            </div>
+
+            <div style={{color: '#666666', fontSize: '15px'}}>
+            {
+              (typeof currentUserContacts[1] != 'string' && currentUserContacts[1].username)
+                ? (`@${currentUserContacts[1].username}`) : (
+                  <div style={{marginTop: '15px'}}></div>
+                )
+            }
+            </div>
+        </div>
+
         </div>
 
     </div>
@@ -447,74 +524,87 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     gap: '0px' }}
     onClick={() => openContactPopUp(2)}>
         <div style={{
-            width: '30px',
-            height: '30px',
+            width: '40px',
+            height: '40px',
             backgroundColor: '#007AFF',
             borderRadius: '50%',
             color: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '17px',
+            fontSize: '27px',
             fontWeight: 'bold',
             position: 'relative', // Added position relative
             zIndex: 2, // Higher z-index to ensure it appears above the gray background
         }}>
-            {
-              typeof currentUserContacts[2] === 'string'
-                ? currentUserContacts[2].charAt(0).toUpperCase()
-                : `${currentUserContacts[2].firstName.charAt(0).toUpperCase()}`
-            }
+{
+  typeof currentUserContacts[2] === 'string'
+    ? (/^\d+$/.test(currentUserContacts[2]) // Simple check if the string contains only digits
+        ? <img src={phoneIconWhite} style={{width: '22px', height: '22px'}}/>
+        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentUserContacts[2]) // Very basic email check
+          ? <img src={mailIconWhite} style={{width: '22px', height: '22px'}}/>
+          : (currentUserContacts[2].charAt(0).toUpperCase())) // Fallback or other handling
+    : `${currentUserContacts[2].firstName.charAt(0).toUpperCase()}`
+}
         </div>
 
         <div style={{
-            backgroundColor: '#E5E5E5', // Light gray background
-            padding: '5px 20px', // Padding to give some space inside the div
+            padding: '5px 10px', // Padding to give some space inside the div
             borderRadius: '0 20px 20px 0', // Rounded border on the right side
             display: 'flex',
             alignItems: 'center',
             fontSize: '17px',
-            marginLeft: '-13px', // Negative margin to make it visually continuous with the circle
+            marginLeft: '0px', // Negative margin to make it visually continuous with the circle
             position: 'relative', // Necessary to make z-index work
             zIndex: 1 // Lower z-index so it appears below the blue circle
         }}>
+
+<div style={{display: 'flex', flexDirection: 'column'}}>
+<div>
             {
               typeof currentUserContacts[2] === 'string'
                 ? currentUserContacts[2]
                 : `${currentUserContacts[2].firstName} ${currentUserContacts[2].lastName}`
             }
+            </div>
+
+            <div style={{color: '#666666', fontSize: '15px'}}>
+            {
+              (typeof currentUserContacts[2] != 'string' && currentUserContacts[2].username)
+                ? (`@${currentUserContacts[2].username}`) : (
+                  <div style={{marginTop: '15px'}}></div>
+                )
+            }
+            </div>
+        </div>
+
         </div>
 
     </div>
     )}
         
-        <div style={{display: 'flex', alignItems: 'center', 
-          justifyContent: 'center', marginLeft: '-15px'}}>
-        <div style={{
-          backgroundColor: '#007AFF',
-          color: '#ffffff',
-          padding: '10px 20px',
-          fontSize: '25px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          borderRadius: '10px',
-          border: '1px solid transparent',
-          cursor: 'pointer',
-          marginTop: '5px',
-          maxWidth: '220px'
-        }}
-        onClick={browseAllContactsClicked}>Contacts</div>
-        </div>
 
   </div>
 
   </div>
+          </div>
 )}
 
 
 
-<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>Refer a friend!</div>
 
+
+
+        <div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  padding: '10px',
+  paddingBottom: '20px',
+  marginTop: '15px'
+}}>
+<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>Refer a friend!</div>
+<div style={{fontSize: '19px', color: '#666666'}}>Add a new contact</div>
     <input
       id="emailOrPhone"
       type="text"
@@ -529,7 +619,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
         borderRadius: '5px', // Rounded edges
         padding: '10px 10px', // Adjust padding as needed
         marginTop: '15px',
-        width: '85vw',
+        width: '75vw',
       }}
       placeholder="Email Or Phone Number"
     />
@@ -552,6 +642,13 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       }} onClick={handleReferButtonPressed}> Submit
 
       </button>
+
+      </div>
+      </div>
+) : (<div>
+
+  <ContactsPage/>
+</div>)}
 
 
 </div>

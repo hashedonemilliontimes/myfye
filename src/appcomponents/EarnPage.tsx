@@ -82,7 +82,7 @@ function EarnPage() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 4    
+      zIndex: 4,
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (

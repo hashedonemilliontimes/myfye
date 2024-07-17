@@ -98,7 +98,7 @@ function WalletPage() {
       
 
     return (
-        <div style={{ backgroundColor: 'white' }}>
+        <div style={{ backgroundColor: 'white', overflow: 'hidden' }}>
 
 { showMenu && (
 <div style={{ 
@@ -107,7 +107,7 @@ function WalletPage() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 4
+      zIndex: 4,
     }}>
 
             <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
@@ -126,11 +126,11 @@ function WalletPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        minHeight: 'calc(100% + 35px)',
-        height: '100%',
+        height: '90vh',
         backgroundColor: 'white',
         width: '94vw',
         overflowX: 'hidden',
+        overflowY: 'hidden',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 3
       }}>
@@ -239,6 +239,12 @@ width: '90vw',}}>
        </div>
 
 </div>
+
+
+
+
+
+
 </div>
 
 

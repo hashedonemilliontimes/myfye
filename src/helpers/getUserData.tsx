@@ -2,8 +2,9 @@ import { useDispatch } from 'react-redux';
 import { getFirestore, collection, addDoc, setDoc, getDoc, doc, getDocs, query, where, } from 'firebase/firestore';
 import { setPrincipalInvested, setPrincipalInvestedHistory, 
     setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-    settotalInvestingValue, setHotBalanceUSDY, clearContacts,
-    setPriceOfUSDYinUSDC, setContacts, setRecentlyUsedSolanaAddresses } from '../redux/userWalletData';
+    settotalInvestingValue, setHotBalanceUSDY,
+    setPriceOfUSDYinUSDC, setContacts, setRecentlyUsedSolanaAddresses, 
+    setAllUsers} from '../redux/userWalletData';
 import { valueAtTime } from './growthPercentage';
 import User from './User';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
@@ -35,9 +36,19 @@ export const getUserData = async (email: string, phoneNumber: string,
             dispatch(setRecentlyUsedSolanaAddresses(data.recentlyUsedAddresses))
         }
     }
-   // to do get contacts from the phoneNumber field
-    //
-    
+
+
+    return true
+};
+
+
+
+export const getUserContacts = async (email: string, phoneNumber: string, 
+    pubKey: string, dispatch: Function): Promise<boolean> => {
+
+
+            const db = getFirestore();
+
     const contactsFromEmailDocRef = doc(db, 'contacts', email);
     // Fetch the document
     const contactsFromEmailDocSnapshot = await getDoc(contactsFromEmailDocRef);
@@ -90,6 +101,7 @@ export const getUserData = async (email: string, phoneNumber: string,
             }
         }
             // Dispatch only once per email and phone batch
+            
             dispatch(setContacts(user_list));
             console.log(user_list);
         }
@@ -113,7 +125,6 @@ export const getUserData = async (email: string, phoneNumber: string,
         
         let user_list: (User | string)[] = [];
 
-        dispatch(clearContacts());
 
         async function processContacts(emails: string[], phoneNumbers: string[]) {
             // Process all emails
@@ -166,11 +177,15 @@ export const getUserData = async (email: string, phoneNumber: string,
     } else {
         console.log("No contacts from email");
     }
+    return true;
+    }
 
-
-    return true
-};
-
+export const getAllDynamicUsers = async (dispatch: Function) => {
+    const result = await getDynamicUsers('None', 'allUsers');
+    const allDynamicUsers = result.users; // Accessing the array of users directly
+    console.log('Got all dynamic users: ', allDynamicUsers)
+    dispatch(setAllUsers(allDynamicUsers)); // Now passing only the array
+}
 
 const getDynamicUsers = async (receiverData: string, dataType: string) => {
     const functions = getFunctions();
@@ -186,6 +201,7 @@ const getDynamicUsers = async (receiverData: string, dataType: string) => {
       throw error; // Rethrow to handle it outside or indicate failure
     });
   };
+  
   
   
   const cleanDynamicUserDataWithEmail = async (data: { users: User[] }, sendToEmail: string) => {

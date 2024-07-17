@@ -31,6 +31,7 @@ interface UserWalletDataState {
   hotBalanceUSDY: number,
   shouldShowBottomNav: boolean,
   showPayPage: boolean,
+  showContactsPage: boolean,
   showSendPage: boolean,
   showWithdrawStablecoinPage: boolean,
   showDepositStablecoinPage: boolean,
@@ -46,7 +47,8 @@ interface UserWalletDataState {
   showEarnDepositPage: boolean,
   priceOfUSDYinUSDC: number,
   contacts: (User | string)[];
-  selectedContactEmail: string,
+  allUsers: User[];
+  selectedContact: User | string,
   recentlyUsedSolanaAddresses: string[];
 }
 
@@ -78,6 +80,7 @@ const initialUserWalletData: UserWalletDataState = {
   hotBalanceUSDY: 0,
   shouldShowBottomNav: true,
   showPayPage: false,
+  showContactsPage: false,
   showSendPage: false,
   showWithdrawStablecoinPage: false,
   showBanxaPopUp: false,
@@ -93,7 +96,8 @@ const initialUserWalletData: UserWalletDataState = {
   showEarnDepositPage: false,
   priceOfUSDYinUSDC: 0,
   contacts: [],
-  selectedContactEmail: '',
+  allUsers: [],
+  selectedContact: '',
   recentlyUsedSolanaAddresses: []
 };
 
@@ -205,6 +209,9 @@ export const userWalletDataSlice = createSlice({
   setShowPayPage: (state, action: PayloadAction<boolean>) => {
     state.showPayPage = action.payload;
   },
+  setShowContactsPage: (state, action: PayloadAction<boolean>) => {
+    state.showContactsPage = action.payload;
+  },
   setShowSendPage: (state, action: PayloadAction<boolean>) => {
     state.showSendPage = action.payload;
   },
@@ -255,9 +262,13 @@ export const userWalletDataSlice = createSlice({
     // Clear all contacts
     state.contacts = [];
   },
-  setSelectedContactEmail: (state, action: PayloadAction<string>) => {
-    state.selectedContactEmail = action.payload;
+  setSelectedContact: (state, action: PayloadAction<User | string>) => {
+    state.selectedContact = action.payload;
   },
+  setAllUsers: (state, action: PayloadAction<User[]>) => {
+    // Set the state to the new payload directly, replacing the existing state
+    state.allUsers = action.payload;
+},
   setRecentlyUsedSolanaAddresses: (state, action: PayloadAction<string[]>) => {
     state.recentlyUsedSolanaAddresses = action.payload;
   },
@@ -284,7 +295,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowProfileMenu, setShowEarnWithdrawPage,
   setShowEarnDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
-  setSelectedContactEmail, setRecentlyUsedSolanaAddresses
+  setSelectedContact, setRecentlyUsedSolanaAddresses, 
+  setShowContactsPage, setAllUsers
   
 } = userWalletDataSlice.actions;
 

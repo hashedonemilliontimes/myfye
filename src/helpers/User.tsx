@@ -17,4 +17,5 @@ export default interface User {
     wallets?: Array<unknown>; // Specify the type if you know what it contains
     phoneNumber?: string,
     phoneCountryCode?: string,
+    username?: string
   }

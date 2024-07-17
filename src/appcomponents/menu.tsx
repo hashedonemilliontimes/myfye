@@ -32,7 +32,7 @@ function Menu() {
       };
 
     return (
-        <div style={{ backgroundColor: 'white' }}>
+        <div style={{ backgroundColor: 'white', overflow: 'hidden' }}>
 
         <div>
                     </div>
@@ -41,24 +41,24 @@ function Menu() {
       position: 'absolute', // Position it relative to the viewport
       top: 0,              // Align to the top of the viewport
       left: 0,            // Align to the right of the viewport
-      padding: '15px',
       cursor: 'pointer',
-      zIndex: 21     // Add some padding for spacing from the edges
+      width: showMenu ? '40vw' : '0', // Cover the right side when the menu is open
+      zIndex: 21,     // Add some padding for spacing from the edges
+      overflow: 'hidden'
     }}>
 
 <div style={{
   position: 'absolute',
   top: 0,
   right: 0,
-  height: '100vh',
-  width: showMenu ? '40vw' : '0', // Cover the right side when the menu is open
   backgroundColor: 'transparent',
   zIndex: 21
 }} onClick={() => handleMenuClick()} />
 
       { showMenu && (
         <div>
-                    <img style={{width: '45px', height: '45px'}} src={ xIcon}
+                    <img style={{width: '45px', height: '45px', 
+                    marginLeft: '15px', marginTop: '15px'}} src={ xIcon}
                     onClick={handleMenuClick} alt="Menu" />
                     </div>
       )}
@@ -70,7 +70,6 @@ function Menu() {
             position: 'absolute',
             top: 0,
             right: 0, 
-            height: '100%',
             backgroundColor: 'white',
             width: '40vw',
             background: 'transparent'
@@ -85,10 +84,11 @@ function Menu() {
         left: menuPosition, // Use state variable for position
         padding: '15px',
         backgroundColor: '#ffffff',
+        height: '99vh',
         width: '60vw',
         transition: 'left 0.5s ease', // Animate the left property
-        height: window.innerHeight < 700 ? 'calc(100vh - 30px)' : 'calc(100vh - 30px)', 
-        zIndex: 20
+        zIndex: 20,
+        overflow: 'hidden'
       }}>
 
 
