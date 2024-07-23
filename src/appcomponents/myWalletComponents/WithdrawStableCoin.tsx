@@ -347,7 +347,7 @@ function WithdrawStableCoin() {
       zIndex: 7    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showWithdrawStablecoinPage ? (
+            <img style={{width: 'auto', height: '35px', background: 'white'}} src={ showWithdrawStablecoinPage ? (
                  backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}

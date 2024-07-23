@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import myfyePay from '../assets/myfyePay.png';
 import { setShouldShowBottomNav, setShowPayPage, 
   setShowSendPage, setShowRequestPage,
-  setContacts, setSelectedContact } from '../redux/userWalletData';
+  setContacts, setSelectedContact,
+   setShowContactPopup } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
 import timerImage from '../assets/timer.png';
 import InvestmentValue from '../appcomponents/investmentValue';
@@ -20,10 +20,12 @@ import User from '../helpers/User';
 import ContactsPage from './ContactsPage';
 import phoneIconWhite from '../assets/phoneIconWhite.png';
 import mailIconWhite from '../assets/mailIconWhite.png';
+import ContactPopup from './ContactPopup';
 
 function PayPage() {
   
-  const [showContactPage, setshowContactPage] = useState(false);
+  
+  const [showContactPage, setShowContactPage] = useState(false);
   const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
@@ -37,7 +39,6 @@ function PayPage() {
     const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
     const [referral, setReferral] = useState('');
     const [contactIndex, setContactIndex] = useState(0);
-    const [showContactPopup, setShowContactPopup] = useState(false);
     const db = getFirestore();
     
     const handleReferralChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +145,7 @@ function PayPage() {
         if (showTransactionHistory) {
           toggleShowTransactionHistory()
         } else if (showContactPage) {
-          setshowContactPage(false)
+          setShowContactPage(false)
         } else {
           if (showPayPage) {
             dispatch(setShowPayPage(false))
@@ -193,19 +194,19 @@ function PayPage() {
     const closeContactPopUp = () => {
       // Add your logic here for what happens when the menu is clicked
 
-      setShowContactPopup(false)
-      
+      dispatch(setShowContactPopup(false))
     };
 
     const openContactPopUp = (index: number) => {
       // Add your logic here for what happens when the menu is clicked
-      setShowContactPopup(true)
+      dispatch(setSelectedContact(currentUserContacts[index]))
+      dispatch(setShowContactPopup(true))
       setContactIndex(index)
     };
 
     const browseAllContactsClicked= async () => {
       console.log(currentUserContacts)
-      setshowContactPage(true)
+      setShowContactPage(true)
     }
 
     const errorLabelText = () => {
@@ -251,6 +252,8 @@ function PayPage() {
     return (
         <div style={{ backgroundColor: 'white'}}>
 
+
+<ContactPopup/>
 { showPayPage && (
 <div style={{ 
       position: 'absolute', // Position it relative to the viewport
@@ -261,7 +264,7 @@ function PayPage() {
       zIndex: 3, 
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src= {showTransactionHistory ? backButton : showContactPage ? backButton : xIcon}
+            <img style={{width: 'auto', height: '35px', background: 'white'}} src= {showTransactionHistory ? backButton : showContactPage ? backButton : backButton}
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 
@@ -298,7 +301,7 @@ function PayPage() {
         cursor: 'pointer',
         zIndex: 4    
 }}>
-<img src={history} style={{height: '45px', width: '45px'}} onClick={toggleShowTransactionHistory}/>
+<img src={history} style={{height: '39px', width: '39px'}} onClick={toggleShowTransactionHistory}/>
 </div>
 
 
@@ -678,107 +681,6 @@ justifyContent: 'center',}}>
   
 </div>
 
-
-
-<div>{showContactPopup && (
-<div       style={{
-position: 'fixed',
-top: 0,
-left: 0,
-width: '100vw',
-height: '100vh',
-backgroundColor: 'rgba(0, 0, 0, 0.5)',
-display: 'flex',
-justifyContent: 'center',
-alignItems: 'center',
-zIndex: 60 // Ensure it's above other content
-}} onClick={closeContactPopUp}>
-
-
-<div style={{
-position: 'fixed',
-top: '30vh',
-left: 0,
-width: '100vw',
-height: '120px',
-background: '#ffffff',
-zIndex: 61
-}}> 
-
-<div style={{textAlign: 'center', fontSize: '22px', marginTop: '15px'}}>
-  
-{
-typeof currentUserContacts[contactIndex] === 'string'
-                ? currentUserContacts[contactIndex]
-                : `${currentUserContacts[contactIndex].firstName} ${currentUserContacts[contactIndex].lastName}`
-}
-
-</div>
-
-<div style={{display: 'flex', alignItems: 'center', 
-  justifyContent: 'space-around', marginTop: '10px'}}>
-
-<div style={{
-color: 'white',
-background: '#60A05B', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} onClick={() => handleSendPageClick(currentUserContacts[contactIndex])}>
-Send
-</div>
-
-
-<div style={{
-color: 'white',
-background: '#60A05B', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} 
-onClick={() => handleRequestPageClick(currentUserContacts[contactIndex])}>
-Request
-</div>
-
-
-<div style={{
-color: 'white',
-background: '#777777', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} onClick={closeContactPopUp}  >
-Cancel
-</div>
-
-
-</div>
-</div>
-
-</div>
-
-)}</div>
 </div>
   
                   </div> 

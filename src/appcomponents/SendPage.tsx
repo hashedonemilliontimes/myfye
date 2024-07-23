@@ -68,7 +68,7 @@ function SendPage() {
         if (typeof selectedContact === 'string') {
           setAddressText(selectedContact)
         } else {
-          setAddressText(`@${user?.username!}`)
+          setAddressText(`@${selectedContact?.username!}`)
         }
 
       } else {
@@ -593,7 +593,7 @@ const updateContactTwo = await setDoc(contactDocRefTwo, {
     }}>
 
 <img 
-    style={{ width: 'auto', height: '45px', background: 'white' }} 
+    style={{ width: 'auto', height: '35px', background: 'white' }} 
     src={backButton}
     onClick={handleMenuClick} 
     alt="Exit" 

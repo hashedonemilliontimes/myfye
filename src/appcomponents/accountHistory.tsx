@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { valueAtTime } from '../helpers/growthPercentage';
@@ -54,8 +53,8 @@ function AccountHistory() {
       zIndex: 5    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+            <img style={{width: 'auto', height: '35px', background: 'white'}} src={ showMenu ? (
+                currencySelected ? backButton : backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 

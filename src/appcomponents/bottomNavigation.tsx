@@ -145,8 +145,9 @@ function BottomNav() {
           src={dollarSign}
           alt="Nav 1"
           style={{
-            width: '40px',
-            height: 'auto'
+            width: '38px',
+            height: 'auto',
+            opacity: '0.75'
           }}
         />
         <div>Earn</div>
@@ -170,7 +171,8 @@ function BottomNav() {
           alt="Nav 2"
           style={{
             width: '40px',
-            height: 'auto'
+            height: 'auto',
+            opacity: '0.7'
           }}
         />
         <div>Pay</div>
@@ -195,7 +197,8 @@ function BottomNav() {
           alt="Nav 3"
           style={{
             width: '44px',
-            height: 'auto'
+            height: 'auto',
+            opacity: '0.7'
           }}
         />
         <div>Home</div>
@@ -220,7 +223,8 @@ function BottomNav() {
           alt="Nav 4"
           style={{
             width: '40px',
-            height: 'auto'
+            height: 'auto',
+            opacity: '0.7'
           }}
         />
         <div>Wallet</div>
@@ -244,7 +248,8 @@ function BottomNav() {
           alt="Nav 5"
           style={{
             width: '40px',
-            height: 'auto'
+            height: 'auto',
+            opacity: '0.7'
           }}
         />
         <div>Profile</div>

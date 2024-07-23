@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../../assets/menuIcon.png';
-import xIcon from '../../assets/xIconGray2.png';
 import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import DepositStableCoin from './DepositStableCoin';
@@ -138,8 +137,8 @@ function WalletDepositPage() {
       zIndex: 4
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : showTransactionHistory ? backButton : xIcon) : menuIcon }
+            <img style={{width: 'auto', height: '35px', background: 'white'}} src={ showMenu ? (
+                currencySelected ? backButton : showTransactionHistory ? backButton : backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 

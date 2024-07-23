@@ -5,18 +5,20 @@ import { useDispatch } from 'react-redux';
 import User from '../helpers/User';
 import { setShouldShowBottomNav, setShowPayPage, 
     setShowSendPage, setShowRequestPage,
-    setContacts, setSelectedContact } from '../redux/userWalletData';
+    setContacts, setSelectedContact,
+    setShowContactPopup } from '../redux/userWalletData';
 
+    
 import phoneIconWhite from '../assets/phoneIconWhite.png';
 import mailIconWhite from '../assets/mailIconWhite.png';
+import ContactPopup from './ContactPopup';
 
-function PayPage() {
+function ContactsPage() {
   
     
     const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-    const [showContactPopup, setShowContactPopup] = useState(false);
     const [contactIndex, setContactIndex] = useState(0);
     const [selectedContactList, setSelectedContactList] = useState<Array<any>>([]);
     const allDynamicUsers = useSelector((state: any) => state.userWalletData.allUsers);
@@ -51,25 +53,29 @@ function PayPage() {
         setSearchResults(results);
       };
 
-      const closeContactPopUp = () => {
-        // Add your logic here for what happens when the menu is clicked
-  
-        setShowContactPopup(false)
-        
-      };
   
       const openContactPopUp = (index: number, list: string) => {
         // Add your logic here for what happens when the menu is clicked
+        
+        setContactIndex(index)
 
         if (list == 'yourContacts') {
             setSelectedContactList(currentUserContacts)
+            dispatch(setSelectedContact(currentUserContacts[index]))
         } else {
             setSelectedContactList(searchResults)
+            dispatch(setSelectedContact(searchResults[index]))
         }
-        setShowContactPopup(true)
-        setContactIndex(index)
-
+        dispatch(setShowContactPopup(true))
       };
+
+
+      const closeContactPopUp = () => {
+        // Add your logic here for what happens when the menu is clicked
+  
+        dispatch(setShowContactPopup(false))
+      };
+  
 
 
 
@@ -106,6 +112,9 @@ function PayPage() {
     return `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
 }
     return (
+        
+        <div>
+            <ContactPopup/>
         <div style={{ backgroundColor: 'white'}}>
       <input
       id="emailOrPhone"
@@ -264,109 +273,8 @@ function PayPage() {
 
 
 
-<div>{showContactPopup && (
-<div       style={{
-position: 'fixed',
-top: 0,
-left: 0,
-width: '100vw',
-height: '100vh',
-backgroundColor: 'rgba(0, 0, 0, 0.0)',
-display: 'flex',
-justifyContent: 'center',
-alignItems: 'center',
-zIndex: 63 // Ensure it's above other content
-}} onClick={closeContactPopUp}>
-
-
-<div style={{
-position: 'fixed',
-top: '30vh',
-left: 0,
-width: '100vw',
-height: '120px',
-boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.4)',
-background: '#ffffff',
-zIndex: 64
-}}> 
-
-<div style={{textAlign: 'center', fontSize: '22px', marginTop: '15px'}}>
-  
-{
-    typeof selectedContactList[contactIndex] === 'string'
-      ? selectedContactList[contactIndex]
-      : `${selectedContactList[contactIndex].firstName} ${selectedContactList[contactIndex].lastName}`
-  }
-
-</div>
-
-<div style={{display: 'flex', alignItems: 'center', 
-  justifyContent: 'space-around', marginTop: '10px'}}>
-
-<div style={{
-color: 'white',
-background: '#60A05B', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} onClick={() => handleSendPageClick(selectedContactList[contactIndex])}>
-Send
-</div>
-
-
-<div style={{
-color: 'white',
-background: '#60A05B', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} 
-onClick={() => handleRequestPageClick(selectedContactList[contactIndex])}>
-Request
-</div>
-
-
-<div style={{
-color: 'white',
-background: '#777777', 
-fontWeight: 'bold',
-borderRadius: '10px', 
-border: 'none', 
-height: '40px', 
-width: '110px',
-display: 'flex',        // Makes this div also a flex container
-justifyContent: 'center', // Centers the text horizontally inside the button
-alignItems: 'center',// Centers the text vertically inside the button
-cursor: 'pointer',
-fontSize: '20px',
-}} onClick={closeContactPopUp}  >
-Cancel
-</div>
-
-
-</div>
-</div>
-
-</div>
-
-)}</div>
-
-
         </div> 
+        </div>
     )
 }
-export default PayPage;
+export default ContactsPage;

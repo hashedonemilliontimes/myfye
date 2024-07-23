@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import backButton from '../assets/backButton3.png';
@@ -374,7 +372,7 @@ const updateContactTwo = await setDoc(contactDocRefTwo, {
     }}>
 
 <img 
-    style={{ width: 'auto', height: '45px', background: 'white' }} 
+    style={{ width: 'auto', height: '35px', background: 'white' }} 
     src={backButton}
     onClick={handleMenuClick} 
     alt="Exit" 

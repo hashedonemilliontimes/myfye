@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../assets/backButton3.png';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
@@ -117,7 +116,7 @@ function Support() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-<img src={questionMarkImage} style={{width: '35px', height: '35px'}}
+<img src={questionMarkImage} style={{width: '35px', height: '35px', opacity: '0.7'}}
 onClick={handleMenuClick}></img>
 
 { showMenu && (
@@ -130,8 +129,8 @@ onClick={handleMenuClick}></img>
       zIndex: 3    
     }}>
 
-            <img style={{width: 'auto', height: '45px', background: 'white'}} src={ showMenu ? (
-                currencySelected ? backButton : xIcon) : menuIcon }
+            <img style={{width: 'auto', height: '35px', background: 'white'}} src={ showMenu ? (
+                currencySelected ? backButton : backButton) : menuIcon }
             onClick={handleMenuClick} alt="Exit" />
             </div>)}
 

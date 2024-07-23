@@ -40,6 +40,7 @@ import BottomNav from '../appcomponents/bottomNavigation';
 import PayPage from '../appcomponents/PayPage';
 import SendPage from '../appcomponents/SendPage';
 import RequestPage from '../appcomponents/RequestPage';
+import ContactsPage from '../appcomponents/ContactsPage';
 import AccountHistory from '../appcomponents/accountHistory';
 import { checkUncreatedUserBalance } from '../helpers/uncreatedUserBalance';
 import NewUserPreviousBalanceNotification from '../appcomponents/NewUserPreviousBalanceNotification';
@@ -261,12 +262,13 @@ function WebAppInner() {
   maxWidth: '90vw',
   background: '#ffffff',
   borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '10px',}}>
 
 
-<div style={{fontSize: '25px', fontWeight: 'bold', width: '70vw', maxWidth: '550px',
+<div style={{fontSize: '25px', fontWeight: 'bold', 
+width: '70vw', maxWidth: '550px', color: '#222222'
   
 }}>Welcome, {firstNameUI}</div>
 
@@ -292,7 +294,7 @@ function WebAppInner() {
 <div style={{
   background: '#ffffff',
   borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '20px',
   width: '90vw'
@@ -378,7 +380,7 @@ alignItems: 'center',
        <div style={{
   background: '#ffffff',
   borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '20px',
   width: '90vw'
@@ -435,7 +437,7 @@ alignItems: 'center',
 <div style={{
   background: '#ffffff',
   borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '20px',
   paddingTop: '20px',

@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import menuIcon from '../../assets/menuIcon.png';
-import xIcon from '../../assets/xIconGray2.png';
 import { useSelector, useDispatch } from 'react-redux';
-import backButton from '../../assets/backButton3.png';
-import usdcSol from '../../assets/usdcSol.png';
-import usdtSol from '../../assets/usdtSol.png';
-import solanaLogo from '../../assets/solanaLogo.png';
-import copy from '../../assets/copy.png';
 import { useFunding } from "@dynamic-labs/sdk-react-core";
 import { setShowBanxaPopUp } from '../../redux/userWalletData';
 

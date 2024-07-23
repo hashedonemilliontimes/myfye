@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { valueAtTime } from '../helpers/growthPercentage';

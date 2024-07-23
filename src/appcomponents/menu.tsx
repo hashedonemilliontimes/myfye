@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import menuIcon from '../assets/menuIcon.png';
-import xIcon from '../assets/xIconGray2.png';
 import { DynamicContextProvider, DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { useSelector } from 'react-redux';
 import MyWallet from './WalletPage';
 import userImage from '../assets/user.png';
+import backButton from '../assets/backButton3.png';
 import { useDispatch } from 'react-redux';
 import { setShowProfileMenu } from '../redux/userWalletData';
 
@@ -57,8 +57,8 @@ function Menu() {
 
       { showMenu && (
         <div>
-                    <img style={{width: '45px', height: '45px', 
-                    marginLeft: '15px', marginTop: '15px'}} src={ xIcon}
+                    <img style={{width: '35px', height: 'auto', 
+                    marginLeft: '15px', marginTop: '15px'}} src={backButton}
                     onClick={handleMenuClick} alt="Menu" />
                     </div>
       )}

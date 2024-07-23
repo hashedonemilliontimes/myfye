@@ -46,10 +46,11 @@ interface UserWalletDataState {
   showEarnWithdrawPage: boolean,
   showEarnDepositPage: boolean,
   priceOfUSDYinUSDC: number,
-  contacts: (User | string)[];
-  allUsers: User[];
+  contacts: (User | string)[],
+  allUsers: User[],
   selectedContact: User | string,
-  recentlyUsedSolanaAddresses: string[];
+  recentlyUsedSolanaAddresses: string[],
+  showContactPopup: boolean
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -98,7 +99,8 @@ const initialUserWalletData: UserWalletDataState = {
   contacts: [],
   allUsers: [],
   selectedContact: '',
-  recentlyUsedSolanaAddresses: []
+  recentlyUsedSolanaAddresses: [],
+  showContactPopup: false
 };
 
 
@@ -272,6 +274,11 @@ export const userWalletDataSlice = createSlice({
   setRecentlyUsedSolanaAddresses: (state, action: PayloadAction<string[]>) => {
     state.recentlyUsedSolanaAddresses = action.payload;
   },
+  setShowContactPopup: (state, action: PayloadAction<boolean>) => {
+    state.showContactPopup = action.payload;
+  },
+
+  
   
   },
 });
@@ -296,7 +303,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowEarnDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
   setSelectedContact, setRecentlyUsedSolanaAddresses, 
-  setShowContactsPage, setAllUsers
+  setShowContactsPage, setAllUsers, setShowContactPopup
   
 } = userWalletDataSlice.actions;
 
