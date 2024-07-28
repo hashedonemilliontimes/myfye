@@ -41,7 +41,7 @@ function SendPage() {
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
-
+    const [sendingToSelectedContact, setSendingToSelectedConact] = useState(false);
     const dispatch = useDispatch();
 
 
@@ -194,18 +194,28 @@ function SendPage() {
       const isValidEmailAddress = emailRegex.test(cleanedAddress);
       const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
   
-      if (cleanedAmount === '' || cleanedAddress === '') {
+
+      if (selectedContact && newAddress.startsWith('@')) {
+        // Selected contact
+        setSendButtonActive(true);
+        setErrorMessage('');
+        setSendingToSelectedConact(true);
+      } else if (cleanedAmount === '' || cleanedAddress === '') {
           setSendButtonActive(false);
           setErrorMessage('Please fill in all fields');
+          setSendingToSelectedConact(false);
       } else if (!isValidEmailAddress && !isValidPhoneNumber) {
         setSendButtonActive(false);
         setErrorMessage('Please enter a valid email address or phone number');
+        setSendingToSelectedConact(false);
       } else if (isNaN(amountToNumber) && amountToNumber < 0.00001) {
         setSendButtonActive(false);
         setErrorMessage('Please enter a valid number');
+        setSendingToSelectedConact(false);
       } else if (amountToNumber > stableCoinBalance) {
         setSendButtonActive(false);
         setErrorMessage('Insufficient balance');
+        setSendingToSelectedConact(false);
       } else {
         setSendButtonActive(true);
         setErrorMessage('');
@@ -237,7 +247,7 @@ function SendPage() {
         // sending by email
         dataType = "email"
         receiverData = cleanedAddress
-      } else {
+      } else if (!sendingToSelectedContact) {
         setErrorMessage('Problem with address or phone number input');
         return
       }
@@ -257,6 +267,28 @@ function SendPage() {
         setSendButtonActive(false); // Deactivate button here
         console.log('Requesting new transaction')
         
+        if (sendingToSelectedContact) {
+          const transactionSuccess = await requestNewSolanaTransaction2(publicKey, 
+            selectedContact.walletPublicKey, convertToSmallestDenomination, currencySelected, 
+              primaryWallet, walletName);
+  
+          console.log('Got transaction status: ', transactionSuccess)
+          if (transactionSuccess) {
+  
+            sendPhoneText(currentUserFirstName, cleanedPhoneNumber, amountToNumber)
+            const updateTransactionsPromise = saveTransaction(amountToNumber, `${selectedContact.firstName} ${selectedContact.lastName}`);
+            await Promise.all([updateTransactionsPromise]);
+            
+            setSendInProgress(false);
+  
+            setErrorMessage('');
+            // this is a rough workaround to save the change to redux and reload the page
+            setTimeout(() =>  setErrorMessage(`Sent USD to ${addressText}`), 30);
+        } else {
+          setSendInProgress(false);
+          setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
+        }
+        } else {
         // get the potential matches
         const users = await getDynamicUsers(receiverData, dataType);  
 
@@ -315,6 +347,7 @@ function SendPage() {
         setSendInProgress(false);
         setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
       }
+        }
     }
   };
 }

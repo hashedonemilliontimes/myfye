@@ -207,7 +207,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
 <div style={{borderRadius: '20px', padding: '10px', 
 color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
-backgroundColor: '#2E7D32', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
+backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
 </div>
 </a>
 </div>

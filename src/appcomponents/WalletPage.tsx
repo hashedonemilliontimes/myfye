@@ -96,6 +96,16 @@ function WalletPage() {
       };
       
 
+      const handleWalletPortfolioClick = () => {
+        const url = `https://solscan.io/account/${publicKey}`;
+        window.open(url, '_blank'); // Opens the link in a new tab
+    };
+
+    const handleWalletExplorerClick = () => {
+      const url = `https://solscan.io/account/${publicKey}`;
+      window.open(url, '_blank'); // Opens the link in a new tab
+  };
+
     return (
         <div style={{ backgroundColor: 'white', overflow: 'hidden' }}>
 
@@ -166,8 +176,8 @@ function WalletPage() {
 
 <div style={{
 display: 'flex', alignItems: 'center', 
-justifyContent: 'center', gap: '60px',
-width: '90vw', height: '65vh', flexDirection: 'column'}}>
+justifyContent: 'center', gap: '20px',
+width: '90vw', height: '75vh', flexDirection: 'column'}}>
 
 
   <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '15px'}}>
@@ -241,6 +251,44 @@ width: '90vw',}}>
 
 
 
+<div style={{width: '110px', height: '110px', marginTop: '40px'}}>
+<QRCode value={publicKey} size={110} level="H" />
+</div>
+
+
+
+<div>
+<div style={{
+           color: '#ffffff', 
+           background: '#60A05B', // gray '#999999', 
+           borderRadius: '10px', 
+           border: 'none', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '180px',
+           textAlign: 'center'
+       }} onClick={handleWalletPortfolioClick}>
+          Portfolio
+       </div>
+
+       <div style={{
+           color: '#ffffff', 
+           background: '#60A05B', // gray '#999999', 
+           borderRadius: '10px', 
+           border: 'none', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '180px',
+           textAlign: 'center',
+           marginTop: '15px'
+       }} onClick={handleWalletExplorerClick}>
+           Explorer
+       </div>
+</div>
 
 
 

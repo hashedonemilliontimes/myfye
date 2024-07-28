@@ -258,13 +258,7 @@ function WebAppInner() {
 
 <div style={{display: 'flex', flexDirection: 'row', 
   justifyContent: 'space-between', marginTop: '15px', marginLeft: '10px',
-  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px',
-  maxWidth: '90vw',
-  background: '#ffffff',
-  borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
-  padding: '10px',
-  paddingBottom: '10px',}}>
+  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px'}}>
 
 
 <div style={{fontSize: '25px', fontWeight: 'bold', 
@@ -284,7 +278,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 <div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
-          height: window.innerHeight < 620 ? 'calc(100vh - 190px)' : 'calc(100vh - 190px)',
+          height: window.innerHeight < 620 ? 'calc(100vh - 150px)' : 'calc(100vh - 150px)',
         flexDirection: 'column', 
         color: '#222222', 
         justifyContent: 'space-around',
@@ -433,7 +427,7 @@ alignItems: 'center',
 </div>
 
 
-
+{/* 
 <div style={{
   background: '#ffffff',
   borderRadius: '20px',
@@ -443,6 +437,7 @@ alignItems: 'center',
   paddingTop: '20px',
   width: '90vw'
 }}>
+
 <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
   <div style={{
       color: '#ffffff', 
@@ -474,6 +469,9 @@ alignItems: 'center',
     }} onClick={handleRequestPageClick}>Request</div>
   </div>          
   </div> 
+*/}
+
+
                 
                     <BottomNav/>
                         </div>
