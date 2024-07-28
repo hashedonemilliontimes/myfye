@@ -97,7 +97,7 @@ function WalletPage() {
       
 
       const handleWalletPortfolioClick = () => {
-        const url = `https://solscan.io/account/${publicKey}`;
+        const url = `https://app.step.finance/en/dashboard?watching=${publicKey}`;
         window.open(url, '_blank'); // Opens the link in a new tab
     };
 
