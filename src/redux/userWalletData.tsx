@@ -303,7 +303,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowEarnDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
   setSelectedContact, setRecentlyUsedSolanaAddresses, 
-  setShowContactsPage, setAllUsers, setShowContactPopup
+  setAllUsers, setShowContactPopup
   
 } = userWalletDataSlice.actions;
 

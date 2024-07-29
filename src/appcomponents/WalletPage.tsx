@@ -5,7 +5,6 @@ import backButton from '../assets/backButton3.png';
 import DepositStableCoin from './myWalletComponents/DepositStableCoin';
 import WithdrawStableCoin from './myWalletComponents/WithdrawStableCoin';
 import ShowBanxaPopUp from './myWalletComponents/ShowBanxaPopUp';
-import myfyeWalletImage from '../assets/myfyeWallet.png';
 import QRCode from 'qrcode.react';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
@@ -13,6 +12,8 @@ import { setShouldShowBottomNav, setShowWithdrawStablecoinPage,
 setShowWalletPage, setShowWalletDepositPage } from '../redux/userWalletData';
 import history from '../assets/history.png';
 import WalletTransactions from './WalletTransactions';
+import myfyeWallet from '../assets/myfyeWallet2.png';
+import xIcon from '../assets/xIconGray2.png';
 
 function WalletPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
@@ -32,6 +33,8 @@ function WalletPage() {
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
     const [qrCodeURL, setqrCodeURL] = useState(''); 
+    const [showWalletInfoPopup, setShowWalletInfoPopup] = useState(false); 
+    const [addressCopied, setAddressCopied] = useState(false);
 
     useEffect(() => {
       const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
@@ -68,6 +71,18 @@ function WalletPage() {
       };
 
 
+      function copyWalletAddress() {
+        navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
+            .then(() => {
+                setAddressCopied(true);
+                setTimeout(() => {
+                    setAddressCopied(false);
+                }, 2000); // Set addressCopied to false after 2 seconds
+            })
+            .catch(err => {
+                console.error('Failed to copy the address: ', err);
+            });
+    }
 
       const handleWithdrawButtonClick = () => {
         // Add your logic here for what happens when the menu is clicked
@@ -83,6 +98,11 @@ function WalletPage() {
         
       };
       
+      const toggleShowWalletInfoPopup = () => {
+        // Add your logic here for what happens when the menu is clicked
+        setShowWalletInfoPopup(!showWalletInfoPopup)
+        
+      };
 
       const toggleShowTransactionHistory = () => {
         console.log()
@@ -134,10 +154,9 @@ function WalletPage() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        padding: '15px',
         height: '90vh',
         backgroundColor: 'white',
-        width: '94vw',
+        width: '100vw',
         overflowX: 'hidden',
         overflowY: 'hidden',
         transition: 'top 0.5s ease', // Animate the left property
@@ -146,9 +165,84 @@ function WalletPage() {
 
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeWalletImage} style= {{marginTop: '0px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+{showWalletInfoPopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999,
+          }}
+          onClick={toggleShowWalletInfoPopup}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              width: '75vw',
+              height: '50vh',
+              padding: '20px',
+              background: '#ffffff',
+              borderRadius: '20px',
+              boxShadow: '4px 10px 30px rgba(0, 0, 0, 0.4), -4px 10px 30px rgba(0, 0, 0, 0.4)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+
+
+            <img src={xIcon} style={{width: '32px', height: 'auto'}}
+            onClick={toggleShowWalletInfoPopup}></img>
+
+<div style={{display: 'flex', flexDirection: 'column', 
+  alignItems: 'center', height: '90%', 
+  justifyContent: 'space-around', marginTop: '-20px'}}>
+<div style={{width: '110px', height: '110px'}}>
+<QRCode value={publicKey} size={110} level="H" />
 </div>
+
+<div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           cursor: 'pointer',
+           fontSize: '20px',
+           padding: '9px',
+           width: '180px',
+           textAlign: 'center'
+       }} onClick={copyWalletAddress}>
+           {addressCopied ? (
+<>Copied!</>
+           ) : (
+<>Copy Address</>
+           )}
+       </div>
+
+       <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+            padding: '9px',
+           cursor: 'pointer',
+           fontSize: '20px',     
+           width: '180px',
+           textAlign: 'center'
+       }} onClick={handleWalletExplorerClick}>
+           Wallet Explorer
+       </div>
+
+</div>
+          </div>
+        </div>
+      )}
+
 
 
 
@@ -163,40 +257,13 @@ function WalletPage() {
         cursor: 'pointer',
         zIndex: 4    
 }}>
-<img src={history} style={{height: '39px', width: '39px'}} onClick={toggleShowTransactionHistory}/>
+{/*<img src={history} style={{height: '39px', width: '39px'}} onClick={toggleShowTransactionHistory}/>*/}
 </div>
 
 
 
 
 <div>
-
-
-
-
-<div style={{
-display: 'flex', alignItems: 'center', 
-justifyContent: 'center', gap: '20px',
-width: '90vw', height: '75vh', flexDirection: 'column'}}>
-
-
-  <div style= {{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '15px'}}>
-    
-    <div style= {{fontSize: '18px', marginTop: '6px'}}>Wallet balance:</div>
-    <div>
-    <div style={{ fontSize: '18px' }}>
-    <span style={{ fontSize: '18px' }}>$</span>
-    {((usdcSolBalance + usdtSolBalance) > 0.00001) ? (
-    <span style={{ fontSize: '25px' }}>{(usdcSolBalance + usdtSolBalance).toFixed(6)}</span>
-    ) : (
-      <span style={{ fontSize: '25px' }}>0.00</span>
-    )}
-</div>
-      
-      </div>
-
-
-      </div>
 
 
 
@@ -204,91 +271,117 @@ width: '90vw', height: '75vh', flexDirection: 'column'}}>
 <div style={{
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', 
-width: '90vw',}}>
+width: '100vw', height: '70vh', flexDirection: 'column', marginTop: '40px'}}>
+
+
+
 
 
 
 <div style={{
-      color: 'white',
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px',
-  }} onClick={handleDepositButtonClick}  >
-      Deposit
-  </div>
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
+  padding: '10px',
+  paddingBottom: '20px',
+  width: '90vw'
+}}>
+<div style={{ display: 'flex',  alignItems: 'center', 
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
+<div style={{display: 'flex', marginTop: '0px'}}>
 
-
-
-<div style={{display: 'flex', alignItems: 'center', 
-                justifyContent: 'center',}}>
-  <div style={{
-      color: 'white', 
-      background: '#60A05B', 
-      fontWeight: 'bold',
-      borderRadius: '10px', 
-      border: 'none', 
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-  }} onClick={handleWithdrawButtonClick}>
-      Withdraw
-  </div>
-       </div>
+  <img style={{ width: '180px', height: 'auto'}}src={myfyeWallet}/>
 
 </div>
 
+<div style={{ display: 'flex', alignItems: 'center', 
+  justifyContent: 'center', flexDirection: 'column',}}>
 
 
-<div style={{width: '110px', height: '110px', marginTop: '40px'}}>
-<QRCode value={publicKey} size={110} level="H" />
-</div>
+    <label htmlFor="deposit" style={{ fontSize: '20px', 
+     display: 'flex', alignItems: 'center', }}>
+    $ <span style={{ fontSize: '35px' }}>
+      
+    <div>
+    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
+  </div>
+
+    </span>
+</label>
+
+   </div>
 
 
 
-<div>
-<div style={{
+
+   {/*
+   <Deposit/>
+    <Withdraw/>
+           <HoldingsPortfolio/>
+  */}
+
+<div style={{display: 'flex', 
+alignItems: 'center', 
+                justifyContent: 'space-around',
+                marginTop: '0px',
+                width: '95vw'}}>
+
+            <div style={{
            color: '#ffffff', 
-           background: '#60A05B', // gray '#999999', 
+           background: '#2E7D32', // gray '#999999', 
            borderRadius: '10px', 
-           border: 'none', 
+           border: '2px solid #2E7D32', 
            fontWeight: 'bold',
            cursor: 'pointer',
            fontSize: '20px',
            padding: '9px',
-           width: '180px',
+           width: '120px',
            textAlign: 'center'
-       }} onClick={handleWalletPortfolioClick}>
-          Portfolio
+       }} onClick={handleDepositButtonClick}>
+           Deposit
        </div>
+       <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+            padding: '9px',
+           cursor: 'pointer',
+           fontSize: '20px',     
+           width: '120px',
+           textAlign: 'center'
+       }} onClick={handleWithdrawButtonClick}>
+           Withdraw
+       </div>
+       </div>
+
+       </div>
+       </div>
+
+
+
+
+
 
        <div style={{
            color: '#ffffff', 
-           background: '#60A05B', // gray '#999999', 
+           background: '#2E7D32', // gray '#999999', 
            borderRadius: '10px', 
-           border: 'none', 
+           border: '2px solid #2E7D32', 
            fontWeight: 'bold',
+            padding: '9px',
            cursor: 'pointer',
-           fontSize: '20px',
-           padding: '9px',
+           fontSize: '20px',     
            width: '180px',
-           textAlign: 'center',
-           marginTop: '15px'
-       }} onClick={handleWalletExplorerClick}>
-           Explorer
+           textAlign: 'center'
+       }} onClick={toggleShowWalletInfoPopup}>
+           Wallet Info
        </div>
-</div>
+
+
+
+
 
 
 

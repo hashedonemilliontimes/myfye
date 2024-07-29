@@ -315,7 +315,7 @@ Depoist via credit or debit card directly
            textAlign: 'center',
            marginTop: '15px'
        }} onClick={handleWalletInfoClick}>
-           View Wallet Info
+           Wallet Explorer
        </div>
 </div>
 
