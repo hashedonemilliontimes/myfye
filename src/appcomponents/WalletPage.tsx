@@ -164,6 +164,10 @@ function WalletPage() {
       }}>
 
 
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeWallet}/>
+</div>
+
 
 {showWalletInfoPopup && (
         <div
@@ -271,7 +275,7 @@ function WalletPage() {
 <div style={{
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', 
-width: '100vw', height: '70vh', flexDirection: 'column', marginTop: '40px'}}>
+width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '0px'}}>
 
 
 
@@ -288,11 +292,6 @@ width: '100vw', height: '70vh', flexDirection: 'column', marginTop: '40px'}}>
 }}>
 <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
-<div style={{display: 'flex', marginTop: '0px'}}>
-
-  <img style={{ width: '180px', height: 'auto'}}src={myfyeWallet}/>
-
-</div>
 
 <div style={{ display: 'flex', alignItems: 'center', 
   justifyContent: 'center', flexDirection: 'column',}}>
@@ -323,8 +322,8 @@ width: '100vw', height: '70vh', flexDirection: 'column', marginTop: '40px'}}>
 <div style={{display: 'flex', 
 alignItems: 'center', 
                 justifyContent: 'space-around',
-                marginTop: '0px',
-                width: '95vw'}}>
+                marginTop: '20px',
+                width: '95vw',}}>
 
             <div style={{
            color: '#ffffff', 

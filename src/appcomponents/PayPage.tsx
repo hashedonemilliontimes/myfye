@@ -281,7 +281,7 @@ function PayPage() {
       }}>
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyePay} style= {{marginTop: '2px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
+<img src = {myfyePay} style= {{marginTop: '2px', width: '50vw', maxWidth: '180px', height: 'auto'}}></img>
 
 </div>
 

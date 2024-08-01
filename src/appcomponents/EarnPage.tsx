@@ -13,19 +13,20 @@ import { useDispatch } from 'react-redux';
 import InvestmentValue from '../appcomponents/investmentValue';
 import history from '../assets/history.png';
 import EarnTransactions from './EarnTransactions';
+import PortfolioPopup from './PortfolioBreakdown';
 
 function EarnPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showEarnPage);
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [currencySelected, setcurrencySelected] = useState('');
     const dispatch = useDispatch();
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const [menuPosition, setMenuPosition] = useState('-150vh'); 
 
     useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-110vh'); // Move the menu off-screen
+          setMenuPosition('-150vh'); // Move the menu off-screen
           
           setcurrencySelected('');
         }
@@ -95,19 +96,15 @@ function EarnPage() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        padding: '15px',
         minHeight: 'calc(100% + 35px)',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '100vw',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 3
       }}>
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img src = {myfyeEarnGreen} style= {{marginTop: '2px', width: '50vw', maxWidth: '270px', height: 'auto'}}></img>
 
-</div>
 
         {!showTransactionHistory ? (
 <div>
@@ -124,24 +121,45 @@ function EarnPage() {
 </div>
 
 
-<div style={{display: 'flex', alignItems: 'center', marginTop: '15px',}}>
 
-<div style={{ fontSize: '20px', whiteSpace: 'nowrap'}}>Current Balance:&nbsp;</div>
-
-
-<div style={{fontSize: '20px', display: 'flex', alignItems: 'center'}}>
-    $ <InvestmentValue/>
-  </div>
-
-
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeEarnGreen}/>
 </div>
 
+<div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+<div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
+  padding: '10px',
+  paddingBottom: '20px',
+  width: '90vw',
+  marginTop: '30px'
+}}>
+       <div style={{ display: 'flex',  alignItems: 'center', 
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px' }}>
 
-<div style={{marginTop: '15px', fontSize: '20px'}}>MyFye Earn APY: 5.1%</div>
+
+
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
+
+    <label htmlFor="deposit" style={{ fontSize: '20px', 
+     display: 'flex', alignItems: 'center', }}>
+    $ <span style={{ fontSize: '35px' }}>
+      
+    <InvestmentValue/>
+
+    </span>
+
+
+    
+</label>
+
+   
 
 <div style={{marginTop: '15px', 
 display: 'flex', alignItems: 'center', 
-justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
+justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
 
 <div style={{
     color: 'white', 
@@ -179,15 +197,37 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
        </div>
 
 </div>
+   </div>
+
+
+<div>
+
+
+       </div>
+
+</div>
+</div>
+
+
+
+
+
 
 <div style={{display:'flex', 
   flexDirection: 'column', 
   justifyContent: 'space-around',
-  height: 'calc(100vh - 300px)'}}>
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
+  padding: '10px',
+  paddingBottom: '25px',
+  width: '90vw',
+  marginTop: '30px',
+  marginBottom: '100px'}}>
 
 <div>
 <div style={{marginTop: '15px', textAlign: 'center', 
-  fontSize: '16px'}}>Portoflio Allocation:</div>
+  fontSize: '25px'}}>Earn Portfolio:</div>
 
     <div style={{
         
@@ -198,23 +238,27 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
     
 <div>
 
-<div>
-<div style={{marginTop: '15px', fontSize: '14px', 
-  textAlign: 'center',}}>Myfye Earn is built on top of USDY, which are 
-  tokenized US treasury bonds by Ondo Finance</div>
 
-<a href="https://ondo.finance/" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
+<PortfolioPopup/>
+
+<div>
+<a href="https://ondo.finance/usdy" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
-<div style={{borderRadius: '20px', padding: '10px', 
+<div style={{borderRadius: '10px', padding: '10px', 
 color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
-backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Learn More About USDY</div>
+backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Learn About USDY</div>
 </div>
 </a>
 </div>
+
 </div>
 
 </div>
-  
+</div> 
+
+
+
+
 </div>
 
         ) : (
