@@ -8,7 +8,7 @@ import { setShouldShowBottomNav, setShowPayPage,
     setContacts, setSelectedContact,
     setShowContactPopup } from '../redux/userWalletData';
 
-    
+import _ from 'lodash';
 import phoneIconWhite from '../assets/phoneIconWhite.png';
 import mailIconWhite from '../assets/mailIconWhite.png';
 import ContactPopup from './ContactPopup';
@@ -17,6 +17,7 @@ function ContactsPage() {
   
     
     const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
+    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [searchValue, setSearchValue] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [contactIndex, setContactIndex] = useState(0);
@@ -44,13 +45,20 @@ function ContactsPage() {
             // Check if any of the User object fields contain the search value
 
             
+            if (currentUserEmail&& contact.email?.toLowerCase() === currentUserEmail.toLowerCase()) {
+              return false;
+            }
+
+            
             return contact.username?.toLowerCase().includes(searchValue) ||
                    contact.firstName?.toLowerCase().includes(searchValue) ||
                    contact.lastName?.toLowerCase().includes(searchValue) ||
                    contact.email?.toLowerCase().includes(searchValue) ||
                    contact.phoneNumber?.toLowerCase().includes(searchValue);
         });
+
         setSearchResults(results);
+        
       };
 
   
@@ -102,15 +110,22 @@ function ContactsPage() {
   };
 
 
-  function getRandomPurple() {
-    // Generate random values for red and blue
-    const red = Math.floor(Math.random() * 100);  // Red can range fully from 0 to 255
-    const blue = 128 + Math.floor(Math.random() * 128);  // Blue is biased towards higher values (128-255)
-    const green = Math.floor(Math.random() * 100);  // Green stays very low to avoid straying into cyan or green
-
+  function getRandomPurple(index: number) {
+    // Use the index to influence the random generation
+    const seed = index * 123456; // Arbitrary multiplier to ensure variation
+    const red = Math.floor((Math.sin(seed) * 10000) % 100);  
+    const blue = 128 + Math.floor((Math.cos(seed) * 10000) % 128);
+    const green = Math.floor((Math.tan(seed) * 10000) % 100);
+  
+    // Ensure values are positive
+    const validRed = red < 0 ? -red : red;
+    const validGreen = green < 0 ? -green : green;
+    const validBlue = blue < 0 ? -blue : blue;
+  
     // Convert each part to a hexadecimal string and return the combined string
-    return `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
-}
+    return `#${validRed.toString(16).padStart(2, '0')}${validGreen.toString(16).padStart(2, '0')}${validBlue.toString(16).padStart(2, '0')}`;
+  }
+  
     return (
         
         <div>
@@ -146,7 +161,7 @@ function ContactsPage() {
       <div style={{
         width: '40px',
         height: '40px',
-        backgroundColor: getRandomPurple(),
+        backgroundColor: getRandomPurple(index),
         borderRadius: '50%',
         color: 'white',
         display: 'flex',

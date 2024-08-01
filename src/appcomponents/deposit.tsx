@@ -247,7 +247,7 @@ function Deposit() {
       
       const handleAllButtonClick = () => {
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (1.0 * balanceSelectedInUSD).toFixed(2).toString().replace(/\.?0+$/, '');
+          const newDeposit = (Math.floor(balanceSelectedInUSD * 100) / 100).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
         setDeposit(newDeposit)
         checkForDepositFieldComplete(String(newDeposit));

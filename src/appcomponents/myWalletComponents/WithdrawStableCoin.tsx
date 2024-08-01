@@ -85,10 +85,10 @@ function WithdrawStableCoin() {
       const handleQuarterButtonClick = () => {
         console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.25 * balanceSelectedInUSD);
-          console.log("Setting deposit to:", newDeposit); // Added logging
-        setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-        checkForValidInput(addressText, String(newDeposit));
+          const newWithdrawal = (0.25 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newWithdrawal); // Added logging
+        setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
+        checkForValidInput(addressText, String(newWithdrawal));
         } else {
             setAmountText("$ 0.0")
         }
@@ -98,10 +98,10 @@ function WithdrawStableCoin() {
       const handleHalfButtonClick = () => {
         console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.5 * balanceSelectedInUSD);
-          console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-          checkForValidInput(addressText, String(newDeposit));
+          const newWithdrawal = (0.5 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newWithdrawal); // Added logging
+          setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
+          checkForValidInput(addressText, String(newWithdrawal));
         }else {
             setAmountText("$ 0.0")
         }
@@ -111,10 +111,10 @@ function WithdrawStableCoin() {
       const handleTwoThirdsButtonClick = () => {
         console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (0.75 * balanceSelectedInUSD);
-          console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-          checkForValidInput(addressText, String(newDeposit));
+          const newWithdrawal = (0.75 * balanceSelectedInUSD);
+          console.log("Setting deposit to:", newWithdrawal); // Added logging
+          setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
+          checkForValidInput(addressText, String(newWithdrawal));
         } else {
             setAmountText("$ 0.0")
         }
@@ -124,10 +124,10 @@ function WithdrawStableCoin() {
       const handleAllButtonClick = () => {
         console.log("Handling button click", balanceSelectedInUSD);
         if (balanceSelectedInUSD>0.0001) {
-          const newDeposit = (1.0 * balanceSelectedInUSD);
-          console.log("Setting deposit to:", newDeposit); // Added logging
-          setAmountText(String(newDeposit.toFixed(2).toString().replace(/\.?0+$/, '')))
-          checkForValidInput(addressText, String(newDeposit));
+          const newWithdrawal = Math.floor(balanceSelectedInUSD * 100) / 100;
+          console.log("Setting deposit to:", newWithdrawal); // Added logging
+          setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
+          checkForValidInput(addressText, String(newWithdrawal));
         } else {
             setAmountText("$ 0.0")
         }

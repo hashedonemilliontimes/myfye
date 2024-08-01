@@ -153,7 +153,7 @@ function SendPage() {
     const handleAllButtonClick = () => {
       console.log("Handling button click", stableCoinBalance);
       if (stableCoinBalance > 0.0001) {
-          const newDeposit = (1.0 * stableCoinBalance).toFixed(2).toString().replace(/\.?0+$/, '');
+        const newDeposit = (Math.floor(stableCoinBalance * 100) / 100).toFixed(2).toString().replace(/\.?0+$/, '');
           console.log("Setting deposit to:", newDeposit); // Added logging
           setAmountText(`${newDeposit}`);
           checkForValidInput(addressText, newDeposit);

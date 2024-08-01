@@ -278,7 +278,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 <div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
-          height: window.innerHeight < 620 ? 'calc(100vh - 150px)' : 'calc(100vh - 150px)',
+          height: window.innerHeight < 620 ? 'calc(100vh - 170px)' : 'calc(100vh - 170px)',
         flexDirection: 'column', 
         color: '#222222', 
         justifyContent: 'space-around',
@@ -290,7 +290,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
   borderRadius: '20px',
   boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
-  paddingBottom: '20px',
+  paddingBottom: '16px',
   width: '90vw'
 }}>
 <div style={{ display: 'flex',  alignItems: 'center', 
@@ -376,7 +376,7 @@ alignItems: 'center',
   borderRadius: '20px',
   boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
-  paddingBottom: '20px',
+  paddingBottom: '16px',
   width: '90vw'
 }}>
        <div style={{ display: 'flex',  alignItems: 'center', 
@@ -427,16 +427,8 @@ alignItems: 'center',
 </div>
 
 
-{/* 
-<div style={{
-  background: '#ffffff',
-  borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
-  padding: '10px',
-  paddingBottom: '20px',
-  paddingTop: '20px',
-  width: '90vw'
-}}>
+
+
 
 <div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
   <div style={{
@@ -468,8 +460,7 @@ alignItems: 'center',
       fontSize: '20px'     
     }} onClick={handleRequestPageClick}>Request</div>
   </div>          
-  </div> 
-*/}
+  
 
 
                 
