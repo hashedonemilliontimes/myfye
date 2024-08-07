@@ -37,7 +37,7 @@ function Deposit() {
     const [currencySelected, setcurrencySelected] = useState('');
     const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
 
-    const [menuPosition, setMenuPosition] = useState('-100vh'); 
+    const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
@@ -47,7 +47,9 @@ function Deposit() {
     const usdtEthBalance = useSelector((state: any) => state.userWalletData.usdtEthBalance);
     const busdEthBalance = useSelector((state: any) => state.userWalletData.busdEthBalance);
     const usdySolBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
+    
     const walletName = useSelector((state: any) => state.userWalletData.type);
 
     const [animateShowAddressUsdcSol, setanimateShowAddressUsdcSol] = useState(false); 
@@ -84,8 +86,9 @@ function Deposit() {
     useEffect(() => {
       if (showMenu) {
         setMenuPosition('0'); // Bring the menu into view
+        window.scrollTo(0, 0);
       } else {
-        setMenuPosition('-100vh'); // Move the menu off-screen
+        setMenuPosition('-110vh'); // Move the menu off-screen
 
 
         if (usdcSolBalance >= MINIMUM_DEPOSIT_VALUE && (usdtSolBalance < 0.01)) {
@@ -148,12 +151,12 @@ function Deposit() {
 
     useEffect(() => {
       if (transactionStatus === 'Signed') {
-        setErrorMessage('Sending transaction')
+        setErrorMessage(selectedLanguageCode === 'es' ? 'Enviando transacción' : 'Sending transaction');
         setErrorMessageColor('#60A05B')
       }
       if (transactionStatus === 'Deposit Success') {
         handleBalanceIsUpdating().then((message) => {
-          setErrorMessage('Success!')
+          setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
           setErrorMessageColor('#60A05B')
           // The following two lines of code are different types of balances
           updateUserBalance() // Update the stable coin balance already
@@ -166,12 +169,16 @@ function Deposit() {
           }, 2000);
       }).catch((error) => {
           console.error(error);
-          setErrorMessage('We are having a little trouble processing your deposit. Please give it 10 minutes before reaching out to customer support.')
-          setErrorMessageColor('#000000')
+          setErrorMessage(selectedLanguageCode === 'es' ? 
+            'Estamos teniendo un pequeño problema al procesar su depósito. Por favor, espere 10 minutos antes de contactar al servicio de atención al cliente.' : 
+            'We are having a little trouble processing your deposit. Please give it 10 minutes before reaching out to customer support.');
+        setErrorMessageColor('#000000')
       });
 
       } else if (transactionStatus === 'Fail') {
-        setErrorMessage('Transaction failed, please try again')
+        setErrorMessage(selectedLanguageCode === 'es' ? 
+          'La transacción falló, por favor intente de nuevo' : 
+          'Transaction failed, please try again');
         setErrorMessageColor('#000000')
         setDepositInProgress(false)
         setShouldNotify(false)
@@ -199,17 +206,23 @@ function Deposit() {
             setErrorMessage('')
           } else {
             setDepositButtonActive(false);
-            setErrorMessage('Insufficient balance')
+            setErrorMessage(selectedLanguageCode === 'es' ? 
+              'Saldo insuficiente' : 
+              'Insufficient balance');
             setErrorMessageColor('#222222')
           }
         } else {
           setDepositButtonActive(false);
-          setErrorMessage('The minimum deposit is $1')
+          setErrorMessage(selectedLanguageCode === 'es' ? 
+            'El depósito mínimo es de $1' : 
+            'The minimum deposit is $1');
           setErrorMessageColor('#222222')
         }
         if (depositToNumber > 30) {
           setDepositButtonActive(false);
-          setErrorMessage('The maximum deposit is $30')
+          setErrorMessage(selectedLanguageCode === 'es' ? 
+            'El depósito máximo es de $30' : 
+            'The maximum deposit is $30');
           setErrorMessageColor('#222222')
         }
 
@@ -571,7 +584,7 @@ function Deposit() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: 'calc(100vh - 35px)',
+        height: 'calc(100vh)',
         backgroundColor: 'white',
         width: '95vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -583,7 +596,8 @@ function Deposit() {
   marginLeft: '-15px',
 }}>
 <div style={{marginTop: '0px', fontSize: '45px', color: '#222222',
-}}>Deposit</div>
+}}>{selectedLanguageCode === 'en' && `Deposit`}
+{selectedLanguageCode === 'es' && `Déposito`}</div>
 
 </div>
 
@@ -645,7 +659,12 @@ function Deposit() {
     {principalInvested >= 0.01 ? (
       <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>Increase your return</div>
     ) : (
-      <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>Start saving... safely</div>
+      <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>
+      
+      {selectedLanguageCode === 'en' && `Start saving... safely`}
+      {selectedLanguageCode === 'es' && `
+Empieza a ahorrar... de forma segura`}
+      </div>
     )}
 
 
@@ -744,7 +763,8 @@ $ <span style={{ fontSize: '35px' }}>
                 }}
                 onClick={handleDepositButtonClick}
             >
-                Invest
+{selectedLanguageCode === 'en' && `Invest`}
+{selectedLanguageCode === 'es' && `Invertir`}
             </button>
             </div>
             ) : (

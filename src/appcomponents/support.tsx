@@ -18,6 +18,7 @@ function Support() {
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     const handleMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newMessage = event.target.value;
@@ -116,7 +117,7 @@ function Support() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-<img src={questionMarkImage} style={{width: '35px', height: '35px', opacity: '0.7'}}
+<img src={questionMarkImage} style={{width: '35px', height: '35px', opacity: '0.72'}}
 onClick={handleMenuClick}></img>
 
 { showMenu && (
@@ -149,7 +150,10 @@ onClick={handleMenuClick}></img>
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '0px', textAlign: 'center', fontSize: '35px', color: '#222222'}}>Get Help</div>
+<div style={{marginTop: '0px', textAlign: 'center', fontSize: '35px', color: '#222222'}}>
+{selectedLanguageCode === 'en' && `Get Help`}
+{selectedLanguageCode === 'es' && `Consigue Ayuda`}
+</div>
 
 <div>
 
@@ -157,7 +161,10 @@ onClick={handleMenuClick}></img>
 
 <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column' }}>
   <label htmlFor="message" style={{ fontSize: '20px', color: '#444444', marginBottom: '5px' }}>
-    What issue are you running into today?
+    
+    {selectedLanguageCode === 'en' && `What issue are you running into today?`}
+{selectedLanguageCode === 'es' && `
+¿Con qué problema te encuentras hoy?`}
   </label>
   <textarea
     id="message"
@@ -176,7 +183,9 @@ onClick={handleMenuClick}></img>
       resize: 'vertical', // Allows the user to resize the textarea vertically
       marginTop: '15px'
     }}
-    placeholder="Describe the problem in detail..."
+    placeholder={selectedLanguageCode === 'es' 
+      ? 'Describe el problema en detalle...'
+      : 'Describe the problem in detail...'}
   />
 </div>
 
@@ -195,7 +204,9 @@ onClick={handleMenuClick}></img>
         border: '1px solid transparent',
         cursor: 'pointer',
         width: '100%',
-      }} onClick={handleRequestSubmitButtonClick}>Submit
+      }} onClick={handleRequestSubmitButtonClick}>
+        {selectedLanguageCode === 'en' && `Submit`}
+        {selectedLanguageCode === 'es' && `Entregar`}
 
       </button>
 

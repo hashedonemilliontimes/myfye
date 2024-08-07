@@ -34,6 +34,7 @@ function RequestPage() {
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [confirmSend, setconfirmSend] = useState(false);
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     const dispatch = useDispatch();
 
@@ -415,7 +416,10 @@ alignItems: 'center' }}>
 
 {errorLabelText()}
 
-<div style={{marginTop: '30px'}}>Please wait...</div>
+<div style={{marginTop: '30px'}}>
+{selectedLanguageCode === 'en' && `Please wait...`}
+{selectedLanguageCode === 'es' && `Espere por favor...`}
+</div>
 </div>
 
 ) : (
@@ -423,7 +427,13 @@ alignItems: 'center' }}>
 <div>
 <div style={{marginTop: '50px', fontSize: '24px'}}>
 
-<div style={{color: '#2E7D32'}}>They get a message, you<br/> get paid</div>
+<div style={{color: '#2E7D32'}}>
+{selectedLanguageCode === 'en' && `They get a message, you`}
+{selectedLanguageCode === 'es' && `Ellos reciben un mensaje,`}
+  <br/>
+  {selectedLanguageCode === 'en' && `get paid`}
+  {selectedLanguageCode === 'es' && `te pagan`}
+</div>
 
 </div>
 
@@ -447,7 +457,9 @@ alignItems: 'center' }}>
       borderRadius: '5px', // Rounded edges
       padding: '10px 10px', // Adjust padding as needed
     }}
-    placeholder="Email Or Phone Number"
+      placeholder={selectedLanguageCode === 'es' 
+        ? 'Correo electrónico'
+        : 'Email or Phone Number'}
     autoCapitalize="none"
   />
 </div>
@@ -505,7 +517,9 @@ alignItems: 'center' }}>
       border: '1px solid transparent',
       cursor: 'pointer',
       width: '100%'
-    }} onClick={handleSendButtonClick}>Invoice
+    }} onClick={handleSendButtonClick}>
+  {selectedLanguageCode === 'en' && `Invoice`}
+  {selectedLanguageCode === 'es' && `Factura`}
 
     </button>
 

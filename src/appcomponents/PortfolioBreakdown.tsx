@@ -7,7 +7,7 @@ function PortfolioPopup() {
   
     
     const [showPopup, setShowPopup] = useState(false);
-
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
     const dispatch = useDispatch();
 
     const togglePopup = () => {
@@ -25,7 +25,10 @@ function PortfolioPopup() {
 onClick={togglePopup}>
 <div style={{borderRadius: '10px', padding: '10px', 
 color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
-backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Portfolio Breakdown</div>
+backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
+                {selectedLanguageCode === 'en' && `Portfolio Breakdown`}
+                {selectedLanguageCode === 'es' && `Detalles de la cartera`}
+</div>
 </div>
 </div>
 
@@ -62,7 +65,10 @@ zIndex: 64
 
 <div style={{display: 'flex', alignItems: 'center', 
   justifyContent: 'space-around', marginTop: '10px'}}>
-<div style={{fontSize: '20px'}}>Portfolio Breakdown</div>
+<div style={{fontSize: '20px'}}>
+{selectedLanguageCode === 'en' && `Portfolio Breakdown`}
+{selectedLanguageCode === 'es' && `Detalles de la cartera`}
+</div>
 </div>
 
 <div style={{display: 'flex', 

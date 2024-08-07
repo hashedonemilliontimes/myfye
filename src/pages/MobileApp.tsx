@@ -36,6 +36,7 @@ import EarnPage from '../appcomponents/EarnPage';
 import userImage from '../assets/user.png';
 import ProfileMenu from '../appcomponents/menu';
 import Support from '../appcomponents/support';
+import Language from '../appcomponents/LanguagePage';
 import BottomNav from '../appcomponents/bottomNavigation';
 import PayPage from '../appcomponents/PayPage';
 import SendPage from '../appcomponents/SendPage';
@@ -63,6 +64,7 @@ function WebAppInner() {
   const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
   const [gotUserContacts, setGotUserContacts] = useState(false);
   const [gotAllUsers, setGotAllUsers] = useState(false);
+  const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
   const db = getFirestore();
 
   const dispatch = useDispatch();
@@ -264,10 +266,14 @@ function WebAppInner() {
 <div style={{fontSize: '25px', fontWeight: 'bold', 
 width: '70vw', maxWidth: '550px', color: '#222222'
   
-}}>Welcome, {firstNameUI}</div>
+}}>
+            {selectedLanguageCode === 'en' && `Welcome, ${firstNameUI}`}
+            {selectedLanguageCode === 'es' && `Hola, ${firstNameUI}`}
+</div>
 
-<div style={{display: 'flex',}}>
+<div style={{display: 'flex', gap: '10px'}}>
   
+  <Language/>
   <Support/>
 
 </div>
@@ -345,7 +351,8 @@ alignItems: 'center',
            width: '120px',
            textAlign: 'center'
        }} onClick={handleWalletDepositPageClick}>
-           Deposit
+            {selectedLanguageCode === 'en' && `Deposit`}
+            {selectedLanguageCode === 'es' && `Déposito`}
        </div>
        <div style={{
            color: '#ffffff', 
@@ -359,7 +366,8 @@ alignItems: 'center',
            width: '120px',
            textAlign: 'center'
        }} onClick={handleWithdrawStableCoinClick}>
-           Withdraw
+            {selectedLanguageCode === 'en' && `Withdraw`}
+            {selectedLanguageCode === 'es' && `Retirar`}
        </div>
        </div>
 
@@ -418,7 +426,8 @@ alignItems: 'center',
            cursor: 'pointer',
            fontSize: '20px'     
        }} onClick={handleEarnPageClick}>
-           View Portfolio
+            {selectedLanguageCode === 'en' && `View Portfolio`}
+            {selectedLanguageCode === 'es' && `Ver Portafolio`}
        </div>
        </div>
        </div>
@@ -444,7 +453,10 @@ alignItems: 'center',
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={handleSendPageClick}>Send</div>
+    }} onClick={handleSendPageClick}>
+      {selectedLanguageCode === 'en' && `Send`}
+      {selectedLanguageCode === 'es' && `Enviar`}
+    </div>
     <div style={{
       color: '#ffffff', 
       background: '#2E7D32', // gray '#999999', 
@@ -458,7 +470,10 @@ alignItems: 'center',
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={handleRequestPageClick}>Request</div>
+    }} onClick={handleRequestPageClick}>
+      {selectedLanguageCode === 'en' && `Request`}
+      {selectedLanguageCode === 'es' && `Pedido`}
+    </div>
   </div>          
   
 

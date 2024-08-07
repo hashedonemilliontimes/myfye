@@ -47,6 +47,7 @@ function Withdraw() {
     const [shouldNotify, setShouldNotify] = useState(false);
     const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -77,18 +78,9 @@ function Withdraw() {
       useEffect(() => {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
+          window.scrollTo(0, 0);
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-
-          setcurrencySelected('');
-        }
-      }, [showMenu]);
-
-    useEffect(() => {
-        if (showMenu) {
-          setMenuPosition('0'); // Bring the menu into view
-        } else {
-          setMenuPosition('-100vh'); // Move the menu off-screen
 
           setcurrencySelected('');
         }
@@ -218,7 +210,7 @@ function Withdraw() {
          setWithdrawalInProgress(false)
          setWithdrawal('')
          setfeeAmount(0)
-        handleMenuClick()
+         handleMenuClick()
          // To Do nice animation for withdraw complete
          
         }
@@ -300,7 +292,7 @@ function Withdraw() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: 'calc(100vh - 35px)',
+        height: '100vh',
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property
@@ -309,7 +301,10 @@ function Withdraw() {
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <div style={{marginTop: '10px', fontSize: '35px', color: '#222222',
-}}>Withdraw</div>
+}}>
+    {selectedLanguageCode === 'en' && `Withdraw`}
+    {selectedLanguageCode === 'es' && `Retirar`}
+</div>
 
 </div>
 
@@ -326,11 +321,17 @@ function Withdraw() {
 <div>
 <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
 alignItems: 'center'}}> 
-<div style={{fontSize: '18px', color: 'black'}}>Account Value: $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
+<div style={{fontSize: '18px', color: 'black'}}>
+{selectedLanguageCode === 'en' && `Account Value: `}
+{selectedLanguageCode === 'es' && `Valor de la cuenta: `}
+$ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
 </div>
-      <div style={{marginTop: '20px', display: 'flex'}}>
+      
+<div style={{marginTop: '20px', display: 'flex'}}>
 
-        Fee: { feeAmount > 0 ? (<>
+{selectedLanguageCode === 'en' && `Fee: `}
+{selectedLanguageCode === 'es' && `Tarifa: `}
+{feeAmount > 0 ? (<>
           $ {(feeAmount.toFixed(6).split('.')[0].toLocaleString() + '.' + feeAmount.toFixed(6).split('.')[1]).replace(/\.?0+$/, '')}
           </>) : (<></>)}
       </div>
@@ -387,7 +388,8 @@ alignItems: 'center'}}>
     }}
     onClick={handleCashOutButtonClick}
 >
-    Cash Out
+{selectedLanguageCode === 'en' && `Cash Out`}
+{selectedLanguageCode === 'es' && `Retiro De Efectivo`}
 </button>
 
 </div>

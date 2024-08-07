@@ -21,6 +21,7 @@ function EarnPage() {
     const [currencySelected, setcurrencySelected] = useState('');
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-150vh'); 
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
         if (showMenu) {
@@ -176,7 +177,8 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
     cursor: 'pointer',
     fontSize: '20px'     
 }} onClick={handleDepositPageClick}>
-    Deposit
+              {selectedLanguageCode === 'en' && `Deposit`}
+              {selectedLanguageCode === 'es' && `Déposito`}
 </div>
 
 
@@ -194,7 +196,8 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
            fontSize: '20px',
            width: '135px',
        }} onClick={handleWithdrawPageClick}>
-           Withdraw
+              {selectedLanguageCode === 'en' && `Withdraw`}
+              {selectedLanguageCode === 'es' && `Retirar`}
        </div>
 
 </div>
@@ -228,7 +231,10 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
 
 <div>
 <div style={{marginTop: '15px', textAlign: 'center', 
-  fontSize: '25px'}}>Earn Portfolio:</div>
+  fontSize: '25px'}}>
+              {selectedLanguageCode === 'en' && `Earn Portfolio`}
+              {selectedLanguageCode === 'es' && `Portafolio`}
+  </div>
 
     <div style={{
         
@@ -247,7 +253,10 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
 <div style={{borderRadius: '10px', padding: '10px', 
 color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
-backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Learn About USDY</div>
+backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
+                {selectedLanguageCode === 'en' && `Learn About USDY`}
+                {selectedLanguageCode === 'es' && `Aprender Acerca USDY`}
+</div>
 </div>
 </a>
 </div>
@@ -264,7 +273,7 @@ backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>Learn About USD
 
         ) : (
 
-          <div>
+          <div style={{marginTop: '50px'}}>
 <EarnTransactions/>
 
 

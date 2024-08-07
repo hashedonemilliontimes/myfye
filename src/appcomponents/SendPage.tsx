@@ -43,7 +43,7 @@ function SendPage() {
     const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [sendingToSelectedContact, setSendingToSelectedConact] = useState(false);
     const dispatch = useDispatch();
-
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
       /*
@@ -652,7 +652,10 @@ const updateContactTwo = await setDoc(contactDocRefTwo, {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>Send</div>
+<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>
+{selectedLanguageCode === 'en' && `Send`}
+{selectedLanguageCode === 'es' && `Enviar`}
+</div>
 
 </div>
 
@@ -670,7 +673,10 @@ alignItems: 'center' }}>
 
 {errorLabelText()}
 
-<div style={{marginTop: '30px'}}>Please wait...</div>
+<div style={{marginTop: '30px'}}>
+{selectedLanguageCode === 'en' && `Please wait...`}
+{selectedLanguageCode === 'es' && `Espere por favor...`}
+</div>
 </div>
 
 ) : (
@@ -681,7 +687,10 @@ alignItems: 'center' }}>
 
     <div style={{display: 'flex', justifyContent: 'space-between', width: '80vw'}}>
     {stableCoinBalance > 0.01 ? (
-    <div>Balance: ${(stableCoinBalance.toFixed(2)).toLocaleString()}</div>
+    <div>
+      {selectedLanguageCode === 'en' && `Balance`}
+      {selectedLanguageCode === 'es' && `Balance`}
+      : ${(stableCoinBalance.toFixed(2)).toLocaleString()}</div>
   ) : (
     <div>Balance: $0.00</div>
   )}
@@ -752,7 +761,9 @@ alignItems: 'center' }}>
       borderRadius: '5px', // Rounded edges
       padding: '10px 10px', // Adjust padding as needed
     }}
-    placeholder="Email Address Or Phone Number"
+    placeholder={selectedLanguageCode === 'es' 
+      ? 'Correo electrónico'
+      : 'Email Address Or Phone Number'}
   />
 </div>
 
@@ -808,7 +819,10 @@ alignItems: 'center' }}>
       border: '1px solid transparent',
       cursor: 'pointer',
       width: '100%'
-    }} onClick={handleSendButtonClick}>Send
+    }} onClick={handleSendButtonClick}>
+      
+      {selectedLanguageCode === 'en' && `Send`}
+      {selectedLanguageCode === 'es' && `Enviar`}
 
     </button>
 

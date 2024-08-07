@@ -29,23 +29,11 @@ function WalletDepositPage() {
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [showQRCode, setshowQRCode] = useState(false);
-    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
-    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
-    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
-    const [qrCodeURL, setqrCodeURL] = useState(''); 
     const { enabled, openFunding } = useFunding();
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
-    useEffect(() => {
-      const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
-      const params = new URLSearchParams({
-        size: "150x150", // Size of the QR code
-        data: publicKey, // Data to encode
-      });
-      setqrCodeURL(`${baseUrl}?${params.toString()}`);
-    }, [publicKey]);
+    
+    
 
     const removeWhitespace = (str: string) => {
         return str.replace(/\s/g, '');
@@ -166,7 +154,10 @@ function WalletDepositPage() {
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <div style={{marginTop: '0px', fontSize: '45px', color: '#222222',
-}}>Deposit</div>
+}}>
+              {selectedLanguageCode === 'en' && `Deposit`}
+              {selectedLanguageCode === 'es' && `Déposito`}
+</div>
 </div>
 
 
@@ -208,7 +199,8 @@ alignItems: 'center',
     textAlign: 'center',
     borderBottom: toggleFiat ? '3px solid #2E7D32' : '3px solid #222222'
 }} onClick={handleToggleFiat}>
-    Credit/ Debit card
+    {selectedLanguageCode === 'en' && `Credit / Debit card`}
+    {selectedLanguageCode === 'es' && `Tarjeta De Crédito`}
 </div>
 <div style={{
     color: !toggleFiat ? '#2E7D32' : '#222222',
@@ -234,10 +226,15 @@ alignItems: 'center',
 
 <div>
   <div>
-Deposit via credit or debit card directly
+{selectedLanguageCode === 'en' && `Deposit via credit or debit card directly`}
+{selectedLanguageCode === 'es' && `Deposite mediante tarjeta de crédito o débito`}
+
 </div>
 <div style={{display: 'flex', alignItems: 'center'}}>
-  <div>into your Myfye account with </div>
+  <div>
+  {selectedLanguageCode === 'en' && `into your Myfye account with`}
+  {selectedLanguageCode === 'es' && ` directamente en tu cuenta Myfye con`}
+   </div>
     <img src={Banxa} style={{height: '30px', width: 'auto', marginLeft: '5px', marginTop: '2px'}}/>
     </div>
     </div>
@@ -255,7 +252,8 @@ Deposit via credit or debit card directly
            width: '120px',
            textAlign: 'center'
        }} onClick={handleBanxaClick}>
-           Deposit
+            {selectedLanguageCode === 'en' && `Deposit`}
+            {selectedLanguageCode === 'es' && `Déposito`}
        </div>
 
 
@@ -265,7 +263,13 @@ Deposit via credit or debit card directly
 
 <></>
 
-<div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC or </span><br/><span style={{fontWeight: 'bold'}}>USDT</span> on the Solana network!</div>
+{selectedLanguageCode === 'en' && 
+  <div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC or </span><br/><span style={{fontWeight: 'bold'}}>USDT</span> on the Solana network!</div>
+}
+{selectedLanguageCode === 'es' && 
+  <div style={{textAlign: 'center', color: '#8B0000', width: '50vw'}}>
+¡Recuerde depositar únicamente USDC o USDT en la red Solana!</div>
+}
 </div>
 ) : (
 <div>
@@ -298,7 +302,10 @@ Deposit via credit or debit card directly
            {addressCopied ? (
 <>Copied!</>
            ) : (
-<>Copy Address</>
+<>
+{selectedLanguageCode === 'en' && `Copy Address`}
+{selectedLanguageCode === 'es' && `Copiar Dirección`}
+</>
            )}
        </div>
 
@@ -315,7 +322,8 @@ Deposit via credit or debit card directly
            textAlign: 'center',
            marginTop: '15px'
        }} onClick={handleWalletInfoClick}>
-           Wallet Explorer
+{selectedLanguageCode === 'en' && `Wallet Explorer`}
+{selectedLanguageCode === 'es' && `Explorador De Billetera`}
        </div>
 </div>
 

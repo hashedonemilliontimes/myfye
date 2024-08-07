@@ -51,6 +51,7 @@ interface UserWalletDataState {
   selectedContact: User | string,
   recentlyUsedSolanaAddresses: string[],
   showContactPopup: boolean
+  selectedLanguageCode: string
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -100,7 +101,8 @@ const initialUserWalletData: UserWalletDataState = {
   allUsers: [],
   selectedContact: '',
   recentlyUsedSolanaAddresses: [],
-  showContactPopup: false
+  showContactPopup: false,
+  selectedLanguageCode: ''
 };
 
 
@@ -277,6 +279,9 @@ export const userWalletDataSlice = createSlice({
   setShowContactPopup: (state, action: PayloadAction<boolean>) => {
     state.showContactPopup = action.payload;
   },
+  setSelectedLanguageCode: (state, action: PayloadAction<string>) => {
+    state.selectedLanguageCode= action.payload;
+  },
 
   
   
@@ -303,7 +308,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowEarnDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
   setSelectedContact, setRecentlyUsedSolanaAddresses, 
-  setAllUsers, setShowContactPopup
+  setAllUsers, setShowContactPopup, setSelectedLanguageCode
   
 } = userWalletDataSlice.actions;
 

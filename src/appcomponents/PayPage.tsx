@@ -40,7 +40,8 @@ function PayPage() {
     const [referral, setReferral] = useState('');
     const [contactIndex, setContactIndex] = useState(0);
     const db = getFirestore();
-    
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+
     const handleReferralChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const newReferral = event.target.value;
       setReferral(newReferral.toLowerCase());
@@ -331,7 +332,10 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={() => handleSendPageClick('')}>Send</div>
+    }} onClick={() => handleSendPageClick('')}>
+      {selectedLanguageCode === 'en' && `Send`}
+      {selectedLanguageCode === 'es' && `Enviar`}
+    </div>
     <div style={{
       color: '#ffffff', 
       background: '#2E7D32', // gray '#999999', 
@@ -345,7 +349,10 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={() => handleRequestPageClick('')}>Request</div>
+    }} onClick={() => handleRequestPageClick('')}>
+      {selectedLanguageCode === 'en' && `Request`}
+      {selectedLanguageCode === 'es' && `Pedido`}
+    </div>
   </div>
 </div>
 
@@ -365,7 +372,10 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
           maxWidth: '300px',
           width: '68vw'
         }}
-        onClick={browseAllContactsClicked}>Contacts</div>
+        onClick={browseAllContactsClicked}>
+      {selectedLanguageCode === 'en' && `Contacts`}
+      {selectedLanguageCode === 'es' && `Contactos`}
+        </div>
         </div>
 </div>
 
@@ -382,7 +392,10 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   <div style= {{display: 'flex', flexDirection: 'column', gap: '10px',}}>
     <div style={{fontSize: '25px', 
       fontWeight: 'bold', 
-      marginTop: '15px'}}>Top Contacts</div>
+      marginTop: '15px'}}>
+      {selectedLanguageCode === 'en' && `Top Contacts`}
+      {selectedLanguageCode === 'es' && `Contactos Principales`}
+      </div>
 
 <div style= {{display: 'flex', flexDirection: 'column', gap: '10px', marginLeft: '15px'}}>
     <div style={{ display: 'flex', 
@@ -606,8 +619,14 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   paddingBottom: '20px',
   marginTop: '15px'
 }}>
-<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>Refer a friend!</div>
-<div style={{fontSize: '19px', color: '#666666'}}>Add a new contact</div>
+<div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>
+{selectedLanguageCode === 'en' && `Refer a friend!`}
+{selectedLanguageCode === 'es' && `¡Recomienda a un amigo!`}
+</div>
+<div style={{fontSize: '19px', color: '#666666'}}>
+{selectedLanguageCode === 'en' && `Add a new contact`}
+{selectedLanguageCode === 'es' && `¡Recomienda a un amigo!`}
+</div>
     <input
       id="emailOrPhone"
       type="text"
@@ -624,7 +643,9 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
         marginTop: '15px',
         width: '75vw',
       }}
-      placeholder="Email Or Phone Number"
+      placeholder={selectedLanguageCode === 'es' 
+        ? 'Correo electrónico'
+        : 'Email or Phone Number'}
     />
 
 
@@ -642,7 +663,9 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
         border: '1px solid transparent',
         cursor: 'pointer',
         marginTop: '5px'
-      }} onClick={handleReferButtonPressed}> Submit
+      }} onClick={handleReferButtonPressed}> 
+            {selectedLanguageCode === 'en' && `Submit`}
+            {selectedLanguageCode === 'es' && `Entregar`}
 
       </button>
 

@@ -23,6 +23,8 @@ function ContactsPage() {
     const [contactIndex, setContactIndex] = useState(0);
     const [selectedContactList, setSelectedContactList] = useState<Array<any>>([]);
     const allDynamicUsers = useSelector((state: any) => state.userWalletData.allUsers);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+
     const dispatch = useDispatch();
 
     const handleSearchValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,7 +149,9 @@ function ContactsPage() {
         marginTop: '15px',
         width: '85vw',
       }}
-      placeholder="Name, Email, Phone Number"
+      placeholder={selectedLanguageCode === 'es' 
+        ? 'Correo nombre o electrónico'
+        : 'Name, Email, Phone Number'}
     />
 
 
@@ -212,7 +216,11 @@ function ContactsPage() {
       )}
 
 
-      <div style={{fontSize: '25px', fontWeight: 'bold', marginTop: '20px'}}>Your contacts</div>
+
+      <div style={{fontSize: '25px', fontWeight: 'bold', marginTop: '20px'}}>
+      {selectedLanguageCode === 'en' && `Your Contacts`}
+      {selectedLanguageCode === 'es' && `Sus Contactos`}
+      </div>
 
 
 

@@ -21,7 +21,8 @@ function DepositStableCoin() {
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
-    
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+
     
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
@@ -118,7 +119,11 @@ function DepositStableCoin() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '0px', fontSize: '40px', color: '#222222'}}>Deposit</div>
+<div style={{marginTop: '0px', fontSize: '40px', color: '#222222'}}>
+    
+{selectedLanguageCode === 'en' && `Deposit`}
+{selectedLanguageCode === 'es' && `Déposito`}
+</div>
 
 </div>
 

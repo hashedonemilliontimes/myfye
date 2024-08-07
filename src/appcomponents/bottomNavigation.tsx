@@ -24,6 +24,7 @@ function BottomNav() {
     const [animatePay, setAnimatePay] = useState(false);
     const [animateWallet, setAnimateWallet] = useState(false);
     const [animateProfile, setAnimateProfile] = useState(false);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
       console.log('shouldShowBottomNav:', shouldShowBottomNav);
@@ -150,7 +151,10 @@ function BottomNav() {
             opacity: '0.75'
           }}
         />
-        <div>Earn</div>
+        <div>
+        {selectedLanguageCode === 'en' && `Earn`}
+        {selectedLanguageCode === 'es' && `Ganar`}
+        </div>
       </div>
     </div>
 
@@ -175,7 +179,10 @@ function BottomNav() {
             opacity: '0.7'
           }}
         />
-        <div>Pay</div>
+        <div>
+        {selectedLanguageCode === 'en' && `Pay`}
+        {selectedLanguageCode === 'es' && `Pagar`}
+        </div>
       </div>
     </div>
 
@@ -201,7 +208,10 @@ function BottomNav() {
             opacity: '0.7'
           }}
         />
-        <div>Home</div>
+        <div>
+        {selectedLanguageCode === 'en' && `Home`}
+        {selectedLanguageCode === 'es' && `Hogar`}
+        </div>
       </div>
     </div>
 
@@ -227,7 +237,9 @@ function BottomNav() {
             opacity: '0.7'
           }}
         />
-        <div>Wallet</div>
+        <div>        
+          {selectedLanguageCode === 'en' && `Wallet`}
+        {selectedLanguageCode === 'es' && `Billetera`}</div>
       </div>
     </div>
 
@@ -252,7 +264,10 @@ function BottomNav() {
             opacity: '0.7'
           }}
         />
-        <div>Profile</div>
+        <div>
+        {selectedLanguageCode === 'en' && `Profile`}
+        {selectedLanguageCode === 'es' && `Perfil`}
+        </div>
       </div>
     </div>
 

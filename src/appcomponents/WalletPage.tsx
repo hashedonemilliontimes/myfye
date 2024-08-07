@@ -35,6 +35,8 @@ function WalletPage() {
     const [qrCodeURL, setqrCodeURL] = useState(''); 
     const [showWalletInfoPopup, setShowWalletInfoPopup] = useState(false); 
     const [addressCopied, setAddressCopied] = useState(false);
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+
 
     useEffect(() => {
       const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
@@ -342,7 +344,8 @@ alignItems: 'center',
            width: '120px',
            textAlign: 'center'
        }} onClick={handleDepositButtonClick}>
-           Deposit
+    {selectedLanguageCode === 'en' && `Deposit`}
+    {selectedLanguageCode === 'es' && `Déposito`}
        </div>
        <div style={{
            color: '#ffffff', 
@@ -356,7 +359,8 @@ alignItems: 'center',
            width: '120px',
            textAlign: 'center'
        }} onClick={handleWithdrawButtonClick}>
-           Withdraw
+    {selectedLanguageCode === 'en' && `Deposit`}
+    {selectedLanguageCode === 'es' && `Déposito`}
        </div>
        </div>
 
@@ -380,7 +384,8 @@ alignItems: 'center',
            width: '180px',
            textAlign: 'center'
        }} onClick={toggleShowWalletInfoPopup}>
-           Wallet Info
+    {selectedLanguageCode === 'en' && `Wallet Info`}
+    {selectedLanguageCode === 'es' && `Información De Billetera`}
        </div>
 
 
