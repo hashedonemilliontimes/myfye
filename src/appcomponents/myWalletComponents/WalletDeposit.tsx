@@ -234,7 +234,7 @@ alignItems: 'center',
 
 <div>
   <div>
-Depoist via credit or debit card directly
+Deposit via credit or debit card directly
 </div>
 <div style={{display: 'flex', alignItems: 'center'}}>
   <div>into your Myfye account with </div>

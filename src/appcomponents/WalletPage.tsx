@@ -164,9 +164,7 @@ function WalletPage() {
       }}>
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeWallet}/>
-</div>
+
 
 
 {showWalletInfoPopup && (
@@ -196,6 +194,7 @@ function WalletPage() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
+
 
 
             <img src={xIcon} style={{width: '32px', height: 'auto'}}
@@ -275,7 +274,7 @@ function WalletPage() {
 <div style={{
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', 
-width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '0px'}}>
+width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '50px'}}>
 
 
 
@@ -290,12 +289,18 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '0px'}}>
   paddingBottom: '20px',
   width: '90vw'
 }}>
+
+
 <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
 
 <div style={{ display: 'flex', alignItems: 'center', 
   justifyContent: 'center', flexDirection: 'column',}}>
 
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px', marginBottom: '20px'}}src={myfyeWallet}/>
+</div>
 
     <label htmlFor="deposit" style={{ fontSize: '20px', 
      display: 'flex', alignItems: 'center', }}>

@@ -122,9 +122,6 @@ function EarnPage() {
 
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeEarnGreen}/>
-</div>
 
 <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
 <div style={{
@@ -134,11 +131,15 @@ function EarnPage() {
   padding: '10px',
   paddingBottom: '20px',
   width: '90vw',
-  marginTop: '30px'
+  marginTop: '80px'
 }}>
        <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px' }}>
 
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeEarnGreen}/>
+</div>
 
 
 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
