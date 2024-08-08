@@ -177,8 +177,8 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
     cursor: 'pointer',
     fontSize: '20px'     
 }} onClick={handleDepositPageClick}>
-              {selectedLanguageCode === 'en' && `Deposit`}
-              {selectedLanguageCode === 'es' && `Déposito`}
+    {selectedLanguageCode === 'en' && `Deposit`}
+    {selectedLanguageCode === 'es' && `Déposito`}
 </div>
 
 

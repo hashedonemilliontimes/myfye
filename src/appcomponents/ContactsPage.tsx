@@ -216,7 +216,6 @@ function ContactsPage() {
       )}
 
 
-
       <div style={{fontSize: '25px', fontWeight: 'bold', marginTop: '20px'}}>
       {selectedLanguageCode === 'en' && `Your Contacts`}
       {selectedLanguageCode === 'es' && `Sus Contactos`}

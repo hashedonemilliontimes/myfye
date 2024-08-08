@@ -42,6 +42,7 @@ function WithdrawStableCoin() {
     const recentlyUsedSolanaAddresses = useSelector((state: any) => state.userWalletData.recentlyUsedSolanaAddresses);
     const [showAddressesDropdown, setShowAddressesDropdown] = useState(false);
     const db = getFirestore();
+    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
 
     useEffect(() => {
@@ -369,7 +370,10 @@ function WithdrawStableCoin() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>Withdraw</div>
+<div style={{marginTop: '0px', fontSize: '35px', color: '#222222'}}>
+{selectedLanguageCode === 'en' && `Withdraw`}
+{selectedLanguageCode === 'es' && `Retirar`}
+</div>
 </div>
 
 <div>
@@ -403,7 +407,9 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
 
 </div>
 
-<div style={{marginTop: '20px', fontSize: '20px', marginLeft: '20px'}}>Balance: {balanceSelectedInUSD}</div>
+<div style={{marginTop: '20px', fontSize: '20px', marginLeft: '20px'}}>
+{selectedLanguageCode === 'en' && `Balance: `}
+{selectedLanguageCode === 'es' && `Valor de la cuenta: `} {balanceSelectedInUSD}</div>
 
 
 <div
@@ -438,7 +444,7 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
         padding: '10px 10px', // Adjust padding as needed
         width: recentlyUsedSolanaAddresses ? '80%' : ''
       }}
-      placeholder="Solana Address"
+      placeholder={selectedLanguageCode === 'en' ? 'Solana Address' : selectedLanguageCode === 'es' ? 'Dirección Solana' : 'Solana Address'}
       autoComplete='off'
     />
 <div style={{
@@ -465,7 +471,12 @@ onClick={() => setShowAddressesDropdown(!showAddressesDropdown)}>
                 <div style={{
                   backgroundColor: '#EEEEEE', borderRadius: '5px',
                   color: '#444444', padding: '10px', marginTop: '5px',}}>
-                  <div style={{ fontStyle: 'italic', fontWeight: 'bold' }}>Recently Used</div>
+                  <div style={{ fontStyle: 'italic', fontWeight: 'bold' }}>
+                    
+                  {selectedLanguageCode === 'en' && `Recently Used`}
+                  {selectedLanguageCode === 'es' && `Recientemente Usado`}
+
+                  </div>
                     {recentlyUsedSolanaAddresses.map((address: string, index: number) => (
                         <div
                             key={index}
@@ -506,7 +517,7 @@ onClick={() => setShowAddressesDropdown(!showAddressesDropdown)}>
         borderRadius: '5px', // Rounded edges
         padding: '10px 30px', // Adjust padding as needed
       }}
-      placeholder="Amount"
+      placeholder={selectedLanguageCode === 'en' ? 'Amount' : 'Cantidad'}
     />
   </div>
 <div style={{opacity: withdrawalInProgress ? '0' : '1'}}>
@@ -535,8 +546,9 @@ onClick={() => setShowAddressesDropdown(!showAddressesDropdown)}>
         border: '1px solid transparent',
         cursor: 'pointer',
         width: '100%'
-      }} onClick={handleWithdrawalButtonClick}>Send
-
+      }} onClick={handleWithdrawalButtonClick}>
+        {selectedLanguageCode === 'en' && `Send`}
+        {selectedLanguageCode === 'es' && `Enviar`}
       </button>
 
 

@@ -110,14 +110,16 @@ onClick={handleMenuClick}></img>
             
             <div style={{ display: 'flex', maxWidth: '400px', width: '70vw',
                 paddingBottom: '15px',
-                borderBottom: '1px solid #777777' }}>
-                <div onClick={() => handleClick('English')}>English</div>
+                borderBottom: '1px solid #777777' }}
+                onClick={() => handleClick('English')}>
+                <div >English</div>
                 {selectedLanguageCode === 'en' && <span style={checkmarkStyle}>&#10003;</span>}
             </div>
             <div style={{ display: 'flex', maxWidth: '400px', width: '70vw',
                 paddingBottom: '15px',
-                borderBottom: '1px solid #777777' }}>
-                <div onClick={() => handleClick('Spanish')}>Español</div>
+                borderBottom: '1px solid #777777' }}
+                onClick={() => handleClick('Spanish')}>
+                <div>Español</div>
                 {selectedLanguageCode === 'es' && <span style={checkmarkStyle}>&#10003;</span>}
             </div>
         </div>

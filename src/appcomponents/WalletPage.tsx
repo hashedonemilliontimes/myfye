@@ -359,8 +359,8 @@ alignItems: 'center',
            width: '120px',
            textAlign: 'center'
        }} onClick={handleWithdrawButtonClick}>
-    {selectedLanguageCode === 'en' && `Deposit`}
-    {selectedLanguageCode === 'es' && `Déposito`}
+    {selectedLanguageCode === 'en' && `Withdraw`}
+    {selectedLanguageCode === 'es' && `Retirar`}
        </div>
        </div>
 
