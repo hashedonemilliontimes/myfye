@@ -4,7 +4,7 @@ import { setPrincipalInvested, setPrincipalInvestedHistory,
     setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
     settotalInvestingValue, setHotBalanceUSDY,
     setPriceOfUSDYinUSDC, setContacts, setRecentlyUsedSolanaAddresses, 
-    setAllUsers} from '../redux/userWalletData';
+    setAllUsers, setCurrentUserKYCVerified} from '../redux/userWalletData';
 import { valueAtTime } from './growthPercentage';
 import User from './User';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
@@ -34,6 +34,9 @@ export const getUserData = async (email: string, phoneNumber: string,
 
         if (data.recentlyUsedAddresses) {
             dispatch(setRecentlyUsedSolanaAddresses(data.recentlyUsedAddresses))
+        }
+        if (data.KYCverified) {
+            dispatch(setCurrentUserKYCVerified(data.KYCverified));
         }
     }
 

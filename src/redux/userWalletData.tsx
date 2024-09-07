@@ -19,6 +19,7 @@ interface UserWalletDataState {
   usdcSolBalance: number,
   usdtSolBalance: number,
   pyusdSolBalance: number,
+  eurcSolBalance: number,
   busdSolBalance: number,
   usdySolBalance: number,
   usdcEthBalance: number,
@@ -67,6 +68,7 @@ const initialUserWalletData: UserWalletDataState = {
   usdcSolBalance: 0,
   usdtSolBalance: 0,
   pyusdSolBalance: 0,
+  eurcSolBalance: 0,
   usdySolBalance: 0,
   busdSolBalance: 0,
   usdcEthBalance: 0,
@@ -165,6 +167,9 @@ export const userWalletDataSlice = createSlice({
     },
     setpyusdSolValue: (state, action: PayloadAction<number>) => {
       state.pyusdSolBalance = action.payload;
+    },
+    seteurcSolValue: (state, action: PayloadAction<number>) => {
+      state.eurcSolBalance = action.payload;
     },
     setusdySolValue: (state, action: PayloadAction<number>) => {
       state.usdySolBalance = action.payload;
@@ -294,7 +299,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setinitialPrincipal, setinitialInvestmentDate, 
   settotalInvestingValue, mergePrincipalInvestedHistory,
   setusdcSolValue, setusdtSolValue, setpyusdSolValue, 
-  setbusdSolValue, setusdySolValue,
+  seteurcSolValue, setbusdSolValue, setusdySolValue,
   setusdcEthValue, setusdtEthValue, setbusdEthValue, 
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,

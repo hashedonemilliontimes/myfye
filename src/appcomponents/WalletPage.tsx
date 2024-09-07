@@ -30,6 +30,7 @@ function WalletPage() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
+    const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
     const [qrCodeURL, setqrCodeURL] = useState(''); 
@@ -301,10 +302,15 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '50px'}}>
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img style={{ width: '180px', height: 'auto', marginTop: '15px', marginBottom: '20px'}}src={myfyeWallet}/>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px', marginBottom: '35px'}}src={myfyeWallet}/>
 </div>
 
-    <label htmlFor="deposit" style={{ fontSize: '20px', 
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
+  width: '90%', minWidth: '240px'}}>
+
+  <div style={{fontSize: '25px'}}>USD Balance:</div>
+    <label style={{ fontSize: '20px', 
      display: 'flex', alignItems: 'center', }}>
     $ <span style={{ fontSize: '35px' }}>
       
@@ -314,6 +320,29 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '50px'}}>
 
     </span>
 </label>
+
+</div>
+
+
+{eurcSolBalance > 0.01 && (
+  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
+  width: '90%', minWidth: '240px', marginTop: '35px'}}>
+
+  <div style={{fontSize: '25px'}}>EUR Balance:</div>
+    <label style={{ fontSize: '20px', 
+     display: 'flex', alignItems: 'center', }}>
+    $ <span style={{ fontSize: '35px' }}>
+      
+    <div>
+    {((eurcSolBalance).toFixed(2)).toLocaleString('en-US')}
+  </div>
+
+    </span>
+</label>
+
+</div>
+)}
+
 
    </div>
 

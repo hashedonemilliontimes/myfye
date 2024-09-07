@@ -264,11 +264,11 @@ alignItems: 'center',
 <></>
 
 {selectedLanguageCode === 'en' && 
-  <div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC or </span><br/><span style={{fontWeight: 'bold'}}>USDT</span> on the Solana network!</div>
+  <div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC, USDT</span><br/><span style={{fontWeight: 'bold'}}>or EURC</span> on the Solana network!</div>
 }
 {selectedLanguageCode === 'es' && 
   <div style={{textAlign: 'center', color: '#8B0000', width: '50vw'}}>
-¡Recuerde depositar únicamente USDC o USDT en la red Solana!</div>
+¡Recuerde depositar únicamente USDC, USDT o EURC en la red Solana!</div>
 }
 </div>
 ) : (
@@ -284,6 +284,16 @@ alignItems: 'center',
 </div>
 
 <></>
+
+
+
+{selectedLanguageCode === 'en' && 
+  <div style={{textAlign: 'center', color: '#8B0000'}}>Please remember to <span style={{fontWeight: 'bold'}}>only deposit USDC, USDT</span><br/><span style={{fontWeight: 'bold'}}>or EURC</span> on the Solana network!</div>
+}
+{selectedLanguageCode === 'es' && 
+  <div style={{textAlign: 'center', color: '#8B0000', width: '50vw'}}>
+¡Recuerde depositar únicamente USDC, USDT o EURC en la red Solana!</div>
+}
 
 
 <div>

@@ -9,13 +9,13 @@ import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
   settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY, setpyusdSolValue,
-  setShouldShowBottomNav } from '../redux/userWalletData';
+  seteurcSolValue, setShouldShowBottomNav } from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
-import pyusdSol from '../assets/pyusdSol.png';
+import eurcSol from '../assets/eurcSol.png';
 import wallet from '../helpers/walletDataType';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
@@ -47,6 +47,7 @@ function Deposit() {
     const usdtEthBalance = useSelector((state: any) => state.userWalletData.usdtEthBalance);
     const busdEthBalance = useSelector((state: any) => state.userWalletData.busdEthBalance);
     const usdySolBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     
@@ -54,6 +55,7 @@ function Deposit() {
 
     const [animateShowAddressUsdcSol, setanimateShowAddressUsdcSol] = useState(false); 
     const [animateShowAddressUsdtSol, setanimateShowAddressUsdtSol] = useState(false); 
+    const [animateShowAddressEurcSol, setanimateShowAddressEurcSol] = useState(false); 
     const [animateShowAddressPyusdSol, setanimateShowAddressPyusdSol] = useState(false); 
 
     const [solanaWalletConnected, setsolanaWalletConnected] = useState(false); 
@@ -165,7 +167,8 @@ function Deposit() {
           setTimeout(() => {
             setDepositInProgress(false)
             setErrorMessage('')
-            dispatch(setShowEarnDepositPage(false))
+            dispatch(setShowEarnDepositPage(false)) 
+            dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
           }, 2000);
       }).catch((error) => {
           console.error(error);
@@ -290,6 +293,27 @@ function Deposit() {
                   
                 } else {
                   setbalanceSelectedInUSD(usdcSolBalance);
+                  setcurrencySelected(currency)
+                }
+              break;
+            case 'eurcSol':
+                if (eurcSolBalance < MINIMUM_DEPOSIT_VALUE) {
+                  copyAddressFor(eurcSol);
+                  document.getElementById('eurcSol')?.classList.add('animate-close-open');
+                  document.getElementById('eurcSolLabel')?.classList.add('animate-fade-in-out');
+                  setTimeout(() => {
+                    setanimateShowAddressEurcSol(true);
+                  }, 1000);
+
+                  setTimeout(() => {
+                  document.getElementById('eurcSol')?.classList.remove('animate-close-open');
+                  document.getElementById('eurcSolLabel')?.classList.remove('animate-fade-in-out');
+                    setanimateShowAddressEurcSol(false);
+                  }, 5000);
+                  
+                  
+                } else {
+                  setbalanceSelectedInUSD(eurcSolBalance);
                   setcurrencySelected(currency)
                 }
               break;
@@ -423,6 +447,8 @@ function Deposit() {
           dispatch(setusdtSolValue(newUSDBalance));
         } else if (currencySelected == "pyusdSol") {
           dispatch(setpyusdSolValue(newUSDBalance));
+        } else if (currencySelected == "eurcSol") {
+          dispatch(seteurcSolValue(newUSDBalance));
         }
         
         console.log('setPrincipalInvested', currentValue+newDepositAmount)
@@ -683,6 +709,7 @@ $ <span style={{ fontSize: '35px' }}>
     {currencySelected == 'usdcSol' && usdcSolBalance}
     {currencySelected == 'usdtSol' && usdtSolBalance}
     {currencySelected == 'pyusdSol' && pyusdSolBalance}
+    {currencySelected == 'eurcSol' && eurcSolBalance}
 
     {currencySelected == 'usdcEth' && usdcEthBalance}
     {currencySelected == 'usdtEth' && usdtEthBalance}
@@ -693,6 +720,7 @@ $ <span style={{ fontSize: '35px' }}>
 {currencySelected == 'usdcSol' && (<>USDC</>)}
 {currencySelected == 'usdtSol' && (<>USDT</>)}
 {currencySelected == 'pyusdSol' && (<>PYUSD</>)}
+{currencySelected == 'eurcSol' && (<>EURC</>)}
 
 {currencySelected == 'usdcEth' && (<>USDC</>)}
 {currencySelected == 'usdtEth' && (<>USDT</>)}
@@ -886,71 +914,6 @@ $ <span style={{ fontSize: '35px' }}>
             ) }
 
 
-{(animateShowAddressPyusdSol && !solanaWalletConnected) ? (
-              <>
-                <div id="pyusdSol" style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between', // This will put maximum space between the main items
-                marginLeft: '10px',
-                padding: '15px',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
-                borderRadius: '10px',
-                marginBottom: '15px',
-                width: '80vw'
-                }}
-                onClick={() => handleCurrencySelection('pyusdSol')}
-                >
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img id="pyusdSolIcon" src={pyusdSol} style={{ width: '67px', height: 'auto' }} />
-                    <div id="pyusdSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
-                </div>
-
-                <div id="pyusdSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
-                  Add a Solana Wallet
-                </div>
-                </div>
-                </>
-            ) : (
-              <>
-                <div id="pyusdSol" style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between', // This will put maximum space between the main items
-                marginLeft: '10px',
-                padding: '15px',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
-                borderRadius: '10px',
-                marginBottom: '15px',
-                width: '80vw'
-                }}
-                onClick={() => handleCurrencySelection('pyusdSol')}
-                >
-                  
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img id="pyusdSolIcon" src={pyusdSol} style={{ width: '67px', height: 'auto' }} />
-                    <div id="pyusdSolTicker" style={{ marginLeft: '15px' }}>PYUSD</div> {/* Adjust marginLeft as needed */}
-                </div>
-
-                <div id="pyusdSolLabel">
-                  {animateShowAddressPyusdSol ? (<div>
-                    <div style = {{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'center'}}>
-                      <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
-                      <div style={{fontWeight: 'bold'}}>
-                        {publicKey.length >= 6
-                          ? `${publicKey.substring(0, 3)}...`
-                          : publicKey}
-                      </div>
-                      </div>
-                  </div>) : (
-                      <div style = {{marginRight: '15px'}}>${pyusdSolBalance}</div>)}
-                </div>
-                </div>
-                </>
-)}
-
 
 
 {(animateShowAddressUsdtSol && !solanaWalletConnected) ? (
@@ -1017,6 +980,78 @@ $ <span style={{ fontSize: '35px' }}>
                 </div>
                 </>
 )}
+
+
+
+
+
+{(animateShowAddressEurcSol && !solanaWalletConnected) ? (
+              <>
+                <div id="eurcSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('eurcSol')}
+                >
+
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="eurcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="eurcSolTicker" style={{ marginLeft: '15px' }}>EURC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="eurcSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
+                  Add a Solana Wallet
+                </div>
+                </div>
+                </>
+            ) : (
+              <>
+                <div id="eurcSol" style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between', // This will put maximum space between the main items
+                marginLeft: '10px',
+                padding: '15px',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4), 0px 0px 0px rgba(0, 0, 0, 0.4)',
+                borderRadius: '10px',
+                marginBottom: '15px',
+                width: '80vw'
+                }}
+                onClick={() => handleCurrencySelection('eurcSol')}
+                >
+
+                {/* Grouping image and "USDC" together in a div */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img id="eurcSolIcon" src={usdcSol} style={{ width: '70px', height: 'auto' }} />
+                    <div id="eurcSolTicker" style={{ marginLeft: '15px' }}>EURC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
+                <div id="eurcSolLabel">
+                  {animateShowAddressEurcSol ? (<div>
+                    <div style = {{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'center'}}>
+                      <div style={{marginLeft: '10px'}}>Address Copied &#10003;</div>
+                      <div style={{fontWeight: 'bold'}}>
+                        {publicKey.length >= 6
+                          ? `${publicKey.substring(0, 3)}...`
+                          : publicKey}
+                      </div>
+                      </div>
+                  </div>) : (
+                      <div style = {{marginRight: '15px'}}>${eurcSolBalance}</div>)}
+                </div>
+                </div>
+                </>
+            ) }
 
 
                 </div>

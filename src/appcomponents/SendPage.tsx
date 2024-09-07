@@ -10,10 +10,12 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { getFirestore, doc, collection, setDoc, 
   getDoc, addDoc, arrayUnion } from 'firebase/firestore';
 import { setShowSendPage, setShouldShowBottomNav, 
-  setSelectedContact } from '../redux/userWalletData';
+  setSelectedContact, setusdcSolValue, setusdtSolValue,
+  seteurcSolValue, } from '../redux/userWalletData';
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import pyusdSol from '../assets/pyusdSol.png';
+import eurcSol from '../assets/pyusdSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
 import User from '../helpers/User';
 
@@ -30,6 +32,7 @@ function SendPage() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
+    const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const selectedContact = useSelector((state: any) => state.userWalletData.selectedContact);
     const [sendButtonActive, setSendButtonActive] = useState(false);
     const [sendInProgress, setSendInProgress] = useState(false);
@@ -46,20 +49,17 @@ function SendPage() {
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
-      /*
-      if (pyusdSolBalance > usdtSolBalance && pyusdSolBalance > usdcSolBalance) {
-        setStableCoinBalance(pyusdSolBalance)
-        setcurrencySelected('pyusdSol')
-      } else
-       
-      */ if (usdtSolBalance > usdcSolBalance) {
+     if (usdtSolBalance > usdcSolBalance && usdtSolBalance > eurcSolBalance) {
         setStableCoinBalance(usdtSolBalance)
         setcurrencySelected('usdtSol')
+      } else if (eurcSolBalance > usdcSolBalance) {
+        setStableCoinBalance(eurcSolBalance)
+        setcurrencySelected('eurcSol')
       } else {
         setStableCoinBalance(usdcSolBalance)
         setcurrencySelected('usdcSol')
       }
-    }, [usdcSolBalance, usdtSolBalance, pyusdSolBalance]);
+    }, [usdcSolBalance, usdtSolBalance, eurcSolBalance]);
 
 
     useEffect(() => {
@@ -252,17 +252,35 @@ function SendPage() {
         return
       }
 
+
+
       if (isNaN(amountToNumber)) {
-        setErrorMessage('Invalid amount');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Cantidad no válida')
+        } else {
+          setErrorMessage('Invalid amount');
+        }
       } else if (amountToNumber > stableCoinBalance) {
-        setErrorMessage('Insufficient balance');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Saldo insuficiente')
+        } else {
+          setErrorMessage('Insufficient balance');
+        }
       } else if (amountToNumber < 0.001) {
-        setErrorMessage('Minimum: $0.001');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Mínimo: $0.001')
+        } else {
+          setErrorMessage('Minimum: $0.001');
+        }
       } else {
         setAmountText('');
         setAddressText('')
         setSendInProgress(true);
-        setErrorMessage('Check your wallet');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Revisa tu billetera.')
+        } else {
+          setErrorMessage('Check your wallet');
+        }
         const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
         setSendButtonActive(false); // Deactivate button here
         console.log('Requesting new transaction')
@@ -279,14 +297,32 @@ function SendPage() {
             const updateTransactionsPromise = saveTransaction(amountToNumber, `${selectedContact.firstName} ${selectedContact.lastName}`);
             await Promise.all([updateTransactionsPromise]);
             
-            setSendInProgress(false);
+            
   
-            setErrorMessage('');
-            // this is a rough workaround to save the change to redux and reload the page
-            setTimeout(() =>  setErrorMessage(`Sent USD to ${addressText}`), 30);
+            setErrorMessage(`Sent to ${addressText}!`);
+
+            if (currencySelected == 'usdcSol') {
+              dispatch(setusdcSolValue(parseFloat((usdcSolBalance - amountToNumber).toFixed(6))));
+          } else if (currencySelected == 'usdtSol') {
+              dispatch(setusdtSolValue(parseFloat((usdtSolBalance - amountToNumber).toFixed(6))));
+          } else if (currencySelected == 'eurcSol') {
+              dispatch(seteurcSolValue(parseFloat((eurcSolBalance - amountToNumber).toFixed(6))));
+          }
+
+            setTimeout(() => {
+              setSendInProgress(false);
+              setErrorMessage('');
+              dispatch(setShouldShowBottomNav(true))
+            }, 2000);
+
+            
         } else {
           setSendInProgress(false);
-          setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
+          if (selectedLanguageCode == 'es') {
+            setErrorMessage('Lo sentimos, hubo un error con tu transacción. Por favor inténtalo de nuevo más tarde.')
+          } else {
+            setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
+          }
         }
         } else {
         // get the potential matches
@@ -731,6 +767,20 @@ alignItems: 'center' }}>
             style={{ width: 'auto', height: '30px', 
               background: 'white', marginTop: '3px' }} 
             src={pyusdSol}
+            onClick={handleMenuClick} 
+            alt="Exit" 
+          />
+        </div>
+      </div>
+    )}
+    {(currencySelected == 'eurcSol') && (
+      <div>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
+          <div style={{fontSize: '15px'}}>EURC</div>
+          <img 
+            style={{ width: 'auto', height: '30px', 
+              background: 'white', marginTop: '3px' }} 
+            src={eurcSol}
             onClick={handleMenuClick} 
             alt="Exit" 
           />

@@ -12,6 +12,7 @@ const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // Mai
 const USDT_MINT_ADDRESS = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'; // Replace with actual USDT mint address on Solana
 const USDY_MINT_ADDRESS = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
 const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
+const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 
 const MYFYE_SERVER_ADDRESS = "DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn"
 
@@ -134,6 +135,41 @@ export const fetchPYUSDBalance = async (address: string): Promise<number> => {
     }
 
     console.log(`No PYUSD balance found for ${address}.`);
+    return 0;
+  } catch (err) {
+    console.error(`Failed to fetch balance: ${err}`);
+    return 0;
+  }
+};
+
+export const fetchEURCBalance = async (address: string): Promise<number> => {
+  
+  const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+  const connection = new Connection(QUICKNODE_RPC);
+  
+  // The mint address for USDC on Solana's mainnet
+  const eurcMintAddress = "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr";
+
+  try {
+    const publicKey = new PublicKey(address);
+
+    // Fetch all SPL token accounts owned by the wallet address
+    const parsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+      programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') // SPL Token program ID
+    });
+
+    for (const account of parsedTokenAccounts.value) {
+      const mintAddress = account.account.data.parsed.info.mint;
+
+      // Check if the mint address matches that of USDC
+      if (mintAddress === eurcMintAddress) {
+        const eurcBalance = account.account.data.parsed.info.tokenAmount.uiAmount;
+        // console.log(`Balance of ${address} got : ${usdcBalance} USDC `);
+        return eurcBalance;
+      }
+    }
+
+    console.log(`No USDC balance found for ${address}.`);
     return 0;
   } catch (err) {
     console.error(`Failed to fetch balance: ${err}`);
@@ -264,6 +300,8 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
           mintAddress = USDT_MINT_ADDRESS;
       } else if (currencySelected === 'usdySol') {
         mintAddress = USDY_MINT_ADDRESS;
+      } else if (currencySelected === 'eurcSol') {
+        mintAddress = EURC_MINT_ADDRESS;
       } else if (currencySelected === 'pyusdSol') {
         mintAddress = PYUSD_MINT_ADDRESS;
         programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
@@ -421,6 +459,8 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
         mintAddress = USDT_MINT_ADDRESS;
     } else if (currencySelected === 'usdySol') {
       mintAddress = USDY_MINT_ADDRESS;
+    } else if (currencySelected === 'eurcSol') {
+      mintAddress = EURC_MINT_ADDRESS;
     } else if (currencySelected === 'pyusdSol') {
       mintAddress = PYUSD_MINT_ADDRESS;
       programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
@@ -608,6 +648,9 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
             mintAddress = USDT_MINT_ADDRESS;
         } else if (currencySelected === 'usdySol') {
           mintAddress = USDY_MINT_ADDRESS;
+        } else if (currencySelected === 'eurcSol') {
+          mintAddress = EURC_MINT_ADDRESS;
+          programId = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
         } else if (currencySelected === 'pyusdSol') {
           mintAddress = PYUSD_MINT_ADDRESS;
           programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
@@ -721,6 +764,8 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
           mintAddress = USDT_MINT_ADDRESS;
       } else if (currencySelected === 'usdySol') {
         mintAddress = USDY_MINT_ADDRESS;
+      } else if (currencySelected === 'eurcSol') {
+        mintAddress = EURC_MINT_ADDRESS;
       } else if (currencySelected === 'pyusdSol') {
         mintAddress = PYUSD_MINT_ADDRESS;
         programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'

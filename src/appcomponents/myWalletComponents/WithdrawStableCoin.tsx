@@ -4,20 +4,22 @@ import { useSelector, useDispatch } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import usdcSol from '../../assets/usdcSol.png';
 import usdtSol from '../../assets/usdtSol.png';
+import eurcSol from '../../assets/eurcSol.png';
 import pyusdSol from '../../assets/pyusdSol.png';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { requestNewSolanaTransaction2 } from '../../helpers/web3Manager';
 import { setShowWithdrawStablecoinPage, 
-  setShouldShowBottomNav,
+  setShouldShowBottomNav, setusdcSolValue, setusdtSolValue,
+  seteurcSolValue,
   setRecentlyUsedSolanaAddresses } from '../../redux/userWalletData';
   import { getFirestore, doc, updateDoc, arrayUnion } from 'firebase/firestore';
-
-
-
+  import LoadingAnimation from '../../components/loadingAnimation';
+  
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageColor, setErrorMessageColor] = useState('#222222');
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
     const { primaryWallet, user } = useDynamicContext();
     const [addressCopied, setaddressCopied] = useState(false); 
@@ -30,10 +32,11 @@ function WithdrawStableCoin() {
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
+    const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [selectedPortion, setselectedPortion] = useState('');
-    const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
+    const [balanceSelected, setbalanceSelected] = useState(0);
     const dispatch = useDispatch();
     const [withdrawalButtonActive, setWithdrawalButtonActive] = useState(false);
     const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
@@ -48,7 +51,7 @@ function WithdrawStableCoin() {
     useEffect(() => {
 
       if (currencySelected == 'usdcSol') {
-        setbalanceSelectedInUSD(usdcSolBalance)
+        setbalanceSelected(usdcSolBalance)
       }
         
       }, [usdcSolBalance]);
@@ -73,20 +76,22 @@ function WithdrawStableCoin() {
 
         setcurrencySelected(selection)
         if (selection == 'usdcSol') {
-            setbalanceSelectedInUSD(usdcSolBalance);
+            setbalanceSelected(usdcSolBalance);
         } else if (selection == 'usdtSol')  {
-            setbalanceSelectedInUSD(usdtSolBalance);
+            setbalanceSelected(usdtSolBalance);
         } else if (selection == 'pyusdSol')  {
-          setbalanceSelectedInUSD(pyusdSolBalance);
+          setbalanceSelected(pyusdSolBalance);
+        } else if (selection == 'eurcSol')  {
+          setbalanceSelected(eurcSolBalance);
         }
 
       };
 
 
       const handleQuarterButtonClick = () => {
-        console.log("Handling button click", balanceSelectedInUSD);
-        if (balanceSelectedInUSD>0.0001) {
-          const newWithdrawal = (0.25 * balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelected);
+        if (balanceSelected>0.001) {
+          const newWithdrawal = (0.25 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
         setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newWithdrawal));
@@ -97,9 +102,9 @@ function WithdrawStableCoin() {
       };
       
       const handleHalfButtonClick = () => {
-        console.log("Handling button click", balanceSelectedInUSD);
-        if (balanceSelectedInUSD>0.0001) {
-          const newWithdrawal = (0.5 * balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelected);
+        if (balanceSelected>0.0001) {
+          const newWithdrawal = (0.5 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
@@ -110,9 +115,9 @@ function WithdrawStableCoin() {
       };
       
       const handleTwoThirdsButtonClick = () => {
-        console.log("Handling button click", balanceSelectedInUSD);
-        if (balanceSelectedInUSD>0.0001) {
-          const newWithdrawal = (0.75 * balanceSelectedInUSD);
+        console.log("Handling button click", balanceSelected);
+        if (balanceSelected>0.0001) {
+          const newWithdrawal = (0.75 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
@@ -123,9 +128,9 @@ function WithdrawStableCoin() {
       };
       
       const handleAllButtonClick = () => {
-        console.log("Handling button click", balanceSelectedInUSD);
-        if (balanceSelectedInUSD>0.0001) {
-          const newWithdrawal = Math.floor(balanceSelectedInUSD * 100) / 100;
+        console.log("Handling button click", balanceSelected);
+        if (balanceSelected>0.0001) {
+          const newWithdrawal = Math.floor(balanceSelected * 100) / 100;
           console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
@@ -172,7 +177,7 @@ function WithdrawStableCoin() {
         if (!isValidSolanaAddress || cleanedAmount === '' || cleanedAddress === '') {
             setWithdrawalButtonActive(false);
         } else if (!isNaN(amountToNumber) && amountToNumber > 0.00001 && 
-        (amountToNumber <= balanceSelectedInUSD)) {
+        (amountToNumber <= balanceSelected)) {
             setWithdrawalButtonActive(true);
         } else {
             setWithdrawalButtonActive(false);
@@ -187,24 +192,45 @@ function WithdrawStableCoin() {
           const cleanedAmount = amountText.replace(/[\s$,!#%&*()A-Za-z]/g, '');
           const amountToNumber = Number(cleanedAmount);
           if (isNaN(amountToNumber)) {
-            setErrorMessage('Invalid amount');
-          } else if (amountToNumber > balanceSelectedInUSD) {
-            setErrorMessage('Insufficient balance');
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Cantidad no válida')
+            } else {
+              setErrorMessage('Invalid amount');
+            }
+          } else if (amountToNumber > balanceSelected) {
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Saldo insuficiente')
+            } else {
+              setErrorMessage('Insufficient balance');
+            }
           } else if (amountToNumber < 0.001) {
-            setErrorMessage('Minimum: $0.001');
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Mínimo: $0.001')
+            } else {
+              setErrorMessage('Minimum: $0.001');
+            }
           } else {
             setAmountText('');
             setAddressText('')
             saveRecentlyUsedSolanaAddress(cleanedAddress);
             setWithdrawalInProgress(true);
-            setErrorMessage('Check your wallet');
+            setErrorMessageColor('#2E7D32');
+
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Revisa tu billetera.')
+            } else {
+              setErrorMessage('Check your wallet');
+            }
             const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
             setWithdrawalButtonActive(false); // Deactivate button here
 
             console.log('connectedWallets', connectedWallets)
             console.log('walletName: ', walletName)
 
-            console.log('Requesting new transaction')
+            console.log('Requesting new transaction currencySelected', currencySelected)
           
             const transactionSuccess = await requestNewSolanaTransaction2(publicKey, 
                 cleanedAddress, convertToSmallestDenomination, currencySelected, 
@@ -213,24 +239,33 @@ function WithdrawStableCoin() {
             console.log('Got transaction status: ', transactionSuccess)
 
             if (transactionSuccess) {
+                
+              setErrorMessageColor('#2E7D32');
+              setErrorMessage('Transaction Success!');
 
-              if (connectedWallets[0].chain == 'solana' || connectedWallets[0].chain == 'Solana' ||
-              connectedWallets[0].chain == 'SOL') {
+              if (currencySelected == 'usdcSol') {
+                dispatch(setusdcSolValue(usdcSolBalance-amountToNumber));
+              } else if (currencySelected == 'usdtSol') {
+                dispatch(setusdtSolValue(usdtSolBalance-amountToNumber));
+              } else if (currencySelected == 'eurcSol') {
+                dispatch(seteurcSolValue(eurcSolBalance-amountToNumber));
+              }
 
-              setWithdrawalInProgress(false);
-              setErrorMessage('');
-              // this is a rough workaround to save the change to redux and reload the page
-              setTimeout(() =>  dispatch(setShowWithdrawStablecoinPage(false)), 10);
-              dispatch(setShouldShowBottomNav(true))
-
+              setTimeout(() => {
+                setWithdrawalInProgress(false);
+                setErrorMessage('');
+                dispatch(setShowWithdrawStablecoinPage(false))
+                dispatch(setShouldShowBottomNav(true))
+              }, 2000);
               
-            } else {
-              setWithdrawalInProgress(false);
-              setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
-            }
           } else {
             setWithdrawalInProgress(false);
-            setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Lo sentimos, hubo un error con tu transacción. Por favor inténtalo de nuevo más tarde.')
+            } else {
+              setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
+            }
           }
         }
       };
@@ -256,13 +291,12 @@ function WithdrawStableCoin() {
     const errorLabelText = () => {
         if (errorMessage) {
           const color = errorMessage === ('Check your wallet' || 
-          'Sending transaction') ? '#60A05B' : ('#FF3B30');
+          'Sending transaction' || 'Transaction Success!') ? '#2E7D32' : ('#FF3B30');
           return (
-
             <div>
 {withdrawalInProgress && ( 
-<div style={{display: 'flex', justifyContent: 'center' }}>
-
+<div style={{display: 'flex', justifyContent: 'center', marginTop: '-130px', marginBottom: '10px' }}>
+<LoadingAnimation/>
             </div>
             )}
 
@@ -273,8 +307,8 @@ function WithdrawStableCoin() {
                 alignItems: 'center',
                 margin: '0 auto',
                 marginTop: '0px',
-                fontSize: '18px',
-                color: color,
+                fontSize: '20px',
+                color: errorMessageColor,
                 textAlign: 'center'
               }}
             >
@@ -403,13 +437,23 @@ padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={()
                     <div style={{ marginLeft: '8px' }}>USDT</div> {/* Adjust marginLeft as needed */}
                     
                 </div>
+
+
+                <div style={{ display: 'flex', alignItems: 'center', 
+                background: (currencySelected == 'eurcSol') ? '#444444' : '#ffffff', 
+                color: (currencySelected == 'eurcSol') ? '#ffffff' : '#000000',  
+padding: '7px', borderRadius: '10px', border: '1px solid black',  }} onClick={() => handleCurrencySelection('eurcSol')}>
+                    <img id="eurcSolIcon" src={eurcSol} style={{ width: '39px', height: 'auto' }} />
+                    <div id="eurcSolTicker" style={{ marginLeft: '8px' }}>EURC</div> {/* Adjust marginLeft as needed */}
+                </div>
+
                 </div>
 
 </div>
 
 <div style={{marginTop: '20px', fontSize: '20px', marginLeft: '20px'}}>
 {selectedLanguageCode === 'en' && `Balance: `}
-{selectedLanguageCode === 'es' && `Valor de la cuenta: `} {balanceSelectedInUSD}</div>
+{selectedLanguageCode === 'es' && `Valor de la cuenta: `} {balanceSelected}</div>
 
 
 <div

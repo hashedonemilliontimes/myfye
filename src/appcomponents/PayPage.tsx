@@ -63,9 +63,18 @@ function PayPage() {
       const isValidPhoneNumber = phoneRegex.test(cleanedPhoneNumber);
 
       if (cleanedReferral === '') {
-        setErrorMessage('Please enter an email address');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Por favor ingrese una dirección de correo electrónico')
+        } else {
+          setErrorMessage('Please enter an email address');
+        }
       } else if (!isValidEmailAddress && !isValidPhoneNumber) {
-          setErrorMessage('Please enter a valid email address or phone number');
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Por favor ingrese una dirección de correo electrónico')
+        } else {
+          setErrorMessage('Please enter an email address or phone number');
+        }
+
       } else {
         if (isValidEmailAddress) {
           const contactCollectionRef = collection(db, 'contacts');

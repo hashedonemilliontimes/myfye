@@ -14,7 +14,8 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
   addConnectedWallets, setShowEarnPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setusdySolValue, setpyusdSolValue, setShowSendPage,
+  setcurrentUserEmail, setusdySolValue, setpyusdSolValue,
+  seteurcSolValue, setShowSendPage,
   setShowWalletDepositPage, setShouldShowBottomNav, 
   setShowWithdrawStablecoinPage, setShowWalletPage,
 clearContacts} from '../redux/userWalletData';
@@ -45,6 +46,8 @@ import ContactsPage from '../appcomponents/ContactsPage';
 import AccountHistory from '../appcomponents/accountHistory';
 import { checkUncreatedUserBalance } from '../helpers/uncreatedUserBalance';
 import NewUserPreviousBalanceNotification from '../appcomponents/NewUserPreviousBalanceNotification';
+import { getFunctions, httpsCallable } from "firebase/functions";
+import PersonaKYC from '../appcomponents/PersonaKYC';
 
 function WebAppInner() {
 
@@ -56,6 +59,7 @@ function WebAppInner() {
   const lastNameUI = useSelector((state: any) => state.userWalletData.currentUserLastName);
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+  const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
   const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
@@ -65,6 +69,7 @@ function WebAppInner() {
   const [gotUserContacts, setGotUserContacts] = useState(false);
   const [gotAllUsers, setGotAllUsers] = useState(false);
   const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+  const KYCVerifired = useSelector((state: any) => state.userWalletData.currentUserKYCVerified);
   const db = getFirestore();
 
   const dispatch = useDispatch();
@@ -130,6 +135,7 @@ function WebAppInner() {
           dispatch(setusdtSolValue(Number(balances.usdt)));
           dispatch(setusdySolValue(Number(balances.usdy)));
           dispatch(setpyusdSolValue(Number(balances.pyusd)));
+          dispatch(seteurcSolValue(Number(balances.eurc)));
           
           console.log('got balances: ', balances)
         }
@@ -231,6 +237,11 @@ function WebAppInner() {
     
   };
 
+
+
+
+    
+  
   if (primaryWallet !== null || user) {
     return (
 
@@ -279,9 +290,14 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 </div>
 </div>
 
+{KYCVerifired ? (<div>
 
 
-<div style={{overflow: 'hidden'}}>
+
+
+
+
+  <div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
           height: window.innerHeight < 620 ? 'calc(100vh - 170px)' : 'calc(100vh - 170px)',
@@ -316,7 +332,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
     $ <span style={{ fontSize: '35px' }}>
       
     <div>
-    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
+    {((usdcSolBalance + usdtSolBalance + eurcSolBalance).toFixed(2)).toLocaleString('en-US')}
   </div>
 
     </span>
@@ -373,9 +389,6 @@ alignItems: 'center',
 
        </div>
        </div>
-
-
-
 
 
 
@@ -482,6 +495,13 @@ alignItems: 'center',
                     <BottomNav/>
                         </div>
                         </div>
+
+
+</div>) : (<div>
+<PersonaKYC/>
+</div>)}
+
+
   </>
 ) : (<>
       <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', marginTop: '60px' }}>
