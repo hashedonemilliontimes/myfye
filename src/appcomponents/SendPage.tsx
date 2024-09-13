@@ -18,6 +18,7 @@ import pyusdSol from '../assets/pyusdSol.png';
 import eurcSol from '../assets/pyusdSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
 import User from '../helpers/User';
+import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
 function SendPage() {
 
@@ -226,6 +227,13 @@ function SendPage() {
 
   const handleSendButtonClick = async () => {
     if (sendButtonActive) {
+
+      const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
+
+
+      if (isTransactionsEnabled) {
+
+
       const cleanedAddress = removeWhitespace(addressText)
       const cleanedAmount = amountText.replace(/[\s$,!#%&*()A-Za-z]/g, '');
       const amountToNumber = Number(cleanedAmount);
@@ -385,6 +393,16 @@ function SendPage() {
       }
         }
     }
+  } else {
+
+    if (selectedLanguageCode == 'es') {
+      setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
+    } else {
+      setErrorMessage('Transactions disabled, please contact Myfye support')
+    }
+
+
+  }
   };
 }
 

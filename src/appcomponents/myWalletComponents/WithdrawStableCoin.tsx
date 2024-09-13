@@ -14,7 +14,7 @@ import { setShowWithdrawStablecoinPage,
   setRecentlyUsedSolanaAddresses } from '../../redux/userWalletData';
   import { getFirestore, doc, updateDoc, arrayUnion } from 'firebase/firestore';
   import LoadingAnimation from '../../components/loadingAnimation';
-  
+  import {getUserTransactionsEnabled} from '../../helpers/getUserData';
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
@@ -187,10 +187,13 @@ function WithdrawStableCoin() {
 
 
     const handleWithdrawalButtonClick = async () => {
+      
+
         if (withdrawalButtonActive) {
           const cleanedAddress = removeWhitespace(addressText)
           const cleanedAmount = amountText.replace(/[\s$,!#%&*()A-Za-z]/g, '');
           const amountToNumber = Number(cleanedAmount);
+          const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
           if (isNaN(amountToNumber)) {
             setErrorMessageColor('#222222');
             if (selectedLanguageCode == 'es') {
@@ -211,6 +214,13 @@ function WithdrawStableCoin() {
               setErrorMessage('Mínimo: $0.001')
             } else {
               setErrorMessage('Minimum: $0.001');
+            }
+          } else if (!isTransactionsEnabled) {
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
+            } else {
+              setErrorMessage('Transactions disabled, please contact Myfye support')
             }
           } else {
             setAmountText('');
@@ -393,10 +403,10 @@ function WithdrawStableCoin() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        padding: '15px',
+        paddingTop: '15px',
         height: '90vh',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '100vw',
         transition: 'top 0.5s ease', // Animate the left property
         overflowY: 'hidden',
         zIndex: 6

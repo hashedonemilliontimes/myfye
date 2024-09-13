@@ -21,6 +21,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import FailImage from '../assets/FailImage.png';
 import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
+import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
 function Deposit() {
 
@@ -75,7 +76,7 @@ function Deposit() {
     const principalInvested = useSelector((state: any) => state.userWalletData.principalInvested);
     const [errorMessageOpacity, setErrorMessageOpacity] = useState(0);
     const [errorMessage, setErrorMessage] = useState('');
-    const [errorMessageColor, setErrorMessageColor] = useState('#FF3B30');
+    const [errorMessageColor, setErrorMessageColor] = useState('#A90900');
     const [depositInProgress, setDepositInProgress] = useState(false);
     const navigate = useNavigate();
     const currentTimeInSeconds = Date.now()/1000;
@@ -378,7 +379,7 @@ function Deposit() {
         if (depositButtonActive) {
 
           let depositToNumber = 0.0
-
+          const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
           if (!newDepositAmount) {
             const cleanedDeposit = deposit.replace(/[\s$,!#%&*()A-Za-z]/g, '');
             depositToNumber = Number(cleanedDeposit);
@@ -390,13 +391,20 @@ function Deposit() {
 
           if (isNaN(depositToNumber)) {
             setErrorMessage('Invalid amount');
-            setErrorMessageColor('#FF3B30')
+            setErrorMessageColor('#A90900')
           } else if (depositToNumber > balanceSelectedInUSD) {
             setErrorMessage('Insufficient balance');
-            setErrorMessageColor('#FF3B30')
+            setErrorMessageColor('#A90900')
           } else if (depositToNumber < 0.9) {
             setErrorMessage('Minimum: $1');
-            setErrorMessageColor('#FF3B30')
+            setErrorMessageColor('#A90900')
+          } else if (!isTransactionsEnabled) {
+              setErrorMessageColor('#222222');
+              if (selectedLanguageCode == 'es') {
+                setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
+              } else {
+                setErrorMessage('Transactions disabled, please contact Myfye support')
+              }
           } else {
             setDeposit('');
             setDepositInProgress(true);
@@ -426,7 +434,7 @@ function Deposit() {
             } else {
               setDepositInProgress(false);
               setErrorMessage('Please sign the transaction with your wallet or keychain')
-              setErrorMessageColor('#FF3B30')
+              setErrorMessageColor('#A90900')
               setShouldNotify(false)
             }
             
@@ -609,10 +617,10 @@ function Deposit() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        padding: '15px',
+        paddingTop: '15px',
         height: 'calc(100vh)',
         backgroundColor: 'white',
-        width: '95vw',
+        width: '100vw',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 4,
       }}>

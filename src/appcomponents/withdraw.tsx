@@ -15,6 +15,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
 import { setShowEarnWithdrawPage, setTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
 function Withdraw() {
 
@@ -143,7 +144,15 @@ function Withdraw() {
 
           console.log('Withdraw usdyBalance: ', usdyBalance)
           if (usdyBalance >= 0.9) {
-
+            const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
+            if (isTransactionsEnabled) {
+            setErrorMessageColor('#222222');
+            if (selectedLanguageCode == 'es') {
+              setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
+            } else {
+              setErrorMessage('Transactions disabled, please contact Myfye support')
+            }
+          
         const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
         const withdrawalToNumber = Number(cleanedWithdrawal);
       
@@ -182,6 +191,13 @@ function Withdraw() {
           console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
           setWithdrawalInProgress(false)
         }
+      } else {
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
+        } else {
+          setErrorMessage('Transactions disabled, please contact Myfye support')
+        }
+      } 
       } else {
         setErrorMessage('Sorry, the minimum withdrawal is $1')
         setWithdrawalInProgress(false)
@@ -291,14 +307,14 @@ function Withdraw() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        padding: '15px',
+        paddingTop: '15px',
         height: '100vh',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '100vw',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 4
       }}>
-
+<div style={{padding: '15px'}}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 <div style={{marginTop: '10px', fontSize: '35px', color: '#222222',
 }}>
@@ -397,7 +413,7 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
     )}
 
 </div>
-
+</div>
 </div>
 
                   </div> 
