@@ -14,14 +14,23 @@ import history from '../assets/history.png';
 import WalletTransactions from './WalletTransactions';
 import myfyeWallet from '../assets/myfyeWallet2.png';
 import xIcon from '../assets/xIconGray2.png';
+import usdcSol from '../assets/usdcSol.png';
+import usdtSol from '../assets/usdtSol.png';
+import eurcSol from '../assets/eurcSol.png';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import LoadingAnimation from '../components/loadingAnimation';
 
 function WalletPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
-
+    const { primaryWallet, user } = useDynamicContext();
     const dispatch = useDispatch()
+    const [swapButtonActive, setSwapButtonActive] = useState(true);
     const [currencySelected, setcurrencySelected] = useState('');
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const [transactionStatus, setTransactionStatus] = useState(''); 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -35,9 +44,13 @@ function WalletPage() {
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
     const [qrCodeURL, setqrCodeURL] = useState(''); 
     const [showWalletInfoPopup, setShowWalletInfoPopup] = useState(false); 
+    const [showSwapPopup, setShowSwapPopup] = useState(false); 
     const [addressCopied, setAddressCopied] = useState(false);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
-
+    const [transactionInProgress, setTransactionInProgress] = useState(false);
+    const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
+    const walletName = useSelector((state: any) => state.userWalletData.type);
+  const MYFYE_SERVER_ADDRESS = "DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn"
 
     useEffect(() => {
       const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
@@ -57,10 +70,31 @@ function WalletPage() {
           setMenuPosition('0'); // Bring the menu into view
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
-          setcurrencySelected('');
+          setcurrencySelected('usd');
+          if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+            setSwapButtonActive(true)
+          }
         }
       }, [showMenu]);
 
+
+      useEffect(() => {
+        
+        if (currencySelected == 'usd') {
+          if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+            setSwapButtonActive(true)
+            } else {
+              setSwapButtonActive(false)
+            }
+        } else if (currencySelected == 'eur') {
+          if (eurcSolBalance >= 1) {
+            setSwapButtonActive(true)
+            } else {
+              setSwapButtonActive(false)
+            }
+        }
+
+      }, [currencySelected]);
 
       const handleMenuClick = () => {
         if (showTransactionHistory) {
@@ -107,6 +141,12 @@ function WalletPage() {
         
       };
 
+      const toggleShowSwapPopup = () => {
+        // Add your logic here for what happens when the menu is clicked
+        setShowSwapPopup(!showSwapPopup)
+        
+      };
+
       const toggleShowTransactionHistory = () => {
         console.log()
         if (!showTransactionHistory) {
@@ -127,6 +167,69 @@ function WalletPage() {
     const handleWalletExplorerClick = () => {
       const url = `https://solscan.io/account/${publicKey}`;
       window.open(url, '_blank'); // Opens the link in a new tab
+  };
+
+
+  const handleSwapButtonClick = async () => {
+    
+
+    let amountSelected;
+    let inputCurrency;
+    let outputCurrency;
+    
+    if (currencySelected == 'usd') {
+      outputCurrency = 'eurcSol';
+      if (usdtSolBalance > usdcSolBalance) {
+        inputCurrency = 'usdtSol';
+        amountSelected = usdtSolBalance;
+      } else {
+        inputCurrency = 'usdcSol';
+        amountSelected = usdcSolBalance;
+      }
+    } else if (currencySelected == 'eur') {
+      outputCurrency = 'usdcSol';
+      amountSelected = eurcSolBalance;
+      inputCurrency = 'eurcSol';
+    } else {
+      setTransactionStatus('Error with swap please try again later.')
+    }
+
+    const convertToSmallestDenomination = amountSelected* 10 *10 *10 *10 *10 *10;
+    setTransactionInProgress(true); 
+
+
+    setTransactionStatus('Confirming Transaction...')
+
+  
+    const transactionSuccess = await requestNewSolanaTransaction2(publicKey, 
+      MYFYE_SERVER_ADDRESS, convertToSmallestDenomination, inputCurrency!, 
+        primaryWallet, walletName);
+    
+    console.log('Got transaction status: ', transactionSuccess)
+
+    if (transactionSuccess) {
+      setTransactionStatus('Confirmed! Your balance will update soon!')
+
+      const functions = getFunctions();
+      const sendSignedTransaction = httpsCallable(functions, 'swap');
+      sendSignedTransaction({
+        publicKey: publicKey,
+        inputAmount: amountSelected,
+        inputCurrency: inputCurrency,
+        outputCurrency: outputCurrency
+      })
+
+      setTimeout(() => {
+        setTransactionInProgress(false);
+        setShowSwapPopup(false);
+        setTransactionStatus('');
+      }, 2500);
+
+    } else {
+      setTransactionStatus('Transaction failed, please try again.')
+    }
+      
+
   };
 
     return (
@@ -252,6 +355,133 @@ function WalletPage() {
 
 
 
+{showSwapPopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999,
+          }}
+          onClick={toggleShowSwapPopup}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              width: '80vw',
+              height: '60vh',
+              padding: '20px',
+              background: '#ffffff',
+              borderRadius: '20px',
+              boxShadow: '8px 20px 60px rgba(0, 0, 0, 0.4), -4px 10px 30px rgba(0, 0, 0, 0.4)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <img src={xIcon} style={{width: '32px', height: 'auto'}}
+            onClick={toggleShowSwapPopup}></img>
+
+{transactionInProgress ? (
+<div style={{marginTop: '10px', display: 'flex', 
+  alignItems: 'center', gap: '20px', flexDirection: 'column'}}>
+
+<div>
+{transactionStatus == 'Confirmed! Your balance will update soon!' ? (
+  <div style={{
+  background: 'rgba(46, 125, 50, 0.3)', // Semi-transparent dark green background
+  width: '125px',
+  height: '125px',
+  borderRadius: '50%', // Circular shape
+  display: 'flex', // To center the checkmark
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'relative'
+}}>
+  <div style={{
+    width: '50px', // Width of the checkmark
+    height: '25px', // Height of the checkmark
+    borderBottom: '5px solid #2E7D32', // Bottom part of the checkmark
+    borderLeft: '5px solid #2E7D32', // Left part of the checkmark
+    transform: 'rotate(-45deg)', // Rotate to form the checkmark
+    position: 'absolute',
+    bottom: '50px', // Positioning the checkmark correctly within the circle
+    borderRadius: '4px'
+  }}></div>
+</div>
+) : (
+<LoadingAnimation/>
+)}
+</div>
+
+<div style={{fontSize: '15px', color: '#222222'}}>{transactionStatus}</div>
+
+</div>
+) : (
+  <div>
+<div style={{marginTop: '20px', fontWeight: 'bold'}}>You pay</div>
+
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '90%'}}>
+<div style={{marginTop: '10px', fontSize: '30px', fontWeight: 'bold', width: '100px', paddingLeft: '2px'}}>
+
+&nbsp;&nbsp;{currencySelected == 'usd' ? (usdcSolBalance > usdtSolBalance ? (usdcSolBalance) : (usdtSolBalance)).toFixed(2) : eurcSolBalance.toFixed(2)}
+
+
+</div>
+
+<img src={currencySelected == 'usd' ? (usdcSolBalance > usdtSolBalance ? (usdcSol) : (usdtSol)) : eurcSol}
+style={{width: 'auto', height: '55px'}}/>
+</div>
+
+
+<div style={{marginTop: '20px', fontWeight: 'bold'}}>You receive</div>
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '90%'}}>
+<div style={{marginTop: '10px', fontSize: '30px', fontWeight: 'bold', width: '100px'}}>
+
+  ~{currencySelected == 'usd' ? ((usdcSolBalance > usdtSolBalance ? (usdcSolBalance) : (usdtSolBalance))*0.89).toFixed(2) : (eurcSolBalance*1.096).toFixed(2)}
+</div>
+
+<img src={currencySelected == 'usd' ? eurcSol : usdcSol}
+style={{width: 'auto', height: '55px'}}/>
+</div>
+
+<div style={{display: 'flex', marginTop: '20px',
+  flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+
+<div style={{
+           color: '#ffffff', 
+           background: swapButtonActive ? '#2E7D32' : 'rgba(46, 125, 50, 0.4)',
+           borderRadius: '10px', 
+           border: swapButtonActive ? '2px solid #2E7D32' : '',
+           fontWeight: 'bold',
+            padding: '9px',
+           cursor: 'pointer',
+           fontSize: '20px',     
+           width: '200px',
+           textAlign: 'center',
+           marginTop: '10px',
+           height: '27px'
+       }} onClick={handleSwapButtonClick}>
+    {selectedLanguageCode === 'en' && 'Swap'}
+    {selectedLanguageCode === 'es' && `Intercambio`}
+       </div>
+
+       </div>
+</div>
+)}
+
+          </div>
+          
+        </div>
+      )}
+
+
 {!showTransactionHistory ? (
 <div>
 
@@ -273,75 +503,130 @@ function WalletPage() {
 
 
 
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px',}}src={myfyeWallet}/>
+</div>
 
 <div style={{
 display: 'flex', alignItems: 'center', 
 justifyContent: 'space-around', 
-width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '50px'}}>
-
-
-
-
+width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
 
 
 <div style={{
-  background: '#ffffff',
-  borderRadius: '20px',
-  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
-  padding: '10px',
-  paddingBottom: '20px',
-  width: '90vw'
-}}>
+      background: '#ffffff',
+      borderRadius: '0 0 20px 20px',
+      boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2), 0px -32px 48px rgba(0, 0, 0, 0.4)',
+      padding: '10px',
+      paddingBottom: '20px',
+      width: '90vw',
+      position: 'relative',
+      zIndex: 2
+    }}>
+      {/* Tabs */}
+      <div style={{ display: 'flex', position: 'absolute', top: '-38px', left: '0', width: '100%' }}>
+        <div 
+          style={{
+            padding: '10px 20px',
+            borderRadius: '20px 20px 0 0',
+            background: '#ffffff',
+            color: '#222222',
+            cursor: 'pointer',
+            marginRight: '5px',
+            flex: 1,
+          }}
+          onClick={() => setcurrencySelected('usd')}
+        >
+          <div style={{
+            textAlign: 'center',
+            color: currencySelected === 'usd' ? '#2E7D32': '#222222',
+            fontSize: '20px',
+            fontWeight: 'bold'
+            }}>
+          U.S. Dollar
+          </div>
+        </div>
+        <div 
+          style={{
+            padding: '10px 20px',
+            borderRadius: '20px 20px 0 0',
+            background: '#ffffff',
+            color: '#222222',
+            cursor: 'pointer',
+            flex: 1,
+            
+          }}
+          onClick={() => setcurrencySelected('eur')}
+        >
+          <div style={{textAlign: 'center',
+            color: currencySelected === 'eur' ? '#2E7D32': '#222222',
+            fontSize: '20px',
+            fontWeight: 'bold'
+          }}>
+          Euro
+          </div>
+        </div>
+      </div>
 
 
-<div style={{ display: 'flex',  alignItems: 'center', 
+
+      <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
 
 <div style={{ display: 'flex', alignItems: 'center', 
   justifyContent: 'center', flexDirection: 'column',}}>
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img style={{ width: '180px', height: 'auto', marginTop: '15px', marginBottom: '35px'}}src={myfyeWallet}/>
-</div>
+      {/* Content inside the tile */}
+      <div style={{ marginTop: '30px' }}>
+        {currencySelected === 'usd' && 
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
+          width: '90%', minWidth: '240px'}}>
+        
+            <label style={{ fontSize: '20px', 
+             display: 'flex', alignItems: 'center', }}>
+            $ <span style={{ fontSize: '35px' }}>
+              
+            <div>
+            {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
+          </div>
+        
+            </span>
+        </label>
+        
+        </div>
+        }
+        {currencySelected === 'eur' && 
+        
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
+          width: '90%', minWidth: '240px'}}>
+        
+            <label style={{ fontSize: '20px', 
+             display: 'flex', alignItems: 'center', }}>
+            € <span style={{ fontSize: '35px' }}>
+              
+            <div>
+            {((eurcSolBalance).toFixed(2)).toLocaleString('en-US')}
+          </div>
+        
+            </span>
+        </label>
+        
+        </div>
+        }
+      </div>
 
 
-<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-  width: '90%', minWidth: '240px'}}>
-
-  <div style={{fontSize: '25px'}}>USD Balance:</div>
-    <label style={{ fontSize: '20px', 
-     display: 'flex', alignItems: 'center', }}>
-    $ <span style={{ fontSize: '35px' }}>
-      
-    <div>
-    {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
-  </div>
-
-    </span>
-</label>
-
-</div>
 
 
-{eurcSolBalance > 0.01 && (
-  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-  width: '90%', minWidth: '240px', marginTop: '35px'}}>
 
-  <div style={{fontSize: '25px'}}>EUR Balance:</div>
-    <label style={{ fontSize: '20px', 
-     display: 'flex', alignItems: 'center', }}>
-    $ <span style={{ fontSize: '35px' }}>
-      
-    <div>
-    {((eurcSolBalance).toFixed(2)).toLocaleString('en-US')}
-  </div>
 
-    </span>
-</label>
 
-</div>
-)}
+
+
+
+
+
 
 
    </div>
@@ -393,7 +678,27 @@ alignItems: 'center',
        </div>
        </div>
 
+       <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+            padding: '9px',
+           cursor: 'pointer',
+           fontSize: '20px',     
+           width: '200px',
+           textAlign: 'center',
+           marginTop: '10px'
+       }} onClick={toggleShowSwapPopup}>
+    {selectedLanguageCode === 'en' && (currencySelected === 'eur' && 'Swap to U.S. Dollars')}
+    {selectedLanguageCode === 'en' && (currencySelected === 'usd' && 'Swap to Euros')}
+    {selectedLanguageCode === 'es' && `Intercambio`}
        </div>
+       </div>
+
+
+       
        </div>
 
 

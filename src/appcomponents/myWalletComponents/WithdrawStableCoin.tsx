@@ -28,13 +28,13 @@ function WithdrawStableCoin() {
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
     const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
+    const walletName = useSelector((state: any) => state.userWalletData.type);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
     const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
     const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
     const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
-    const walletName = useSelector((state: any) => state.userWalletData.type);
     const [selectedPortion, setselectedPortion] = useState('');
     const [balanceSelected, setbalanceSelected] = useState(0);
     const dispatch = useDispatch();
@@ -244,12 +244,12 @@ function WithdrawStableCoin() {
               setErrorMessage('Transaction Success!');
 
               if (currencySelected == 'usdcSol') {
-                dispatch(setusdcSolValue(usdcSolBalance-amountToNumber));
-              } else if (currencySelected == 'usdtSol') {
-                dispatch(setusdtSolValue(usdtSolBalance-amountToNumber));
-              } else if (currencySelected == 'eurcSol') {
-                dispatch(seteurcSolValue(eurcSolBalance-amountToNumber));
-              }
+                dispatch(setusdcSolValue(parseFloat((usdcSolBalance - amountToNumber).toFixed(6))));
+            } else if (currencySelected == 'usdtSol') {
+                dispatch(setusdtSolValue(parseFloat((usdtSolBalance - amountToNumber).toFixed(6))));
+            } else if (currencySelected == 'eurcSol') {
+                dispatch(seteurcSolValue(parseFloat((eurcSolBalance - amountToNumber).toFixed(6))));
+            }
 
               setTimeout(() => {
                 setWithdrawalInProgress(false);
