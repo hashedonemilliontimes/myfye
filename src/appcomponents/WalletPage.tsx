@@ -568,6 +568,8 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
         </div>
       </div>
 
+      <hr style={{ border: 'none', height: '1.5px', backgroundColor: '#BBBBBB', borderRadius: '10px' }} />
+
 
 
       <div style={{ display: 'flex',  alignItems: 'center', 
@@ -585,7 +587,7 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
         
             <label style={{ fontSize: '20px', 
              display: 'flex', alignItems: 'center', }}>
-            $ <span style={{ fontSize: '35px' }}>
+            USD$ Balance: $<span style={{ fontSize: '35px' }}>
               
             <div>
             {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
@@ -603,7 +605,7 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
         
             <label style={{ fontSize: '20px', 
              display: 'flex', alignItems: 'center', }}>
-            € <span style={{ fontSize: '35px' }}>
+            EUR€ Balance: €<span style={{ fontSize: '35px' }}>
               
             <div>
             {((eurcSolBalance).toFixed(2)).toLocaleString('en-US')}
