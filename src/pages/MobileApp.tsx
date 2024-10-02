@@ -328,7 +328,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 
 
   <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-  width: '90%', minWidth: '240px', marginTop: '0px'}}>
+  width: '100%', minWidth: '240px', marginTop: '0px'}}>
 
 
   <div style={{fontSize: '25px', width: '200px', letterSpacing: '0.25px'}}>USD$ Balance:</div>
@@ -348,7 +348,7 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 
 
   <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-  width: '90%', minWidth: '240px', marginTop: '-2px'}}>
+  width: '100%', minWidth: '240px', marginTop: '-2px'}}>
 
 
   <div style={{fontSize: '25px', width: '200px',letterSpacing: '0.5px'}}>EUR€ Balance:</div>

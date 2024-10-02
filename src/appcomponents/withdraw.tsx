@@ -8,9 +8,9 @@ import backButton from '../assets/backButton3.png';
 import PieChartComponent from '../components/dashboardTiles/pieChart';
 import roadImage1 from '../assets/roadImage1.png'
 import { saveNewWithdrawal } from '../helpers/saveNewWithdrawal';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getFunctions } from 'firebase/functions';
 import { setusdySolValue } from '../redux/userWalletData';
-import { requestNewSolanaTransaction } from '../helpers/web3Manager';
+import { requestNewSolanaTransaction, swap } from '../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
 import { setShowEarnWithdrawPage, setTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';
@@ -90,41 +90,54 @@ function Withdraw() {
       useEffect(() => {
 
         if (transactionStatus === 'Signed') {
-          setErrorMessage('Sending transaction')
+          setErrorMessageColor('#60A05B')
+          setErrorMessage('Swapping, Please Wait')
+          if (selectedLanguageCode == 'es') {
+            setErrorMessage('Intercambio, por favor espera');
+          } else {
+            setErrorMessage('Swapping, Please Wait')
+          }
           setErrorMessageColor('#60A05B')
         }
 
-        if (transactionStatus === 'Withdrawal Success') {
-          console.log('Withdrawal Success!')
-          //send usdc to user
+        if (transactionStatus === 'Success') {
+
+          setErrorMessageColor('#60A05B')
+          if (selectedLanguageCode == 'es') {
+            setErrorMessage('Exito!');
+          } else {
+            setErrorMessage('Success!')
+          }
+          
           console.log('Calling handleWithdrawal with pubKey: ', publicKey, ' usdyBalance: ', usdyBalance);
-          const handleWithdrawal = httpsCallable(functions, 
-            'handleWithdrawal');
-            handleWithdrawal({ withdrawerPubKey: publicKey, 
-              amountInUSDY: usdyBalance })
-            .then((result) => {
-                // Read result of the Cloud Function.
-                console.log('RESULT handleWithdrawal', result);
-                //update db
-                const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
-                const withdrawalToNumber = Number(cleanedWithdrawal);
-                handleWithdrawSuccess(withdrawalToNumber)
-                dispatch(setusdySolValue(0.0));
-            })
-            .catch((error) => {
-                // Getting the Error details.
-                console.log('ERROR in call to handleWithdrawal');
-                console.log(error);
-            });
+          const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
+          const withdrawalToNumber = Number(cleanedWithdrawal);
+          handleWithdrawSuccess(withdrawalToNumber)
+          dispatch(setusdySolValue(0.0));
+
+          setTimeout(() => {
+            /*
+            setErrorMessage('')
+            setconfirmButtonActive(false);
+            setreviewButtonClicked(false)
+            setWithdrawalInProgress(false)
+            setWithdrawal('')
+            setfeeAmount(0)
+            handleMenuClick()
+            */
+            window.location.reload();
+          }, 3000);
       }
       if (transactionStatus === 'Fail') {
-        setErrorMessage('Transaction failed, please try again')
+
+        if (selectedLanguageCode == 'es') {
+          setErrorMessage('La transacción falló, por favor inténtalo de nuevo.');
+        } else {
+          setErrorMessage('Swap Failed, Please Try Again')
+        }
         setErrorMessageColor('#000000')
         setWithdrawalInProgress(false)
         setShouldNotify(false)
-      }
-      if (transactionStatus === 'Deposit Success') {
-        setErrorMessage('')
       }
       }, [transactionStatus]);
 
@@ -165,28 +178,25 @@ function Withdraw() {
         if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 0.5 && 
         (withdrawalToNumber <= usdyBalance)) {
 
-          let withdrawSuccess: boolean
-
           // take off a small amount because USDY changes 
-          const convertToSmallestDenomination = (usdyBalance * 10 *10 *10 *10 *10 *10) - 0.000007; 
+          const convertToSmallestDenomination = Math.round(usdyBalance * 1e6);
 
           setShouldNotify(true)
+          /*
           withdrawSuccess = await requestNewSolanaTransaction(publicKey, 
             convertToSmallestDenomination, 'usdySol', primaryWallet, 0, principalHistory, dispatch, walletName);
+            */
+
           setShouldNotify(false)
 
-          console.log('withdrawSuccess', withdrawSuccess)
-          if (withdrawSuccess) {
+          const inputAmount: number = convertToSmallestDenomination;
+          const inputCurrency: String = 'usdySol';
+          const outputCurrency: String = 'usdcSol';
+          const swapTX = await swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch);
+          
 
-            console.log('Returned withdraw success')
-
-          } else {
-            setErrorMessage('Sorry, there was an error with your transaction. Please try again later')
-            setWithdrawalInProgress(false)
-            setErrorMessageColor('#000000')
-          }
         } else {
-          setErrorMessage('Failed number test or minimum after fee test')
+          setErrorMessage('Insufficient Funds')
           setErrorMessageColor('#000000')
           console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
           setWithdrawalInProgress(false)
@@ -219,14 +229,6 @@ function Withdraw() {
 
         if (docRef) {
           // success ready to update UI
-
-         setErrorMessage('')
-         setconfirmButtonActive(false);
-         setreviewButtonClicked(false)
-         setWithdrawalInProgress(false)
-         setWithdrawal('')
-         setfeeAmount(0)
-         handleMenuClick()
          // To Do nice animation for withdraw complete
          
         }

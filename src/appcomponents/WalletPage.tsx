@@ -9,7 +9,9 @@ import QRCode from 'qrcode.react';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
   setShowBanxaPopUp, setShowDepositStablecoinPage,
-setShowWalletPage, setShowWalletDepositPage } from '../redux/userWalletData';
+setShowWalletPage, setShowWalletDepositPage, setTransactionStatus,
+setusdySolValue, setpyusdSolValue,
+  seteurcSolValue, setusdcSolValue, setusdtSolValue } from '../redux/userWalletData';
 import history from '../assets/history.png';
 import WalletTransactions from './WalletTransactions';
 import myfyeWallet from '../assets/myfyeWallet2.png';
@@ -18,9 +20,10 @@ import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import eurcSol from '../assets/eurcSol.png';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
+import { requestNewSolanaTransaction2, swap } from '../helpers/web3Manager';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
+import { HandleSolanaConnection } from '../dynamichelpers/HandleNewSolanaConnection';
 
 function WalletPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
@@ -30,7 +33,7 @@ function WalletPage() {
     const [currencySelected, setcurrencySelected] = useState('');
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
-    const [transactionStatus, setTransactionStatus] = useState(''); 
+  const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus) 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -47,6 +50,8 @@ function WalletPage() {
     const [showSwapPopup, setShowSwapPopup] = useState(false); 
     const [addressCopied, setAddressCopied] = useState(false);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessageColor, setErrorMessageColor] = useState('#A90900');
     const [transactionInProgress, setTransactionInProgress] = useState(false);
     const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
     const walletName = useSelector((state: any) => state.userWalletData.type);
@@ -71,6 +76,7 @@ function WalletPage() {
         } else {
           setMenuPosition('-110vh'); // Move the menu off-screen
           setcurrencySelected('usd');
+          setErrorMessage('');
           if (usdcSolBalance>=1 || usdtSolBalance>=1) {
             setSwapButtonActive(true)
           }
@@ -107,6 +113,50 @@ function WalletPage() {
         
       };
 
+      useEffect(() => {
+        if (transactionStatus === 'Unsigned') {
+          setErrorMessage(selectedLanguageCode === 'es' ? 'Por favor firme la transacción' : 'Please sign the transaction');
+          setErrorMessageColor('#60A05B')  
+        }
+        if (transactionStatus === 'Signed') {
+          setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
+          setErrorMessageColor('#60A05B')
+        }
+        if (transactionStatus === 'Success') {
+            setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
+            setErrorMessageColor('#60A05B')
+
+            /*
+            const fetchBalances = async () => {
+              const balances = await HandleSolanaConnection(primaryWallet!.address, primaryWallet!.connector.name);
+              if (balances) {
+                dispatch(setusdcSolValue(Number(balances.usdc)));
+                dispatch(setusdtSolValue(Number(balances.usdt)));
+                dispatch(setusdySolValue(Number(balances.usdy)));
+                dispatch(setpyusdSolValue(Number(balances.pyusd)));
+                dispatch(seteurcSolValue(Number(balances.eurc)));
+                
+                console.log('got balances: ', balances)
+              }
+            }
+            fetchBalances();
+            */
+            
+            setTimeout(() => {
+              window.location.reload();
+            }, 3000);
+  
+        } else if (transactionStatus === 'Fail') {
+          setErrorMessage(selectedLanguageCode === 'es' ? 
+            'La transacción falló, por favor intente de nuevo' : 
+            'Swap failed, please try again');
+          setErrorMessageColor('#000000')
+          setTimeout(() => {
+            setTransactionInProgress(false);
+            dispatch(setTransactionStatus(''))
+          }, 3000);
+        }
+      }, [transactionStatus]);
 
       function copyWalletAddress() {
         navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
@@ -172,11 +222,12 @@ function WalletPage() {
 
   const handleSwapButtonClick = async () => {
     
+    
 
     let amountSelected;
     let inputCurrency;
     let outputCurrency;
-    
+
     if (currencySelected == 'usd') {
       outputCurrency = 'eurcSol';
       if (usdtSolBalance > usdcSolBalance) {
@@ -191,13 +242,29 @@ function WalletPage() {
       amountSelected = eurcSolBalance;
       inputCurrency = 'eurcSol';
     } else {
-      setTransactionStatus('Error with swap please try again later.')
+      dispatch(setTransactionStatus('Fail'))
     }
 
-    const convertToSmallestDenomination = amountSelected* 10 *10 *10 *10 *10 *10;
-    setTransactionInProgress(true); 
+    if (amountSelected < 1.0) {
+      setErrorMessage(selectedLanguageCode === 'es' ? 
+        'Saldo insuficiente' : 
+        'Insufficient balance');
+    } else {
+
+      dispatch(setTransactionStatus('Unsigned'))
+
+      const convertToSmallestDenomination = Math.round(amountSelected * 1e6);
+      setTransactionInProgress(true); 
+  
+  
+      const inputAmount: number = convertToSmallestDenomination;
+      const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch);
+
+    }
 
 
+
+    /*
     setTransactionStatus('Confirming Transaction...')
 
   
@@ -228,9 +295,58 @@ function WalletPage() {
     } else {
       setTransactionStatus('Transaction failed, please try again.')
     }
-      
+      */
 
   };
+
+
+
+  const errorLabelText = () => {
+    if (errorMessage) {
+      const color = errorMessageColor;
+      return (
+        <div>
+        <div style={{display:'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <label
+          style={{
+            width: '80vw',
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '20px',
+            fontSize: '18px',
+            color: color,
+            textAlign: 'center',
+          }}
+        >
+          
+          {errorMessage}
+        </label>
+        </div>
+
+        </div>
+
+      );
+    } else {
+      return (
+        <div style={{ visibility: 'hidden' }}>
+          <label
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              margin: '0 auto',
+              marginTop: '10px',
+              fontSize: '18px',
+            }}
+          >
+            $
+          </label>
+        </div>
+
+      );
+    }
+  };
+
 
     return (
         <div style={{ backgroundColor: 'white', overflow: 'hidden' }}>
@@ -391,34 +507,10 @@ function WalletPage() {
   alignItems: 'center', gap: '20px', flexDirection: 'column'}}>
 
 <div>
-{transactionStatus == 'Confirmed! Your balance will update soon!' ? (
-  <div style={{
-  background: 'rgba(46, 125, 50, 0.3)', // Semi-transparent dark green background
-  width: '125px',
-  height: '125px',
-  borderRadius: '50%', // Circular shape
-  display: 'flex', // To center the checkmark
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative'
-}}>
-  <div style={{
-    width: '50px', // Width of the checkmark
-    height: '25px', // Height of the checkmark
-    borderBottom: '5px solid #2E7D32', // Bottom part of the checkmark
-    borderLeft: '5px solid #2E7D32', // Left part of the checkmark
-    transform: 'rotate(-45deg)', // Rotate to form the checkmark
-    position: 'absolute',
-    bottom: '50px', // Positioning the checkmark correctly within the circle
-    borderRadius: '4px'
-  }}></div>
-</div>
-) : (
 <LoadingAnimation/>
-)}
+{errorLabelText()}
 </div>
 
-<div style={{fontSize: '15px', color: '#222222'}}>{transactionStatus}</div>
 
 </div>
 ) : (
@@ -447,11 +539,13 @@ style={{width: 'auto', height: '55px'}}/>
   ~{currencySelected == 'usd' ? ((usdcSolBalance > usdtSolBalance ? (usdcSolBalance) : (usdtSolBalance))*0.89).toFixed(2) : (eurcSolBalance*1.096).toFixed(2)}
 </div>
 
+
 <img src={currencySelected == 'usd' ? eurcSol : usdcSol}
 style={{width: 'auto', height: '55px'}}/>
 </div>
 
-<div style={{display: 'flex', marginTop: '20px',
+{errorLabelText()}
+<div style={{display: 'flex', marginTop: '0px',
   flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
 
 <div style={{
@@ -583,11 +677,11 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
       <div style={{ marginTop: '30px' }}>
         {currencySelected === 'usd' && 
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-          width: '90%', minWidth: '240px'}}>
+          width: '100%', minWidth: '240px'}}>
         
             <label style={{ fontSize: '20px', 
              display: 'flex', alignItems: 'center', }}>
-            USD$ Balance: $<span style={{ fontSize: '35px' }}>
+            USD$ Balance: $<span style={{ fontSize: '30px' }}>
               
             <div>
             {((usdcSolBalance + usdtSolBalance).toFixed(2)).toLocaleString('en-US')}
@@ -601,11 +695,11 @@ width: '100vw', height: '65vh', flexDirection: 'column', marginTop: '30px'}}>
         {currencySelected === 'eur' && 
         
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-around', 
-          width: '90%', minWidth: '240px'}}>
+          width: '100%', minWidth: '240px'}}>
         
             <label style={{ fontSize: '20px', 
              display: 'flex', alignItems: 'center', }}>
-            EUR€ Balance: €<span style={{ fontSize: '35px' }}>
+            EUR€ Balance: €<span style={{ fontSize: '30px' }}>
               
             <div>
             {((eurcSolBalance).toFixed(2)).toLocaleString('en-US')}

@@ -273,13 +273,10 @@ export const getUSDYPriceQuote = async (price: number, dispatch: Function): Prom
     if (price <= 0.01) {
         const quote = await getSwapQuote()
         const priceInUSD = quote.outAmount/1000000
-        console.log('quote.outAmount ', quote.outAmount)
         if (priceInUSD && priceInUSD>0.01) {
             dispatch(setPriceOfUSDYinUSDC(quote.outAmount/1000000))
-            console.log('setting the price to ', quote.outAmount/1000000)
         } else {
-            dispatch(setPriceOfUSDYinUSDC(1.04))
-            console.log('setting the price to ', 1.04)
+            dispatch(setPriceOfUSDYinUSDC(1.05))
         }
         
     }

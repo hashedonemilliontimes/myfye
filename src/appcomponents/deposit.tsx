@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { valueAtTime } from '../helpers/growthPercentage';
 import { saveNewDeposit, } from '../helpers/saveNewDeposit';
-import { requestNewSolanaTransaction } from '../helpers/web3Manager';
+import { requestNewSolanaTransaction, swap } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
@@ -154,10 +154,10 @@ function Deposit() {
 
     useEffect(() => {
       if (transactionStatus === 'Signed') {
-        setErrorMessage(selectedLanguageCode === 'es' ? 'Enviando transacción' : 'Sending transaction');
+        setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
         setErrorMessageColor('#60A05B')
       }
-      if (transactionStatus === 'Deposit Success') {
+      if (transactionStatus === 'Success') {
         handleBalanceIsUpdating().then((message) => {
           setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
           setErrorMessageColor('#60A05B')
@@ -166,11 +166,14 @@ function Deposit() {
           dispatch(setUpdatingBalance(true)) // The investment balance is being swapped
           setShouldNotify(false)
           setTimeout(() => {
+            /*
             setDepositInProgress(false)
             setErrorMessage('')
             dispatch(setShowEarnDepositPage(false)) 
             dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
-          }, 2000);
+            */
+            window.location.reload();
+          }, 3000);
       }).catch((error) => {
           console.error(error);
           setErrorMessage(selectedLanguageCode === 'es' ? 
@@ -182,7 +185,7 @@ function Deposit() {
       } else if (transactionStatus === 'Fail') {
         setErrorMessage(selectedLanguageCode === 'es' ? 
           'La transacción falló, por favor intente de nuevo' : 
-          'Transaction failed, please try again');
+          'Swap failed, please try again');
         setErrorMessageColor('#000000')
         setDepositInProgress(false)
         setShouldNotify(false)
@@ -420,13 +423,19 @@ function Deposit() {
             
 
             setShouldNotify(true)
+
+            /*
             const signDepositSuccess = await requestNewSolanaTransaction(publicKey, 
                 convertToSmallestDenomination, currencySelected, primaryWallet, 
                 currentValue, principalHistory, dispatch, walletName, true);
-            
-            console.log('Got signDepositSuccess: ', signDepositSuccess)
+            */
 
-            
+            const inputAmount: number = convertToSmallestDenomination;
+            const inputCurrency: String = currencySelected;
+            const outputCurrency: String = 'usdySol';
+            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch);
+
+            /*
             if (signDepositSuccess) {
               // save the new transaction
                    
@@ -437,6 +446,7 @@ function Deposit() {
               setErrorMessageColor('#A90900')
               setShouldNotify(false)
             }
+              */
             
           } 
 
@@ -481,6 +491,7 @@ function Deposit() {
     
     function tryAgainButtonPressed() {
       setDepositButtonActive(true)
+      dispatch(setTransactionStatus(''))
       handleDepositButtonClick()
     }
 
@@ -493,8 +504,10 @@ function Deposit() {
 
           const quote = await getSwapQuote()
 
+          
           const newUSDYBalance = Number(usdySolBalance) + Number(quote.outAmount/1000000)
           dispatch(setHotBalanceUSDY(newUSDYBalance))
+          console.log('Dispatch set setHotBalanceUSDY', newUSDYBalance);
           await setDoc(pubKeyDocRef, {
               updatingBalance: true,
               hotBalanceUSDY: newUSDYBalance
