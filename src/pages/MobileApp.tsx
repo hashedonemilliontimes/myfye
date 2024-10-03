@@ -18,7 +18,7 @@ import { setusdcSolValue, setusdtSolValue, setbusdSolValue,
   seteurcSolValue, setShowSendPage,
   setShowWalletDepositPage, setShouldShowBottomNav, 
   setShowWithdrawStablecoinPage, setShowWalletPage,
-clearContacts} from '../redux/userWalletData';
+clearContacts, setcurrentUserID} from '../redux/userWalletData';
 import { getUserData, getAllDynamicUsers, getUserContacts } from '../helpers/getUserData';
 import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
@@ -62,7 +62,7 @@ function WebAppInner() {
   const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
   const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
-  const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail );
+  const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
   const allDynamicUsers = useSelector((state: any) => state.userWalletData.allUsers);
   const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
   const currentUserContacts = useSelector((state: any) => state.userWalletData.contacts);
@@ -81,7 +81,7 @@ function WebAppInner() {
 
     if (primaryWallet?.address && userEmail) {
 
-
+      dispatch(setcurrentUserID(user?.userId!))
       const getInvestmentData = async () => {
       const userData = await getUserData(userEmail, user!.phoneNumber!, primaryWallet?.address, dispatch);
       }

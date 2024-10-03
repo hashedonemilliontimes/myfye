@@ -5,6 +5,7 @@ import backButton from '../assets/backButton3.png';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import questionMarkImage from '../assets/questionMark.png';
 import { setShouldShowBottomNav } from '../redux/userWalletData';
+import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 
 function Support() {
 
@@ -19,6 +20,10 @@ function Support() {
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
     const [SubmitButtonActive, setSubmitButtonActive] = useState(false);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+
+    const firstName = useSelector((state: any) => state.userWalletData.currentUserFirstName);
+    const lastName = useSelector((state: any) => state.userWalletData.currentUserLastName);
+    const userID = useSelector((state: any) => state.userWalletData.currentUserID);
 
     const handleMessageChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newMessage = event.target.value;
@@ -104,7 +109,14 @@ function Support() {
               // Save the user document to Firestore
               const supportRequestsCollectionRef = collection(firestore, "supportRequests");
               const docRef = await addDoc(supportRequestsCollectionRef, newSupportRequest);
-              
+              const documentId = docRef.id;
+
+              sendEmail(firstName, 'gavinmilligan1997@gmail.com', documentId,
+                Message, lastName, userID, creationDate)
+
+              sendEmail(firstName, 'eli@myfye.com', documentId,
+                Message, lastName, userID, creationDate)
+
               setMessage('')
               setSubmitButtonActive(false)
               alert(`Support request received! We will email you at ${currentUserEmail}`);
@@ -113,6 +125,32 @@ function Support() {
             }
         }
       };
+
+      const sendEmail = async (firstName: string, email: string, supportRequestID: string,
+        supportMessage: string, lastName: string, userID: string, timestamp: string
+      ) => {
+
+        const functions = getFunctions();
+        const sendEmailFn = httpsCallable(functions, 
+          'sendgridEmail');
+          sendEmailFn({ emailAddress: email,
+            firstName: firstName, 
+            templateId: 'd-6e7e5976fd6849d48de52c3acedcab61',
+            userID: `${userID}`,
+            lastName: `${lastName}`,
+            supportRequestID: `${supportRequestID}`,
+            supportMessage: `${supportMessage}`,
+            timestamp: `${timestamp}`,
+            publicKey: `${publicKey}`})
+          .then((result) => {
+              // Read result of the Cloud Function.
+              console.log(result);
+          })
+          .catch((error) => {
+              // Getting the Error details.
+              console.log(error);
+          });
+    };
 
     return (
         <div style={{ backgroundColor: 'white' }}>

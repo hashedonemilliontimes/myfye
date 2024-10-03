@@ -4,6 +4,7 @@ import wallet from '../helpers/walletDataType';
 import User from '../helpers/User';
 
 interface UserWalletDataState {
+  currentUserID: string;
   currentUserFirstName: string;
   currentUserLastName: string;
   currentUserEmail: string;
@@ -51,7 +52,7 @@ interface UserWalletDataState {
   allUsers: User[],
   selectedContact: User | string,
   recentlyUsedSolanaAddresses: string[],
-  showContactPopup: boolean
+  showContactPopup: boolean,
   selectedLanguageCode: string
 }
 
@@ -104,7 +105,8 @@ const initialUserWalletData: UserWalletDataState = {
   selectedContact: '',
   recentlyUsedSolanaAddresses: [],
   showContactPopup: false,
-  selectedLanguageCode: ''
+  selectedLanguageCode: '',
+  currentUserID: ''
 };
 
 
@@ -192,6 +194,9 @@ export const userWalletDataSlice = createSlice({
       state.currentUserKYCVerified = action.payload;
     },
 
+    setcurrentUserID: (state, action: PayloadAction<string>) => {
+      state.currentUserID = action.payload;
+    },
   setcurrentUserFirstName: (state, action: PayloadAction<string>) => {
     state.currentUserFirstName = action.payload;
   },
@@ -313,7 +318,8 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setShowEarnDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
   setSelectedContact, setRecentlyUsedSolanaAddresses, 
-  setAllUsers, setShowContactPopup, setSelectedLanguageCode
+  setAllUsers, setShowContactPopup, setSelectedLanguageCode,
+  setcurrentUserID
   
 } = userWalletDataSlice.actions;
 
