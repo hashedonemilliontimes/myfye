@@ -17,6 +17,8 @@ import PortfolioBreakdown from '../components/homePage/portfolio';
 import usdcSol from '../assets/usdcSol.png';
 import myfyeUseCase1 from '../assets/myfyeUseCase1.png';
 import AiStockImage from '../assets/AiStockImage.png';
+import manWithPhone from '../assets/manWithPhone.png';
+import manWithPhone3 from '../assets/manWithPhone3.png';
 import SignUpAppShowcase from '../assets/SignUpAppShowcase.png';
 import BanxaAppShowcase from '../assets/BanxaAppShowcase.png';
 import AccountAppShowcase from '../assets/AccountAppShowcase.png';
@@ -69,7 +71,8 @@ useEffect (() => {
     return (
       <div>
 
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingTop: '30px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', 
+          justifyContent: 'center', paddingTop: '30px'}}>
             <img src={MyFyeLogo1} style={{width: 'auto', height: '70px'}}></img>
         </div>
 
@@ -79,10 +82,13 @@ useEffect (() => {
     flexWrap: 'wrap',
     paddingTop: '100px', 
     margin: '0 auto',
-    maxWidth: '1500px', marginTop: '-100px'
+    maxWidth: '1500px', 
+    marginTop: '-100px',
 }}>
     <div style={{display: 'flex', flexDirection: 'column', minWidth: '400px', maxWidth: '45vw', 
-    height: '685px', justifyContent: 'center', gap: '30px'}}>
+    height: '685px', justifyContent: 'center', 
+    gap: '30px',
+    marginLeft: '40px'}}>
 
         <div style={{color: '#447E26', fontSize: '40px', fontWeight: 'bold'}}>Store, save, and earn directly from your phone with no bank account needed.</div>
         <div style={{color: 'black', fontSize: '25px'}}>Myfye gives users around the world instant access to yield on their deposits backed by US treasury bonds, directly from their phone.</div>
@@ -100,7 +106,9 @@ useEffect (() => {
 
     </div>
 
-    <img src = {AiStockImage} style={{height: '685px', width: '400px'}}></img>
+    <img src = {manWithPhone3} style={{height: '704px', 
+      width: '535px',
+      marginLeft: '-50px'}}></img>
     </div>
 
     <div style={{backgroundColor: '#447E26', paddingBottom: '50px'}}>
