@@ -71,8 +71,7 @@ useEffect (() => {
     return (
       <div>
 
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', 
-          justifyContent: 'center', paddingTop: '30px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingTop: '30px'}}>
             <img src={MyFyeLogo1} style={{width: 'auto', height: '70px'}}></img>
         </div>
 
@@ -80,15 +79,17 @@ useEffect (() => {
     display: 'flex',
     justifyContent: 'space-around', 
     flexWrap: 'wrap',
-    paddingTop: '100px', 
     margin: '0 auto',
     maxWidth: '1500px', 
-    marginTop: '-100px',
+    gap: '-40px',
+    height: 'calc(100vh - 100px)'
 }}>
-    <div style={{display: 'flex', flexDirection: 'column', minWidth: '400px', maxWidth: '45vw', 
-    height: '685px', justifyContent: 'center', 
-    gap: '30px',
-    marginLeft: '40px'}}>
+    <div style={{display: 'flex', flexDirection: 'column', 
+    minWidth: '400px', maxWidth: '45vw', 
+    marginTop: window.innerWidth > 800 ? '50px' : '0px',
+    height: 'calc(100vh-250px)', 
+    maxHeight: '600px',
+    justifyContent: 'space-around'}}>
 
         <div style={{color: '#447E26', fontSize: '40px', fontWeight: 'bold'}}>Store, save, and earn directly from your phone with no bank account needed.</div>
         <div style={{color: 'black', fontSize: '25px'}}>Myfye gives users around the world instant access to yield on their deposits backed by US treasury bonds, directly from their phone.</div>
@@ -106,9 +107,12 @@ useEffect (() => {
 
     </div>
 
-    <img src = {manWithPhone3} style={{height: '704px', 
-      width: '535px',
-      marginLeft: '-50px'}}></img>
+    <img src = {manWithPhone3} style={{
+      height: 'calc(100vh-200px)', 
+      width: 'auto',
+      marginLeft: '-10vw',
+      zIndex: -1
+      }}></img>
     </div>
 
     <div style={{backgroundColor: '#447E26', paddingBottom: '50px'}}>
