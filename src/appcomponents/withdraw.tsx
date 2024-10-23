@@ -126,7 +126,7 @@ function Withdraw() {
             handleMenuClick()
             */
             window.location.reload();
-          }, 3000);
+          }, 4000);
       }
       if (transactionStatus === 'Fail') {
 

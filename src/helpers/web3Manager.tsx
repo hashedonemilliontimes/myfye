@@ -1027,8 +1027,9 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
               quoteResponse,
               userPublicKey: userPublicKey.toString(),
               wrapAndUnwrapSol,
-              // Uncomment and provide a feeAccount if necessary
-              // feeAccount: "fee_account_public_key"
+              dynamicComputeUnitLimit: true,
+              prioritizationFeeLamports: 'auto',
+              dynamicSlippage: { maxBps: 300 }
           })
       });
 
@@ -1040,42 +1041,20 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       // Get recent blockhash and create a new transaction
 
       const swapTransactionBuf = Buffer.from(data.swapTransaction, 'base64');
-      var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+      var transaction = VersionedTransaction.deserialize(new Uint8Array(swapTransactionBuf));
       console.log('transaction', transaction);
 
       let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: transaction });
-      const latestBlockHash = await connection.getLatestBlockhash();
       
       console.log('Signed Transaction:', signedTransaction);
       dispatch(setTransactionStatus('Signed'));
 
-      const signedTransactionBuffer = Buffer.from(signedTransaction);
+      const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
       const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
-
-      //const serializedTransaction = signedVersionedTransaction.serialize();
       const serializedTransaction = Buffer.from(signedVersionedTransaction.serialize());
-      /*
-      const txid = await connection.sendRawTransaction(serializedTransaction, {
-        skipPreflight: true,
-        maxRetries: 3
-      });
-      console.log(`https://solscan.io/tx/${txid}`);
 
-      const stat = await connection.confirmTransaction({
-       blockhash: latestBlockHash.blockhash,
-       lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-       signature: txid
-      });
+      const latestBlockHash = await connection.getLatestBlockhash();
       
-
-      if (stat.value.err === null) {
-        dispatch(setTransactionStatus('Success'));
-
-      } else {
-        dispatch(setTransactionStatus('Fail'));
-      }
-      */
-
       const sendTransactionResponse = await transactionSenderAndConfirmationWaiter({
         connection,
         serializedTransaction,
@@ -1121,7 +1100,7 @@ async function transactionSenderAndConfirmationWaiter({
       try {
         await connection.sendRawTransaction(
           serializedTransaction,
-          SEND_OPTIONS
+          SEND_OPTIONS,
         );
       } catch (e) {
         console.warn(`Failed to resend transaction: ${e}`);

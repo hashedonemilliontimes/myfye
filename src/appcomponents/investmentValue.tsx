@@ -8,9 +8,7 @@ function InvestmentValue() {
     const initialInvestmentDate = useSelector((state: any) => state.userWalletData.initialInvestmentDate);
     const principalInvestedHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
-    const hotBalanceUSDY = useSelector((state: any) => state.userWalletData.hotBalanceUSDY);
     const currentTimeInSeconds = Date.now()/1000;
-    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
 
     const currentValue: number = usdyBalance
@@ -25,13 +23,8 @@ function InvestmentValue() {
 
         console.log('priceOfUSDYinUSDC', priceOfUSDYinUSDC)
 
-        if (updatingBalance) {
-            console.log('Updating USDY balance')
-            setUpBy(hotBalanceUSDY*priceOfUSDYinUSDC);
-        } else {
             setUpBy(usdyBalance*priceOfUSDYinUSDC);
-        }
-    }, [usdyBalance, updatingBalance, priceOfUSDYinUSDC]);
+    }, [usdyBalance, priceOfUSDYinUSDC]);
 
     if (currentValue >= 10) {
         upByPrecision = 8;

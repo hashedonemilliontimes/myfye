@@ -7,9 +7,10 @@ import { saveNewDeposit, } from '../helpers/saveNewDeposit';
 import { requestNewSolanaTransaction, swap } from '../helpers/web3Manager';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
-  setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, setUpdatingBalance,
-  settotalInvestingValue, setShowEarnDepositPage, setHotBalanceUSDY, setpyusdSolValue,
-  seteurcSolValue, setShouldShowBottomNav } from '../redux/userWalletData';
+  setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, 
+  settotalInvestingValue, setShowEarnDepositPage, setpyusdSolValue,
+  seteurcSolValue, setShouldShowBottomNav, 
+  setusdySolValue} from '../redux/userWalletData';
 import LoadingAnimation from '../components/loadingAnimation';
 import backButton from '../assets/backButton3.png';
 import solIcon from '../assets/solIcon.png';
@@ -51,6 +52,7 @@ function Deposit() {
     const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
+    const [usdyQuoteOutput, setusdyQuoteOutput] = useState(0); 
     
     const walletName = useSelector((state: any) => state.userWalletData.type);
 
@@ -82,7 +84,6 @@ function Deposit() {
     const currentTimeInSeconds = Date.now()/1000;
     const currentValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
       initialInvestmentDate, principalHistory)
-    const [shouldNotify, setShouldNotify] = useState(false);
     const [newDepositAmount, setnewDepositAmount] = useState(0);
 
 
@@ -123,21 +124,6 @@ function Deposit() {
       }
     };
     
-    useEffect(() => {
-      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        if (shouldNotify) {
-          const message = 'Hold on! We are almost done.';
-          e.returnValue = message; // Legacy method for cross browser support
-          return message; // For modern browsers
-        }
-      };
-  
-      window.addEventListener('beforeunload', handleBeforeUnload);
-  
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-      };
-    }, [shouldNotify]);
 
     useEffect(() => {
       let connectedWallet: wallet
@@ -163,16 +149,12 @@ function Deposit() {
           setErrorMessageColor('#60A05B')
           // The following two lines of code are different types of balances
           updateUserBalance() // Update the stable coin balance already
-          dispatch(setUpdatingBalance(true)) // The investment balance is being swapped
-          setShouldNotify(false)
           setTimeout(() => {
-            /*
             setDepositInProgress(false)
             setErrorMessage('')
             dispatch(setShowEarnDepositPage(false)) 
-            dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
-            */
-            window.location.reload();
+            //dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
+            dispatch(setusdySolValue(usdySolBalance+usdyQuoteOutput))
           }, 3000);
       }).catch((error) => {
           console.error(error);
@@ -188,7 +170,6 @@ function Deposit() {
           'Swap failed, please try again');
         setErrorMessageColor('#000000')
         setDepositInProgress(false)
-        setShouldNotify(false)
       }
     }, [transactionStatus]);
 
@@ -422,32 +403,11 @@ function Deposit() {
             console.log('Requesting new transaction')
             
 
-            setShouldNotify(true)
-
-            /*
-            const signDepositSuccess = await requestNewSolanaTransaction(publicKey, 
-                convertToSmallestDenomination, currencySelected, primaryWallet, 
-                currentValue, principalHistory, dispatch, walletName, true);
-            */
-
             const inputAmount: number = convertToSmallestDenomination;
             const inputCurrency: String = currencySelected;
             const outputCurrency: String = 'usdySol';
             const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch);
 
-            /*
-            if (signDepositSuccess) {
-              // save the new transaction
-                   
-
-            } else {
-              setDepositInProgress(false);
-              setErrorMessage('Please sign the transaction with your wallet or keychain')
-              setErrorMessageColor('#A90900')
-              setShouldNotify(false)
-            }
-              */
-            
           } 
 
         }
@@ -506,8 +466,9 @@ function Deposit() {
 
           
           const newUSDYBalance = Number(usdySolBalance) + Number(quote.outAmount/1000000)
-          dispatch(setHotBalanceUSDY(newUSDYBalance))
-          console.log('Dispatch set setHotBalanceUSDY', newUSDYBalance);
+
+          setusdyQuoteOutput(quote.outAmount/1000000)
+
           await setDoc(pubKeyDocRef, {
               updatingBalance: true,
               hotBalanceUSDY: newUSDYBalance
