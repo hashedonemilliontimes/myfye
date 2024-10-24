@@ -10,7 +10,7 @@ import roadImage1 from '../assets/roadImage1.png'
 import { saveNewWithdrawal } from '../helpers/saveNewWithdrawal';
 import { getFunctions } from 'firebase/functions';
 import { setusdySolValue } from '../redux/userWalletData';
-import { requestNewSolanaTransaction, swap } from '../helpers/web3Manager';
+import { swap } from '../helpers/swaps';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
 import { setShowEarnWithdrawPage, setTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';

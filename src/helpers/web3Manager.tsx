@@ -1026,10 +1026,10 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
           body: JSON.stringify({
               quoteResponse,
               userPublicKey: userPublicKey.toString(),
-              wrapAndUnwrapSol,
-              dynamicComputeUnitLimit: true,
-              prioritizationFeeLamports: 'auto',
-              dynamicSlippage: { maxBps: 300 }
+              wrapAndUnwrapSol: true,
+              dynamicSlippage: { maxBps: 2000 },
+              priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "high", "maxLamports": 5000000}},
+              feeAccount: userPublicKey.toString(),
           })
       });
 

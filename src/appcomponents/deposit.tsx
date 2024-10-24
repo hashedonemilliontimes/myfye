@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { valueAtTime } from '../helpers/growthPercentage';
 import { saveNewDeposit, } from '../helpers/saveNewDeposit';
-import { requestNewSolanaTransaction, swap } from '../helpers/web3Manager';
+import { swap } from '../helpers/swaps';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
   setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, 

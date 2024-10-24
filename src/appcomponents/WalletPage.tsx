@@ -20,7 +20,7 @@ import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import eurcSol from '../assets/eurcSol.png';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { requestNewSolanaTransaction2, swap } from '../helpers/web3Manager';
+import { swap } from '../helpers/swaps';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
 import { HandleSolanaConnection } from '../dynamichelpers/HandleNewSolanaConnection';
