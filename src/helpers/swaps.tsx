@@ -32,6 +32,8 @@ const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 
   window.Buffer = Buffer;
 
+
+  
 export const swap = async (primaryWallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
     outputCurrency: String, dispatch: Function) => {
   
@@ -78,7 +80,7 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
     
     try {
       const quoteResponse = await fetch(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=50`
+        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=500`
       ).then(response => response.json());
   
       return quoteResponse;
@@ -94,7 +96,6 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
             
     const swapTransactionSignature = await getJupiterSwapTransaction(primaryWallet, quoteData, receiverPubKey, dispatch)
 
-    console.log('Transaction signature: ', swapTransactionSignature)
 
 };
 
@@ -104,7 +105,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
     window.Buffer = Buffer;
   
     if (primaryWallet) {
-      const connection: any = await (
+      let connection: any = await (
         primaryWallet as any
       ).connector.getConnection();
   
@@ -116,12 +117,17 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-              quoteResponse,
-              userPublicKey: userPublicKey.toString(),
-              wrapAndUnwrapSol: true,
-              dynamicSlippage: { maxBps: 2000 },
-              priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "high", "maxLamports": 5000000}},
-              feeAccount: userPublicKey.toString(),
+                // quoteResponse from /quote api
+                quoteResponse,
+                // user public key to be used for the swap
+                userPublicKey: userPublicKey,
+                // auto wrap and unwrap SOL. default is true
+                wrapAndUnwrapSol: true,
+                // jup.ag frontend default max for user
+                dynamicSlippage: { "maxBps": 500 },
+                dynamicComputeUnitLimit: true, // allow dynamic compute limit instead of max 1,400,000
+                // custom priority fee
+                priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "stupidHigh", "maxLamports": 10000000000000000000}},
           })
       });
 
@@ -136,28 +142,40 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       var transaction = VersionedTransaction.deserialize(new Uint8Array(swapTransactionBuf));
       console.log('transaction', transaction);
 
+      //const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+
+      const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
+      connection = new Connection(HELIUS_RPC);
+
+      const { blockhash: latestBlockHash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+
+      transaction.message.recentBlockhash = latestBlockHash;
+
       let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: transaction });
       
       console.log('Signed Transaction:', signedTransaction);
       dispatch(setTransactionStatus('Signed'));
 
+      
       const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
       const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
       const serializedTransaction = Buffer.from(signedVersionedTransaction.serialize());
 
-      const latestBlockHash = await connection.getLatestBlockhash();
       
       const sendTransactionResponse = await transactionSenderAndConfirmationWaiter({
         connection,
         serializedTransaction,
-        blockhashWithExpiryBlockHeight: latestBlockHash, // Pass the blockhash and height here
+        blockhashWithExpiryBlockHeight: {
+            blockhash: latestBlockHash,          // Pass the blockhash
+            lastValidBlockHeight: lastValidBlockHeight // Pass the last valid block height
+          }
       });
   
-      if (response) {
+      if (sendTransactionResponse) {
         console.log(`Transaction succeeded: https://solscan.io/tx/${response}`);
         dispatch(setTransactionStatus('Success')); // Update UI
       } else {
-        console.error('Transaction failed due to block height expiration or other issue');
+        console.log('Transaction failed due to block height expiration or other issue');
         dispatch(setTransactionStatus('Fail')); // Update UI
       }
 
@@ -166,7 +184,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
     }
   } catch (error) {
     dispatch(setTransactionStatus('Fail')); // Update UI
-      console.error('Error with swap transaction:', error);
+      console.error('Error with swap transaction');
       return `Unable to confirm transaction txid: `  // Re-throw the error for further handling if necessary
   }
 }
@@ -232,9 +250,11 @@ async function transactionSenderAndConfirmationWaiter({
   } catch (e) {
     if (e instanceof TransactionExpiredBlockheightExceededError) {
       // we consume this error and getTransaction would return null
+      console.error('TransactionExpiredBlockheightExceededError')
       return null;
     } else {
       // invalid state from web3.js
+      console.error('error', e)
       throw e;
     }
   } finally {
@@ -254,7 +274,7 @@ async function transactionSenderAndConfirmationWaiter({
       return response;
     },
     {
-      retries: 5,
+      retries: 7,
       minTimeout: 1e3,
     }
   );

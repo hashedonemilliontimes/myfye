@@ -116,7 +116,6 @@ function Withdraw() {
           dispatch(setusdySolValue(0.0));
 
           setTimeout(() => {
-            /*
             setErrorMessage('')
             setconfirmButtonActive(false);
             setreviewButtonClicked(false)
@@ -124,8 +123,6 @@ function Withdraw() {
             setWithdrawal('')
             setfeeAmount(0)
             handleMenuClick()
-            */
-            window.location.reload();
           }, 4000);
       }
       if (transactionStatus === 'Fail') {

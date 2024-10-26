@@ -186,7 +186,7 @@ export const getUserContacts = async (email: string, phoneNumber: string,
 export const getAllDynamicUsers = async (dispatch: Function) => {
     const result = await getDynamicUsers('None', 'allUsers');
     const allDynamicUsers = result.users; // Accessing the array of users directly
-    console.log('Got all dynamic users: ', allDynamicUsers)
+    
     dispatch(setAllUsers(allDynamicUsers)); // Now passing only the array
 }
 

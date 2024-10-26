@@ -125,25 +125,31 @@ function WalletPage() {
         if (transactionStatus === 'Success') {
             setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
             setErrorMessageColor('#60A05B')
-
             /*
-            const fetchBalances = async () => {
-              const balances = await HandleSolanaConnection(primaryWallet!.address, primaryWallet!.connector.name);
-              if (balances) {
-                dispatch(setusdcSolValue(Number(balances.usdc)));
-                dispatch(setusdtSolValue(Number(balances.usdt)));
-                dispatch(setusdySolValue(Number(balances.usdy)));
-                dispatch(setpyusdSolValue(Number(balances.pyusd)));
-                dispatch(seteurcSolValue(Number(balances.eurc)));
-                
-                console.log('got balances: ', balances)
+            if (currencySelected == 'usd') {
+              if (usdtSolBalance > usdcSolBalance) {
+
+                console.log('updating usdtSolBalanc', 0)
+                console.log('updating eurcSolBalanc', usdtSolBalance*0.89)
+                dispatch(seteurcSolValue(usdtSolBalance*0.89))
+                dispatch(setusdtSolValue(0))
+              } else {
+                console.log('updating usdcSolBalanc', 0)
+                console.log('updating eurcSolBalanc', usdcSolBalance*0.89)
+                dispatch(seteurcSolValue(usdcSolBalance*0.89))
+                dispatch(setusdcSolValue(0))
               }
-            }
-            fetchBalances();
-            */
-            
+            } else if (currencySelected == 'eur') {
+              console.log('updating usdcSolBalanc', usdcSolBalance*1.096)
+              console.log('updating eurcSolBalanc', 0)
+              dispatch(seteurcSolValue(0))
+              dispatch(setusdcSolValue(usdcSolBalance*1.096))
+            }*/
+
             setTimeout(() => {
-              window.location.reload();
+              setErrorMessage('')
+              setTransactionInProgress(false);
+              console.log('setting transaciton in prgress false')
             }, 3000);
   
         } else if (transactionStatus === 'Fail') {
