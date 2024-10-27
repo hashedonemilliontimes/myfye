@@ -131,7 +131,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
                 dynamicSlippage: { "maxBps": 500 },
                 dynamicComputeUnitLimit: true, // allow dynamic compute limit instead of max 1,400,000
                 // custom priority fee
-                priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "stupidHigh", "maxLamports": 10000000000000000000}},
+                priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "veryHigh", "maxLamports": 3000000000}},
           })
       });
 

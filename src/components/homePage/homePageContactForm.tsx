@@ -111,7 +111,7 @@ export default function HomeContactForm(props: LanguageCodeProps) {
       if (!isSmallScreen) {
         return (
 
-          <div>
+          <div style={{paddingTop: '15px', paddingBottom: '15px'}}>
 
           <div style={{display: 'flex', flexDirection: 'column', 
             width: '40vw', margin: '0 auto',
