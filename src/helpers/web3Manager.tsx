@@ -2,7 +2,7 @@ import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { setTransactionStatus } from '../redux/userWalletData';
+import { setEarnDepositTransactionStatus } from '../redux/userWalletData';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useAppDispatch } from '../redux/hooks';
 import { saveNewDeposit } from '../helpers/saveNewDeposit';
@@ -370,14 +370,14 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
       console.log('amountSmallestDenominationt: ', amountSmallestDenomination);
       console.log("Retrieved blockhash:", blockhashInfo.blockhash);
 
-      dispatch(setTransactionStatus('Built'));
+      dispatch(setEarnDepositTransactionStatus('Built'));
 
       const signedTransaction = await provider.signAndSendTransaction(transaction);
       console.log("Transaction sent:", signedTransaction);
 
       if (signedTransaction) {
         console.log('Handling deposit success!: signedTransaction')
-        dispatch(setTransactionStatus('Signed'));
+        dispatch(setEarnDepositTransactionStatus('Signed'));
 
         try {
     
@@ -405,12 +405,10 @@ export const requestNewSolanaTransaction = async (payerPubKey: string, amountSma
             // Handle the result
             console.log(result.data); // Process the data returned from the function
             if (result.data) {
-              dispatch(setTransactionStatus('Success'));
-            } else {
-              dispatch(setTransactionStatus('Fail'));
+              dispatch(setEarnDepositTransactionStatus('Fail'));
             }
           }).catch((error) => {
-            dispatch(setTransactionStatus('Fail'));
+            dispatch(setEarnDepositTransactionStatus('Fail'));
             console.error("Error calling sendSignedTransaction:", error);
           });
           return true
@@ -530,7 +528,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
 
     try {
       //Need to update the UI here 
-      dispatch(setTransactionStatus('Built'));
+      dispatch(setEarnDepositTransactionStatus('Built'));
 
       //let transactionID = await (primaryWallet as any).connector.signAndSendTransaction({ transaction: transaction });
 
@@ -538,7 +536,7 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
       const transactionBuffer = Transaction.from(Buffer.from(signedTransaction, 'base64'));
       const transactionID = await connection.sendRawTransaction(transactionBuffer.serialize());
 
-      dispatch(setTransactionStatus('Signed'));
+      dispatch(setEarnDepositTransactionStatus('Signed'));
 
       console.log("signedTransaction is", signedTransaction);
       console.log("Type of signedTransaction is", typeof signedTransaction);
@@ -564,12 +562,12 @@ export const sendDynamicWeb2EmbeddedSolanaTransaction = async (payerPubKey: stri
         // Handle the result
         console.log(result.data); // Process the data returned from the function
         if (result.data) {
-          dispatch(setTransactionStatus(`${transactionType} Success`));
+          dispatch(setEarnDepositTransactionStatus(`${transactionType} Success`));
         } else {
-          dispatch(setTransactionStatus('Fail'));
+          dispatch(setEarnDepositTransactionStatus('Fail'));
         }
       }).catch((error) => {
-        dispatch(setTransactionStatus('Fail'));
+        dispatch(setEarnDepositTransactionStatus('Fail'));
         console.error("Error calling sendSignedTransaction:", error);
       });
       return true

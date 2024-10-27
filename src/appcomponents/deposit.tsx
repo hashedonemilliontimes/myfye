@@ -7,7 +7,7 @@ import { saveNewDeposit, } from '../helpers/saveNewDeposit';
 import { swap } from '../helpers/swaps';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setPrincipalInvested, mergePrincipalInvestedHistory, 
-  setTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, 
+  setEarnDepositTransactionStatus, setinitialInvestmentDate, setinitialPrincipal, 
   settotalInvestingValue, setShowEarnDepositPage, setpyusdSolValue,
   seteurcSolValue, setShouldShowBottomNav, 
   setusdySolValue} from '../redux/userWalletData';
@@ -66,7 +66,7 @@ function Deposit() {
 
     const dispatch = useDispatch();
     const [depositButtonActive, setDepositButtonActive] = useState(false);
-    const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
+    const transactionStatus = useSelector((state: any) => state.userWalletData.earnDepositTransactionStatus)
     const [deposit, setDeposit] = useState('');
     const [selectedDepositPortion, setselectedDepositPortion] = useState('');
     const cryptoList = useSelector((state: any) => state.userWalletData.cryptoList)
@@ -118,7 +118,7 @@ function Deposit() {
         if (depositInProgress) {
           // Do nothing
         } else {
-          dispatch(setTransactionStatus(''))
+          dispatch(setEarnDepositTransactionStatus(''))
           dispatch(setShowEarnDepositPage(false))
         }
       }
@@ -406,7 +406,7 @@ function Deposit() {
             const inputAmount: number = convertToSmallestDenomination;
             const inputCurrency: String = currencySelected;
             const outputCurrency: String = 'usdySol';
-            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch);
+            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch, 'deposit');
 
           } 
 
@@ -446,12 +446,12 @@ function Deposit() {
 
 
       function goBackButtonPressed() {
-        dispatch(setTransactionStatus(''))
+        dispatch(setEarnDepositTransactionStatus(''))
     }
     
     function tryAgainButtonPressed() {
       setDepositButtonActive(true)
-      dispatch(setTransactionStatus(''))
+      dispatch(setEarnDepositTransactionStatus(''))
       handleDepositButtonClick()
     }
 

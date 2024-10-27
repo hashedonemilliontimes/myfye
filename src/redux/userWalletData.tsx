@@ -28,7 +28,9 @@ interface UserWalletDataState {
   busdEthBalance: number,
   connectedWallets: wallet[],
   currentUserKYCVerified: boolean,
-  transactionStatus: string,
+  earnWithdrawTransactionStatus: string,
+  earnDepositTransactionStatus: string,
+  walletSwapTransactionStatus: string,
   updatingBalance: boolean,
   hotBalanceUSDY: number,
   shouldShowBottomNav: boolean,
@@ -80,7 +82,9 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserFirstName: '',
   currentUserLastName: '',
   currentUserEmail: '',
-  transactionStatus: 'Not Initiated',
+  earnWithdrawTransactionStatus: 'string',
+  earnDepositTransactionStatus: 'string',
+  walletSwapTransactionStatus: 'string',
   updatingBalance: false,
   hotBalanceUSDY: 0,
   shouldShowBottomNav: true,
@@ -208,8 +212,14 @@ export const userWalletDataSlice = createSlice({
   setcurrentUserEmail: (state, action: PayloadAction<string>) => {
     state.currentUserEmail = action.payload;
   },
-  setTransactionStatus: (state, action: PayloadAction<string>) => {
-    state.transactionStatus = action.payload;
+  setEarnWithdrawTransactionStatus: (state, action: PayloadAction<string>) => {
+    state.earnWithdrawTransactionStatus = action.payload;
+  },
+  setEarnDepositTransactionStatus: (state, action: PayloadAction<string>) => {
+    state.earnDepositTransactionStatus = action.payload;
+  },
+  setWalletSwapTransactionStatus: (state, action: PayloadAction<string>) => {
+    state.walletSwapTransactionStatus = action.payload;
   },
   setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
     state.updatingBalance = action.payload;
@@ -308,7 +318,9 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setusdcEthValue, setusdtEthValue, setbusdEthValue, 
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setTransactionStatus, setUpdatingBalance,
+  setcurrentUserEmail, setEarnDepositTransactionStatus,
+  setEarnWithdrawTransactionStatus, setWalletSwapTransactionStatus,
+   setUpdatingBalance,
   setShouldShowBottomNav, setShowPayPage, setShowSendPage,
   setShowWithdrawStablecoinPage, setShowBanxaPopUp,
   setShowDepositStablecoinPage, setShowEarnPage,

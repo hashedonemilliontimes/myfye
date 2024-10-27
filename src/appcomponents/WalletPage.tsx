@@ -9,7 +9,7 @@ import QRCode from 'qrcode.react';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { setShouldShowBottomNav, setShowWithdrawStablecoinPage, 
   setShowBanxaPopUp, setShowDepositStablecoinPage,
-setShowWalletPage, setShowWalletDepositPage, setTransactionStatus,
+setShowWalletPage, setShowWalletDepositPage, setWalletSwapTransactionStatus,
 setusdySolValue, setpyusdSolValue,
   seteurcSolValue, setusdcSolValue, setusdtSolValue } from '../redux/userWalletData';
 import history from '../assets/history.png';
@@ -33,7 +33,7 @@ function WalletPage() {
     const [currencySelected, setcurrencySelected] = useState('');
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
-  const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus) 
+  const transactionStatus = useSelector((state: any) => state.userWalletData.walletSwapTransactionStatus) 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -149,7 +149,7 @@ function WalletPage() {
             setTimeout(() => {
               setErrorMessage('')
               setTransactionInProgress(false);
-              console.log('setting transaciton in prgress false')
+              setShowSwapPopup(false);
             }, 3000);
   
         } else if (transactionStatus === 'Fail') {
@@ -159,7 +159,7 @@ function WalletPage() {
           setErrorMessageColor('#000000')
           setTimeout(() => {
             setTransactionInProgress(false);
-            dispatch(setTransactionStatus(''))
+            dispatch(setWalletSwapTransactionStatus(''))
           }, 3000);
         }
       }, [transactionStatus]);
@@ -228,8 +228,6 @@ function WalletPage() {
 
   const handleSwapButtonClick = async () => {
     
-    
-
     let amountSelected;
     let inputCurrency;
     let outputCurrency;
@@ -248,7 +246,7 @@ function WalletPage() {
       amountSelected = eurcSolBalance;
       inputCurrency = 'eurcSol';
     } else {
-      dispatch(setTransactionStatus('Fail'))
+      dispatch(setWalletSwapTransactionStatus('Fail'))
     }
 
     if (amountSelected < 1.0) {
@@ -257,14 +255,14 @@ function WalletPage() {
         'Insufficient balance');
     } else {
 
-      dispatch(setTransactionStatus('Unsigned'))
+      dispatch(setWalletSwapTransactionStatus('Unsigned'))
 
       const convertToSmallestDenomination = Math.round(amountSelected * 1e6);
       setTransactionInProgress(true); 
   
   
       const inputAmount: number = convertToSmallestDenomination;
-      const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch);
+      const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'walletSwap');
 
     }
 

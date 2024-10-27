@@ -10,7 +10,10 @@ import { ComputeBudgetProgram,
     sendAndConfirmTransaction, SystemProgram, 
     Transaction, TransactionInstruction,
     VersionedTransaction } from "@solana/web3.js";
-import { setTransactionStatus } from '../redux/userWalletData'; // For managing UI
+import { setEarnWithdrawTransactionStatus,
+  setEarnDepositTransactionStatus,
+  setWalletSwapTransactionStatus
+ } from '../redux/userWalletData'; // For managing UI
 
 // Swapping pairs
 const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -35,7 +38,7 @@ const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 
   
 export const swap = async (primaryWallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
-    outputCurrency: String, dispatch: Function) => {
+    outputCurrency: String, dispatch: Function, type: String) => {
   
     console.log('running swap with data: ', publicKey, inputAmount, inputCurrency, outputCurrency)
   
@@ -52,10 +55,10 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
             console.log('Got quote for swap');
             const amountInt = Math.round(quote.outAmount);
             const amountBigInt = BigInt(amountInt);
-            swapTransaction(primaryWallet, quote, publicKey, dispatch);
+            swapTransaction(primaryWallet, quote, publicKey, dispatch, type);
         })
         .catch(error => {
-          dispatch(setTransactionStatus('Fail'));
+          updateUI(dispatch, type, 'Fail')
           console.error('Error calling getSwapQuote retrying becuase error: ', error)
   });
   }
@@ -92,14 +95,15 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
     }
   }
 
-  const swapTransaction = async (primaryWallet: any, quoteData: any, receiverPubKey: String, dispatch: Function, wrapAndUnwrapSol = true) => {
+  const swapTransaction = async (primaryWallet: any, quoteData: any, receiverPubKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) => {
             
-    const swapTransactionSignature = await getJupiterSwapTransaction(primaryWallet, quoteData, receiverPubKey, dispatch)
+    const swapTransactionSignature = await getJupiterSwapTransaction(primaryWallet, quoteData, receiverPubKey, dispatch, type)
 
 
 };
 
-async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any, userPublicKey: String, dispatch: Function, wrapAndUnwrapSol = true) {
+async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any, 
+  userPublicKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) {
   try {
 
     window.Buffer = Buffer;
@@ -154,8 +158,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: transaction });
       
       console.log('Signed Transaction:', signedTransaction);
-      dispatch(setTransactionStatus('Signed'));
-
+      updateUI(dispatch, type, 'Signed')
       
       const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
       const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
@@ -173,19 +176,19 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
   
       if (sendTransactionResponse) {
         console.log(`Transaction succeeded: https://solscan.io/tx/${response}`);
-        dispatch(setTransactionStatus('Success')); // Update UI
+        updateUI(dispatch, type, 'Success')
       } else {
         console.log('Transaction failed due to block height expiration or other issue');
-        dispatch(setTransactionStatus('Fail')); // Update UI
+        updateUI(dispatch, type, 'Fail')
       }
 
     } else {
-      dispatch(setTransactionStatus('Fail')); // Update UI
+      updateUI(dispatch, type, 'Fail')
     }
   } catch (error) {
-    dispatch(setTransactionStatus('Fail')); // Update UI
-      console.error('Error with swap transaction');
-      return `Unable to confirm transaction txid: `  // Re-throw the error for further handling if necessary
+    updateUI(dispatch, type, 'Fail')
+    console.error('Error with swap transaction');
+    return `Unable to confirm transaction txid: `  // Re-throw the error for further handling if necessary
   }
 }
 
@@ -284,4 +287,16 @@ async function transactionSenderAndConfirmationWaiter({
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function updateUI(dispatch: any, type: String, status: string): void {
+
+  if (type == 'withdraw' ) {
+    dispatch(setEarnWithdrawTransactionStatus(status)); // Update UI
+  } else if (type == 'deposit') {
+    dispatch(setEarnDepositTransactionStatus(status)); // Update UI
+  } else {
+    dispatch(setWalletSwapTransactionStatus(status)); // Update UI
+  }
+
 }

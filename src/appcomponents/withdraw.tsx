@@ -13,7 +13,7 @@ import { setusdySolValue } from '../redux/userWalletData';
 import { swap } from '../helpers/swaps';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
-import { setShowEarnWithdrawPage, setTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';
+import { setShowEarnWithdrawPage, setEarnWithdrawTransactionStatus, setShouldShowBottomNav } from '../redux/userWalletData';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
@@ -46,7 +46,7 @@ function Withdraw() {
       initialInvestmentDate, principalHistory)
     const walletName = useSelector((state: any) => state.userWalletData.type);
     const [shouldNotify, setShouldNotify] = useState(false);
-    const transactionStatus = useSelector((state: any) => state.userWalletData.transactionStatus)
+    const transactionStatus = useSelector((state: any) => state.userWalletData.earnWithdrawTransactionStatus)
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
@@ -138,15 +138,13 @@ function Withdraw() {
       }
       }, [transactionStatus]);
 
-
-
       const handleMenuClick = () => {
         // Add your logic here for what happens when the menu is clicked
         dispatch(setShouldShowBottomNav(true))
         setreviewButtonClicked(false)
         setconfirmButtonActive(false);
         dispatch(setShowEarnWithdrawPage(false))
-        dispatch(setTransactionStatus(''))
+        dispatch(setEarnWithdrawTransactionStatus(''))
         setErrorMessage('')
       };
 
@@ -189,7 +187,7 @@ function Withdraw() {
           const inputAmount: number = convertToSmallestDenomination;
           const inputCurrency: String = 'usdySol';
           const outputCurrency: String = 'usdcSol';
-          const swapTX = await swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch);
+          const swapTX = await swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch, 'withdraw');
           
 
         } else {
