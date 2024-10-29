@@ -15,7 +15,7 @@ import { setShowSendPage, setShouldShowBottomNav,
 import usdcSol from '../assets/usdcSol.png';
 import usdtSol from '../assets/usdtSol.png';
 import pyusdSol from '../assets/pyusdSol.png';
-import eurcSol from '../assets/pyusdSol.png';
+import eurcSol from '../assets/eurcSol.png';
 import { requestNewSolanaTransaction2 } from '../helpers/web3Manager';
 import User from '../helpers/User';
 import {getUserTransactionsEnabled} from '../helpers/getUserData';
