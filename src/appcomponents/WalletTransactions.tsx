@@ -85,7 +85,10 @@ function WalletTransactions() {
     
                                 const data = instruction.data;
                                 const decodedData = bs58.decode(data);
-                                const rawAmount = decodedData.readUInt32LE(1);
+                                const dataView = new DataView(decodedData.buffer);
+                    
+                                // Read the 32-bit unsigned integer at offset 1 in little-endian format
+                                const rawAmount = dataView.getUint32(1, true); 
 
                                 if (isNaN(rawAmount)) {
                                     amount = 1.0

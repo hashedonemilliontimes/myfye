@@ -404,10 +404,10 @@ function Deposit() {
             
 
             const inputAmount: number = convertToSmallestDenomination;
-            const inputCurrency: String = currencySelected;
-            const outputCurrency: String = 'usdySol';
-            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch, 'deposit');
-
+            const inputCurrency: string = currencySelected;
+            const outputCurrency: string = 'usdySol';
+            console.log('signDeposit', primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
+            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
           } 
 
         }

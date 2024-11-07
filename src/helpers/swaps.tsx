@@ -65,8 +65,6 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
 
   async function getSwapQuote(microInputAmount: number, inputCurrencyType: String, outputMint: String = USDY_MINT_ADDRESS) {
 
-    console.log('getting swap quote with amount', microInputAmount, 'inputCurrencyType', inputCurrencyType, 'outputMint', outputMint)
-
     // Input mint
     let inputMintAddress = USDC_MINT_ADDRESS;
     if (inputCurrencyType === 'usdcSol') {
@@ -80,6 +78,8 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
     } else if (inputCurrencyType === 'eurcSol') {
       inputMintAddress = EURC_MINT_ADDRESS;
     }
+    console.log('getting swap quote with amount', microInputAmount, 'inputMint', inputMintAddress, 'outputMint', outputMint)
+    console.log(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=500`)
     
     try {
       const quoteResponse = await fetch(

@@ -5,7 +5,6 @@ import background4 from '../assets/background4.png';
 import background5 from '../assets/background5.png';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import { FirebaseError } from '@firebase/util';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import userIconGray2 from '../assets/userIconGray2.png';
 import { LanguageCodeProps } from '../helpers/languageManager';
@@ -166,8 +165,8 @@ export default function GetStarted() {
 
       } catch (error: any) {
           // Handle error during sign up
-          const errorCode = (error as FirebaseError).code;
-          const errorMessage = (error as FirebaseError).message;
+          const errorCode = (error as any).code;
+          const errorMessage = (error as any).message;
           console.log(errorCode)
           console.log(errorMessage)
           setErrorMessage('Invalid sign up try a different email');

@@ -300,8 +300,6 @@ function WithdrawStableCoin() {
 
     const errorLabelText = () => {
         if (errorMessage) {
-          const color = errorMessage === ('Check your wallet' || 
-          'Sending transaction' || 'Transaction Success!') ? '#2E7D32' : ('#FF3B30');
           return (
             <div>
 {withdrawalInProgress && ( 
