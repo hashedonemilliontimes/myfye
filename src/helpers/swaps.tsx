@@ -157,7 +157,6 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
 
       let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: transaction });
       
-      console.log('Signed Transaction:', signedTransaction);
       updateUI(dispatch, type, 'Signed')
       
       const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
