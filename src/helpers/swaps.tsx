@@ -14,6 +14,7 @@ import { setEarnWithdrawTransactionStatus,
   setEarnDepositTransactionStatus,
   setWalletSwapTransactionStatus
  } from '../redux/userWalletData'; // For managing UI
+ const web3 = require("@solana/web3.js");
 
 // Swapping pairs
 const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -163,7 +164,19 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
       const serializedTransaction = Buffer.from(signedVersionedTransaction.serialize());
 
+
+      // Simulation
+      /*
+      const simulationResult = await connection.simulateTransaction(signedVersionedTransaction);
+
+      if (simulationResult.value.err) {
+          console.log("Simulation failed:", simulationResult.value.err);
+      } else {
+          console.log("Simulation succeeded. Logs:", simulationResult.value.logs);
+      }*/
       
+
+
       const sendTransactionResponse = await transactionSenderAndConfirmationWaiter({
         connection,
         serializedTransaction,
@@ -172,7 +185,6 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
             lastValidBlockHeight: lastValidBlockHeight // Pass the last valid block height
           }
       });
-  
       if (sendTransactionResponse) {
         console.log(`Transaction succeeded: https://solscan.io/tx/${response}`);
         updateUI(dispatch, type, 'Success')
@@ -181,12 +193,13 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
         updateUI(dispatch, type, 'Fail')
       }
 
+
     } else {
       updateUI(dispatch, type, 'Fail')
     }
   } catch (error) {
     updateUI(dispatch, type, 'Fail')
-    console.error('Error with swap transaction');
+    console.error('Error with swap transaction', error);
     return `Unable to confirm transaction txid: `  // Re-throw the error for further handling if necessary
   }
 }
