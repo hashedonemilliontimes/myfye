@@ -78,7 +78,7 @@ const initialUserWalletData: UserWalletDataState = {
   usdtEthBalance: 0,
   busdEthBalance: 0,
   connectedWallets: [],
-  currentUserKYCVerified: false,
+  currentUserKYCVerified: true, // true for Development, false for Deployment
   currentUserFirstName: '',
   currentUserLastName: '',
   currentUserEmail: '',
