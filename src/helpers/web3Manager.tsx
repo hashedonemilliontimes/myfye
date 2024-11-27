@@ -616,9 +616,14 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
 
 
 
-  export const requestNewSolanaTransaction2 = async (payerPubKey: string, receiverPubKey: string, 
-    amountSmallestDenomination: number, currencySelected: string, 
-    primaryWallet: any, walletType: string = "Turnkey HD"): Promise<boolean> => {
+  export const requestNewSolanaTransaction2 = async (
+    payerPubKey: string, 
+    receiverPubKey: string, 
+    amountSmallestDenomination: number, 
+    currencySelected: string, 
+    primaryWallet: any, 
+    walletType: string = "Turnkey HD"
+  ): Promise<boolean> => {
     try {
   
       if (walletType == "Turnkey HD") {
@@ -747,9 +752,11 @@ const handleDepositSuccess = async (publicKey: string, amountSmallestDenominatio
       ).connector.getConnection();
   
       if (!connection) return false;
-  
-      const blockhashInfo = await connection.getRecentBlockhash();
-  
+      
+      const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+      const connection2 = new Connection(QUICKNODE_RPC);
+      const blockhashInfo = await connection2.getLatestBlockhash();
+
       const payer = new PublicKey(payerPubKey);
       const senderPublicKey = new PublicKey(payerPubKey);
       console.log('receiverPubKey', receiverPubKey)
