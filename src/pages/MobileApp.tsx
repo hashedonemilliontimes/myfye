@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { DynamicContextProvider, DynamicWidget, useDynamicContext, useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { SolanaWalletConnectors } from "@dynamic-labs/solana";
-import myfyelogo from '../assets/MyFyeLogo1.png';
+import myfyelogo from '../assets/MyFyeLogo2.png';
 import Deposit from '../appcomponents/deposit';
 import Withdraw from '../appcomponents/withdraw';
 import { HandleSolanaConnection } from '../dynamichelpers/HandleNewSolanaConnection';
@@ -626,7 +626,7 @@ marginTop: '35px',
 
   </>
 ) : (<>
-      <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', marginTop: '60px' }}>
+      <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', marginTop: '40px' }}>
 
         <div>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -642,11 +642,48 @@ marginTop: '35px',
     );
   } else {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', 
-      flexDirection: 'column', justifyContent: 'center', height: '100vh' }}>
-        <img style={{width: '80vw', marginBottom: '50px', marginTop: '-170px', maxWidth: '300px'}} src={myfyelogo} alt="My Fye Logo" />
-        <DynamicWidget />
-      </div>
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    height: '100vh',
+    background: 'linear-gradient(to top, #4CD964, white 14%)', // Green to white gradient
+  }}
+>
+  <img
+    style={{
+      width: '80vw',
+      marginBottom: '50px',
+      marginTop: '-200px',
+      maxWidth: '300px',
+    }}
+    src={myfyelogo}
+    alt="My Fye Logo"
+  />
+
+
+<div>
+  <div style={{color: '#447E26', 
+          fontSize: '25px',
+          fontWeight: 'bold',
+          marginTop: '-120px'}}>Your Money, Your Phone.<br/>No Bank Needed.</div>
+<div style={{
+    color: '#333333',
+    fontSize: '20px',
+    marginTop: '15px'
+}}>
+
+    Hold <span style={{ fontWeight: 'bold' }}>US Dollars</span>, <span style={{ fontWeight: 'bold' }}>Euros</span>, <br />
+    <span style={{ fontWeight: 'bold' }}> US Treasury Bonds</span>,
+    and <br /><span style={{ fontWeight: 'bold' }}>Bitcoin</span> directly on your phone.
+</div>
+</div>
+<div style={{marginTop: '40px'}}>
+  <DynamicWidget />
+  </div>
+</div>
     );
   }
 }
