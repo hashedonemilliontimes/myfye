@@ -62,7 +62,7 @@ function WithdrawStableCoin() {
         if (showWithdrawStablecoinPage) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-100vh'); // Move the menu off-screen
+          setMenuPosition('-110vh'); // Move the menu off-screen
         }
       }, [showWithdrawStablecoinPage]);
     
@@ -387,7 +387,7 @@ function WithdrawStableCoin() {
       left: 0,            // Align to the right of the viewport
       padding: '15px',
       cursor: 'pointer',
-      zIndex: 7    
+      zIndex: 7,
     }}>
 
             <img style={{width: 'auto', height: '35px', background: 'white'}} src={ showWithdrawStablecoinPage ? (

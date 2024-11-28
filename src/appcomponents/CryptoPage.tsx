@@ -5,24 +5,24 @@ import backButton from '../assets/backButton3.png';
 import Deposit from '../appcomponents/deposit';
 import Withdraw from '../appcomponents/withdraw';
 import HoldingsPortfolio from '../appcomponents/holdingsPortfolio';
-import PieChartComponent from '../components/dashboardTiles/pieChart';
-import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
-import { setShouldShowBottomNav, setShowEarnPage,
+import PieChartComponent from './cryptoPieChart';
+import myfyeCryptoGreen from '../assets/myfyeCryptoGreen.png';
+import { setShouldShowBottomNav, setShowCryptoPage,
   setShowEarnWithdrawPage, setShowEarnDepositPage,
   setDepositWithdrawProductType } from '../redux/userWalletData';
 import { useDispatch } from 'react-redux';
-import InvestmentValue from '../appcomponents/investmentValue';
 import history from '../assets/history.png';
 import EarnTransactions from './EarnTransactions';
 import PortfolioPopup from './PortfolioBreakdown';
 
-function EarnPage() {
-    const showMenu = useSelector((state: any) => state.userWalletData.showEarnPage);
+function CryptoPage() {
+    const showMenu = useSelector((state: any) => state.userWalletData.showCryptoPage);
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [currencySelected, setcurrencySelected] = useState('');
     const dispatch = useDispatch();
     const [menuPosition, setMenuPosition] = useState('-150vh'); 
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+    const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
 
     useEffect(() => {
         if (showMenu) {
@@ -40,7 +40,7 @@ function EarnPage() {
           toggleShowTransactionHistory()
         } else {
           if (showMenu) {
-            dispatch(setShowEarnPage(false))
+            dispatch(setShowCryptoPage(false))
           }
         }
         
@@ -64,13 +64,13 @@ function EarnPage() {
     const handleWithdrawPageClick = () => {
       dispatch(setShouldShowBottomNav(false))
       dispatch(setShowEarnWithdrawPage(true))
-      dispatch(setDepositWithdrawProductType('Earn'))
+      dispatch(setDepositWithdrawProductType('Crypto'))
     };
 
     const handleDepositPageClick = () => {
       dispatch(setShouldShowBottomNav(false))
       dispatch(setShowEarnDepositPage(true))
-      dispatch(setDepositWithdrawProductType('Earn'))
+      dispatch(setDepositWithdrawProductType('Crypto'))
     };
       
     return (
@@ -102,6 +102,9 @@ function EarnPage() {
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 3
       }}>
+
+
+
 
         {!showTransactionHistory ? (
 <div>
@@ -135,7 +138,7 @@ function EarnPage() {
 
 
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeEarnGreen}/>
+<img style={{ width: '180px', height: 'auto', marginTop: '15px'}}src={myfyeCryptoGreen}/>
 </div>
 
 
@@ -145,7 +148,9 @@ function EarnPage() {
      display: 'flex', alignItems: 'center', }}>
     $ <span style={{ fontSize: '35px' }}>
       
-    <InvestmentValue/>
+    <div>
+    {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+  </div>
 
     </span>
 
@@ -228,8 +233,8 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
 <div>
 <div style={{marginTop: '15px', textAlign: 'center', 
   fontSize: '25px'}}>
-              {selectedLanguageCode === 'en' && `Earn Portfolio`}
-              {selectedLanguageCode === 'es' && `Portafolio`}
+              {selectedLanguageCode === 'en' && `Crypto Portfolio`}
+              {selectedLanguageCode === 'es' && `Crypto Portafolio`}
   </div>
 
     <div style={{
@@ -242,16 +247,15 @@ justifyContent: 'space-around', width: '85vw'}} onClick={fadePieChartOpacity}>
 <div>
 
 
-<PortfolioPopup/>
 
 <div>
-<a href="https://ondo.finance/usdy" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
+<a href="https://www.investopedia.com/terms/b/bitcoin.asp" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none'}}>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '15px'}}>
 <div style={{borderRadius: '10px', padding: '10px', 
 color: '#ffffff', fontWeight: 'bold', fontSize: '16px', 
 backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
-                {selectedLanguageCode === 'en' && `Learn About USDY`}
-                {selectedLanguageCode === 'es' && `Aprender Acerca USDY`}
+                {selectedLanguageCode === 'en' && `Learn About Bitcoin`}
+                {selectedLanguageCode === 'es' && `Aprender Acerca Bitcoin`}
 </div>
 </div>
 </a>
@@ -270,7 +274,8 @@ backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
         ) : (
 
           <div style={{marginTop: '50px'}}>
-<EarnTransactions/>
+            {/* replace with crypto transactions*/}
+<EarnTransactions/> 
 
 
           </div>
@@ -286,4 +291,4 @@ backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
         </div>
     )
 }
-export default EarnPage;
+export default CryptoPage;

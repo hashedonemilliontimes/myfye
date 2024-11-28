@@ -22,7 +22,7 @@ const USDT_MINT_ADDRESS = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB';
 const USDY_MINT_ADDRESS = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
 const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
 const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
-
+const BTC_MINT_ADDRESS = 'cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij';
   
   type TransactionSenderAndConfirmationWaiterArgs = {
     connection: Connection;
@@ -49,6 +49,8 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
       output_mint = USDC_MINT_ADDRESS
     } else if (outputCurrency == 'eurcSol') {
       output_mint = EURC_MINT_ADDRESS
+    } else if (outputCurrency == 'btcSol') {
+      output_mint = BTC_MINT_ADDRESS
     }
   
     getSwapQuote(inputAmount, inputCurrency, output_mint)
@@ -78,6 +80,8 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
       inputMintAddress = PYUSD_MINT_ADDRESS;
     } else if (inputCurrencyType === 'eurcSol') {
       inputMintAddress = EURC_MINT_ADDRESS;
+    } else if (inputCurrencyType === 'btcSol') {
+      inputMintAddress = BTC_MINT_ADDRESS;
     }
     console.log('getting swap quote with amount', microInputAmount, 'inputMint', inputMintAddress, 'outputMint', outputMint)
     console.log(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=500`)
@@ -173,9 +177,8 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
           console.log("Simulation failed:", simulationResult.value.err);
       } else {
           console.log("Simulation succeeded. Logs:", simulationResult.value.logs);
-      }*/
-      
-
+      }
+      */
 
       const sendTransactionResponse = await transactionSenderAndConfirmationWaiter({
         connection,
@@ -192,8 +195,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
         console.log('Transaction failed due to block height expiration or other issue');
         updateUI(dispatch, type, 'Fail')
       }
-
-
+      
     } else {
       updateUI(dispatch, type, 'Fail')
     }
@@ -204,31 +206,26 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
   }
 }
 
-
 async function transactionSenderAndConfirmationWaiter({
   connection,
   serializedTransaction,
   blockhashWithExpiryBlockHeight,
 }: TransactionSenderAndConfirmationWaiterArgs): Promise<VersionedTransactionResponse | null> {
-  const txid = await connection.sendRawTransaction(
-    serializedTransaction,
-    SEND_OPTIONS
-  );
+  console.log('Preparing to send transaction...');
+  const txid = await connection.sendRawTransaction(serializedTransaction, SEND_OPTIONS);
+
+  console.log('Transaction sent, txid:', txid);
 
   const controller = new AbortController();
   const abortSignal = controller.signal;
 
   const abortableResender = async () => {
-    while (true) {
-      await wait(2_000);
-      if (abortSignal.aborted) return;
+    while (!abortSignal.aborted) {
       try {
-        await connection.sendRawTransaction(
-          serializedTransaction,
-          SEND_OPTIONS,
-        );
-      } catch (e) {
-        console.warn(`Failed to resend transaction: ${e}`);
+        await wait(2_000);
+        await connection.sendRawTransaction(serializedTransaction, SEND_OPTIONS);
+      } catch (e: any) {
+        console.warn(`Resending transaction failed: ${e.message}`);
       }
     }
   };
@@ -236,9 +233,9 @@ async function transactionSenderAndConfirmationWaiter({
   try {
     abortableResender();
     const lastValidBlockHeight =
-      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 150;
+      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 60;
 
-    // this would throw TransactionExpiredBlockheightExceededError
+    console.log('Starting transaction confirmation...');
     await Promise.race([
       connection.confirmTransaction(
         {
@@ -248,54 +245,60 @@ async function transactionSenderAndConfirmationWaiter({
           abortSignal,
         },
         "confirmed"
-      ),
-      new Promise(async (resolve) => {
-        // in case ws socket died
+      ).catch((e) => {
+        console.error('Error during confirmTransaction:', e);
+        throw e;
+      }),
+      new Promise(async (resolve, reject) => {
         while (!abortSignal.aborted) {
           await wait(2_000);
           const tx = await connection.getSignatureStatus(txid, {
             searchTransactionHistory: false,
           });
           if (tx?.value?.confirmationStatus === "confirmed") {
+            console.log('Transaction confirmed via polling.');
             resolve(tx);
+            return;
           }
         }
+        reject(new Error('Transaction polling timeout'));
       }),
     ]);
   } catch (e) {
     if (e instanceof TransactionExpiredBlockheightExceededError) {
-      // we consume this error and getTransaction would return null
-      console.error('TransactionExpiredBlockheightExceededError')
+      console.error('TransactionExpiredBlockheightExceededError:', e);
       return null;
     } else {
-      // invalid state from web3.js
-      console.error('error', e)
+      console.error('Unknown error during confirmation:', e);
       throw e;
     }
   } finally {
     controller.abort();
   }
 
-  // in case rpc is not synced yet, we add some retries
-  const response = promiseRetry(
+  console.log('Fetching transaction details...');
+  const response = await promiseRetry(
     async (retry) => {
-      const response = await connection.getTransaction(txid, {
+      const transaction = await connection.getTransaction(txid, {
         commitment: "confirmed",
         maxSupportedTransactionVersion: 0,
       });
-      if (!response) {
-        retry(response);
+      if (!transaction) {
+        console.warn('Transaction not found, retrying...');
+        retry(transaction);
       }
-      return response;
+      return transaction;
     },
     {
       retries: 7,
-      minTimeout: 1e3,
+      minTimeout: 1_000,
     }
   );
 
+  console.log('Transaction response:', response);
   return response;
 }
+
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -285,7 +285,7 @@ function PayPage() {
         padding: '15px',
         minHeight: '130vh',
         backgroundColor: 'white',
-        width: '92vw',
+        width: '94vw',
         transition: 'top 0.5s ease', // Animate the left property
         zIndex: 2
       }}>

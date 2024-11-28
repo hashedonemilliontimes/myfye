@@ -23,6 +23,7 @@ interface UserWalletDataState {
   eurcSolBalance: number,
   busdSolBalance: number,
   usdySolBalance: number,
+  btcSolBalance: number,
   usdcEthBalance: number,
   usdtEthBalance: number,
   busdEthBalance: number,
@@ -41,6 +42,7 @@ interface UserWalletDataState {
   showDepositStablecoinPage: boolean,
   showBanxaPopUp: boolean,
   showEarnPage: boolean,
+  showCryptoPage: boolean,
   showWalletPage: boolean,
   showWalletDepositPage: boolean,
   showAccountHistory: boolean,
@@ -55,7 +57,8 @@ interface UserWalletDataState {
   selectedContact: User | string,
   recentlyUsedSolanaAddresses: string[],
   showContactPopup: boolean,
-  selectedLanguageCode: string
+  selectedLanguageCode: string,
+  depositWithdrawProductType: string;
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -72,6 +75,7 @@ const initialUserWalletData: UserWalletDataState = {
   usdtSolBalance: 0,
   pyusdSolBalance: 0,
   eurcSolBalance: 0,
+  btcSolBalance: 0,
   usdySolBalance: 0,
   busdSolBalance: 0,
   usdcEthBalance: 0,
@@ -94,6 +98,7 @@ const initialUserWalletData: UserWalletDataState = {
   showWithdrawStablecoinPage: false,
   showBanxaPopUp: false,
   showDepositStablecoinPage: false,
+  showCryptoPage: false,
   showEarnPage: false,
   showWalletPage: false,
   showWalletDepositPage: false,
@@ -110,7 +115,8 @@ const initialUserWalletData: UserWalletDataState = {
   recentlyUsedSolanaAddresses: [],
   showContactPopup: false,
   selectedLanguageCode: '',
-  currentUserID: ''
+  currentUserID: '',
+  depositWithdrawProductType: 'Earn'
 };
 
 
@@ -176,6 +182,9 @@ export const userWalletDataSlice = createSlice({
     },
     seteurcSolValue: (state, action: PayloadAction<number>) => {
       state.eurcSolBalance = action.payload;
+    },
+    setbtcSolValue: (state, action: PayloadAction<number>) => {
+      state.btcSolBalance = action.payload;
     },
     setusdySolValue: (state, action: PayloadAction<number>) => {
       state.usdySolBalance = action.payload;
@@ -254,6 +263,9 @@ export const userWalletDataSlice = createSlice({
   setShowEarnPage: (state, action: PayloadAction<boolean>) => {
     state.showEarnPage = action.payload;
   },
+  setShowCryptoPage: (state, action: PayloadAction<boolean>) => {
+    state.showCryptoPage = action.payload;
+  },
   setShowWalletPage: (state, action: PayloadAction<boolean>) => {
     state.showWalletPage = action.payload;
   },
@@ -302,7 +314,9 @@ export const userWalletDataSlice = createSlice({
   setSelectedLanguageCode: (state, action: PayloadAction<string>) => {
     state.selectedLanguageCode= action.payload;
   },
-
+  setDepositWithdrawProductType: (state, action: PayloadAction<string>) => {
+    state.depositWithdrawProductType= action.payload;
+  },
   
   
   },
@@ -315,6 +329,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   settotalInvestingValue, mergePrincipalInvestedHistory,
   setusdcSolValue, setusdtSolValue, setpyusdSolValue, 
   seteurcSolValue, setbusdSolValue, setusdySolValue,
+  setbtcSolValue,
   setusdcEthValue, setusdtEthValue, setbusdEthValue, 
   addConnectedWallets, setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
@@ -323,7 +338,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
    setUpdatingBalance,
   setShouldShowBottomNav, setShowPayPage, setShowSendPage,
   setShowWithdrawStablecoinPage, setShowBanxaPopUp,
-  setShowDepositStablecoinPage, setShowEarnPage,
+  setShowDepositStablecoinPage, setShowEarnPage, setShowCryptoPage,
   setShowWalletPage, setShowWalletDepositPage, setShowAccountHistory,
   setNewUserHasPreviousBalance, setShowRequestPage,
   setShowProfileMenu, setShowEarnWithdrawPage,
@@ -331,7 +346,7 @@ export const { setCrypto, setAllCryptos, setWalletConnected,
   setPriceOfUSDYinUSDC, setContacts, clearContacts, 
   setSelectedContact, setRecentlyUsedSolanaAddresses, 
   setAllUsers, setShowContactPopup, setSelectedLanguageCode,
-  setcurrentUserID
+  setcurrentUserID, setDepositWithdrawProductType
   
 } = userWalletDataSlice.actions;
 

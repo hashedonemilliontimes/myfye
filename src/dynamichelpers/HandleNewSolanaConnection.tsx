@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setWalletConnected, setWalletType, setCrypto, setWalletPubKey } from '../redux/userWalletData';
 import { initializePhantomConnection, fetchUSDCBalance, 
   fetchSolBalance, fetchUSDTBalance, fetchUSDYBalance,
-  fetchPYUSDBalance, fetchEURCBalance } from '../helpers/web3Manager';
+  fetchPYUSDBalance, fetchEURCBalance, fetchBTCBalance } from '../helpers/web3Manager';
 import crypto from '../helpers/cryptoDataType';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { Buffer } from 'buffer';
@@ -25,6 +25,8 @@ export const HandleSolanaConnection = async (address: string, walletType: string
       const pyusdbalanceNative: number = await fetchPYUSDBalance(address);
 
       const eurcbalanceNative: number = await fetchEURCBalance(address);
+
+      const btcbalanceNative: number = await fetchBTCBalance(address);
       /*
       const solanabalanceNative: number = await fetchSolBalance(address);
       const solanabalanceUSD: number = (solanabalanceNative*18.0); // TO DO get realtime price
@@ -61,7 +63,8 @@ export const HandleSolanaConnection = async (address: string, walletType: string
         usdt: usdtbalanceNative,
         usdy: usdybalanceNative,
         pyusd: pyusdbalanceNative,
-        eurc: eurcbalanceNative
+        eurc: eurcbalanceNative,
+        btc: btcbalanceNative
       };
         
       } catch (err) {

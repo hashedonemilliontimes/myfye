@@ -9,7 +9,7 @@ import PieChartComponent from '../components/dashboardTiles/pieChart';
 import roadImage1 from '../assets/roadImage1.png'
 import { saveNewWithdrawal } from '../helpers/saveNewWithdrawal';
 import { getFunctions } from 'firebase/functions';
-import { setusdySolValue } from '../redux/userWalletData';
+import { setusdySolValue, setbtcSolValue } from '../redux/userWalletData';
 import { swap } from '../helpers/swaps';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import LoadingAnimation from '../components/loadingAnimation';
@@ -40,6 +40,7 @@ function Withdraw() {
     const initialInvestmentDate = useSelector((state: any) => state.userWalletData.initialInvestmentDate);
     const principalHistory = useSelector((state: any) => state.userWalletData.principalInvestedHistory);
     const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+    const depositWithdrawProductType = useSelector((state: any) => state.userWalletData.depositWithdrawProductType);
     const navigate = useNavigate();
     const currentTimeInSeconds = Date.now()/1000;
     const currentPortfolioValue = valueAtTime(currentTimeInSeconds, initialPrincipal, 
@@ -48,6 +49,7 @@ function Withdraw() {
     const [shouldNotify, setShouldNotify] = useState(false);
     const transactionStatus = useSelector((state: any) => state.userWalletData.earnWithdrawTransactionStatus)
     const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+    const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     useEffect(() => {
@@ -68,13 +70,17 @@ function Withdraw() {
 
       //default to 100% cash out
       useEffect(() => {
-        setWithdrawal(`${usdyBalance}`)
+        if (depositWithdrawProductType == 'Earn') {
+          setWithdrawal(`${usdyBalance}`)
+        } else if (depositWithdrawProductType == 'Crypto') {
+          setWithdrawal(`${btcSolBalance}`)
+        }
         setfeeAmount(0.1)
         setWithdrawalButtonActive(true)
         if (usdyBalance < 0.0001) {
           setWithdrawalButtonActive(false)
         }
-      }, [usdyBalance]);
+      }, [usdyBalance, btcSolBalance]);
 
       useEffect(() => {
         if (showMenu) {
@@ -113,7 +119,14 @@ function Withdraw() {
           const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
           const withdrawalToNumber = Number(cleanedWithdrawal);
           handleWithdrawSuccess(withdrawalToNumber)
-          dispatch(setusdySolValue(0.0));
+
+          if (depositWithdrawProductType == 'Earn') {
+            dispatch(setusdySolValue(0.0));
+          } else if (depositWithdrawProductType == 'Crypto') {
+            dispatch(setbtcSolValue(0.0));
+          }
+
+          
 
           setTimeout(() => {
             setErrorMessage('')
@@ -170,11 +183,25 @@ function Withdraw() {
         setErrorMessageColor('#60A05B')
         setWithdrawalInProgress(true)
 
-        if (!isNaN(withdrawalToNumber) && withdrawalToNumber >= 0.5 && 
-        (withdrawalToNumber <= usdyBalance)) {
-
+        if (!isNaN(withdrawalToNumber)) {
+          
+          if (depositWithdrawProductType == 'Earn' && withdrawalToNumber < 0.5) {
+            console.log('funds', withdrawalToNumber)
+            setErrorMessage('Insufficient Funds')
+            setErrorMessageColor('#000000')
+            console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
+            setWithdrawalInProgress(false)
+          
+          } else {
+          
+          
           // take off a small amount because USDY changes 
-          const convertToSmallestDenomination = Math.round(usdyBalance * 1e6);
+          let convertToSmallestDenomination = 0;
+          if (depositWithdrawProductType == 'Earn') {
+            convertToSmallestDenomination =  Math.round(usdyBalance * 1e6);
+          } else if (depositWithdrawProductType == 'Crypto') {
+            convertToSmallestDenomination =  Math.round(btcSolBalance * 1e8);
+          }
 
           setShouldNotify(true)
           /*
@@ -185,11 +212,16 @@ function Withdraw() {
           setShouldNotify(false)
 
           const inputAmount: number = convertToSmallestDenomination;
-          const inputCurrency: String = 'usdySol';
+          let inputCurrency: String = '';
+          if (depositWithdrawProductType == 'Earn') {
+            inputCurrency = 'usdySol'
+          } else if (depositWithdrawProductType == 'Crypto') {
+            inputCurrency = 'btcSol'
+          }
           const outputCurrency: String = 'usdcSol';
           const swapTX = await swap(primaryWallet, publicKey, inputAmount, inputCurrency, outputCurrency, dispatch, 'withdraw');
           
-
+        }
         } else {
           setErrorMessage('Insufficient Funds')
           setErrorMessageColor('#000000')
@@ -219,7 +251,7 @@ function Withdraw() {
           time: new Date().toISOString(),
           amount: withdrawalToNumber,
           currencySelected: 'usdySol',
-          publicKey: publicKey
+          publicKey: publicKey,
         });
 
         if (docRef) {
@@ -337,7 +369,22 @@ alignItems: 'center'}}>
 <div style={{fontSize: '18px', color: 'black'}}>
 {selectedLanguageCode === 'en' && `Account Value: `}
 {selectedLanguageCode === 'es' && `Valor de la cuenta: `}
-$ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
+
+
+
+{ depositWithdrawProductType === 'Crypto' && (
+        <span>
+$ {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+        </span>
+      )}
+
+      { depositWithdrawProductType === 'Earn' && (
+        <span>
+$ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}
+        </span>
+      )}
+
+</div>
 </div>
       
 <div style={{marginTop: '20px', display: 'flex'}}>
@@ -361,7 +408,21 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}</div>
       <div style={{display: 'flex', flexDirection: 'row', marginTop: '90px',
       alignItems: 'center', justifyContent:'center'}}> 
       <div style={{marginLeft: '20px'}}>$ </div>
+
+
+      { depositWithdrawProductType === 'Crypto' && (
+        <span>
+<div style={{ fontSize: '36px'}}>{((btcSolBalance * 95000)-feeAmount).toFixed(4).toLocaleString()}</div>
+        </span>
+      )}
+
+      { depositWithdrawProductType === 'Earn' && (
+        <span>
       <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)-feeAmount).toFixed(4).toLocaleString()}</div>
+        </span>
+      )}
+
+
       </div>
       )}
       </div>

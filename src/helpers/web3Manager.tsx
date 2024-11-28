@@ -109,6 +109,40 @@ export const fetchUSDCBalance = async (address: string): Promise<number> => {
   }
 };
 
+export const fetchBTCBalance = async (address: string): Promise<number> => {
+  
+  const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+  const connection = new Connection(QUICKNODE_RPC);
+  
+  // The mint address for USDC on Solana's mainnet
+  const btcMintAddress = "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij";
+
+  try {
+    const publicKey = new PublicKey(address);
+
+    // Fetch all SPL token accounts owned by the wallet address
+    const parsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+      programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') // SPL Token program ID
+    });
+
+    for (const account of parsedTokenAccounts.value) {
+      const mintAddress = account.account.data.parsed.info.mint;
+
+      // Check if the mint address matches that of USDC
+      if (mintAddress === btcMintAddress) {
+        const usdcBalance = account.account.data.parsed.info.tokenAmount.uiAmount;
+        // console.log(`Balance of ${address} got : ${usdcBalance} USDC `);
+        return usdcBalance;
+      }
+    }
+
+    return 0;
+  } catch (err) {
+    console.error(`Failed to fetch balance: ${err}`);
+    return 0;
+  }
+};
+
 export const fetchPYUSDBalance = async (address: string): Promise<number> => {
   
   const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';

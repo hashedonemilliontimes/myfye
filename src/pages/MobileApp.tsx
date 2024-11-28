@@ -12,13 +12,14 @@ import InvestmentPercentageChange from '../appcomponents/investmentPercentageGai
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue, setbusdSolValue, 
   setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
-  addConnectedWallets, setShowEarnPage, setShowRequestPage,
+  addConnectedWallets, setShowEarnPage, setShowCryptoPage, setShowRequestPage,
   setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
   setcurrentUserEmail, setusdySolValue, setpyusdSolValue,
-  seteurcSolValue, setShowSendPage,
+  seteurcSolValue, setShowSendPage, 
   setShowWalletDepositPage, setShouldShowBottomNav, 
   setShowWithdrawStablecoinPage, setShowWalletPage,
-clearContacts, setcurrentUserID} from '../redux/userWalletData';
+clearContacts, setcurrentUserID,
+setbtcSolValue, setDepositWithdrawProductType} from '../redux/userWalletData';
 import { getUserData, getAllDynamicUsers, getUserContacts } from '../helpers/getUserData';
 import { getUSDYPriceQuote } from '../helpers/getUserData';
 import wallet from '../helpers/walletDataType';
@@ -32,8 +33,10 @@ import timerImage from '../assets/timer.png';
 import WalletPage from '../appcomponents/WalletPage';
 import WalletDepositPage from '../appcomponents/myWalletComponents/WalletDeposit';
 import myfyeEarn from '../assets/myfyeEarn.png';
+import myfyeCrypto from '../assets/myfyeCrypto.png';
 import myfyeWallet from '../assets/myfyeWallet2.png';
 import EarnPage from '../appcomponents/EarnPage';
+import CryptoPage from '../appcomponents/CryptoPage';
 import userImage from '../assets/user.png';
 import ProfileMenu from '../appcomponents/menu';
 import Support from '../appcomponents/support';
@@ -60,6 +63,7 @@ function WebAppInner() {
   const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
   const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
   const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
+  const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
   const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
   const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
@@ -136,6 +140,7 @@ function WebAppInner() {
           dispatch(setusdySolValue(Number(balances.usdy)));
           dispatch(setpyusdSolValue(Number(balances.pyusd)));
           dispatch(seteurcSolValue(Number(balances.eurc)));
+          dispatch(setbtcSolValue(Number(balances.btc)));
           
           console.log('got balances: ', balances)
         }
@@ -213,28 +218,38 @@ function WebAppInner() {
   const handleSendPageClick = () => {
     dispatch(setShouldShowBottomNav(false));
     dispatch(setShowSendPage(true));
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   const handleRequestPageClick = () => {
     dispatch(setShouldShowBottomNav(false));
     dispatch(setShowRequestPage(true));
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   const handleEarnPageClick = () => {
     dispatch(setShowEarnPage(true))
-    
+    dispatch(setDepositWithdrawProductType('Earn'))
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  };
+
+  const handleCryptoPageClick = () => {
+    dispatch(setShowCryptoPage(true))
+    dispatch(setDepositWithdrawProductType('Crypto'))
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   const handleWalletDepositPageClick = () => {
     dispatch(setShouldShowBottomNav(false))
     dispatch(setShowWalletDepositPage(true))
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   const handleWithdrawStableCoinClick = () => {
     // Add your logic here for what happens when the menu is clicked
     dispatch(setShouldShowBottomNav(false));
     dispatch(setShowWithdrawStablecoinPage(true))
-    
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
 
@@ -246,7 +261,7 @@ function WebAppInner() {
     return (
 
       
-        <div style={{overflow: 'hidden', backgroundColor: '#ffffff',}}>
+        <div style={{overflowX: 'hidden', backgroundColor: '#ffffff',}}>
 
 {userDataLoaded ? (
   <>
@@ -255,11 +270,16 @@ function WebAppInner() {
   <SendPage/>
   <RequestPage/>
   <EarnPage/>
+  <CryptoPage/>
   <WalletPage/>
   <WalletDepositPage/>
   <AccountHistory/>
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
+
+<Deposit/>
+<Withdraw/>
+
   
   {ANNOUNCMENT_MESSAGE && (
   <div style={{textAlign: 'center', fontSize: '14px', 
@@ -295,16 +315,12 @@ width: '70vw', maxWidth: '550px', color: '#222222'
 
 
 
-
-
-  <div style={{overflow: 'hidden'}}>
 <div style={{ display: 'flex',  
           alignItems: 'center', 
-          height: window.innerHeight < 620 ? 'calc(100vh - 170px)' : 'calc(100vh - 170px)',
         flexDirection: 'column', 
         color: '#222222', 
         justifyContent: 'space-around',
-        overflow: 'hidden' }}>
+        overflowX: 'hidden', }}>
 
 
 <div style={{
@@ -313,7 +329,8 @@ width: '70vw', maxWidth: '550px', color: '#222222'
   boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '16px',
-  width: '90vw'
+  width: '90vw',
+  marginTop: '15px'
 }}>
 <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px'  }}>
@@ -426,7 +443,8 @@ alignItems: 'center',
   boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
   padding: '10px',
   paddingBottom: '16px',
-  width: '90vw'
+  width: '90vw',
+  marginTop: '15px',
 }}>
        <div style={{ display: 'flex',  alignItems: 'center', 
         flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px' }}>
@@ -480,7 +498,82 @@ alignItems: 'center',
 
 
 
-<div style={{display: 'flex', justifyContent: 'space-around', width: '90vw'}}>
+
+<div style={{
+  background: '#ffffff',
+  borderRadius: '20px',
+  boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.2), -2px 5px 15px rgba(0, 0, 0, 0.2)',
+  padding: '10px',
+  paddingBottom: '16px',
+  width: '90vw',
+  marginTop: '15px',
+}}>
+<div style={{ display: 'flex',  alignItems: 'center', 
+        flexDirection: 'column', color: '#222222', gap: window.innerHeight < 620 ? '1px' : '10px' }}>
+<img style={{ width: '180px', height: 'auto'}}src={myfyeCrypto}/>
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',}}>
+
+    <label htmlFor="deposit" style={{ fontSize: '20px', 
+     display: 'flex', alignItems: 'center', }}>
+    $ <span style={{ fontSize: '35px' }}>
+
+    <div>
+    {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+  </div>
+
+    </span>
+</label>
+
+   
+   </div>
+
+
+<div>
+
+<div style={{display: 'flex', alignItems: 'center', 
+                justifyContent: 'center',
+                marginTop: '0px'}}>
+            <div style={{
+           color: '#ffffff', 
+           background: '#2E7D32', // gray '#999999', 
+           borderRadius: '10px', 
+           border: '2px solid #2E7D32', 
+           fontWeight: 'bold',
+           height: '40px', 
+           width: '210px',
+           display: 'flex',        // Makes this div also a flex container
+           justifyContent: 'center', // Centers the text horizontally inside the button
+           alignItems: 'center',// Centers the text vertically inside the button
+           cursor: 'pointer',
+           fontSize: '20px',     
+       }} onClick={handleCryptoPageClick}>
+            {selectedLanguageCode === 'en' && `View Portfolio`}
+            {selectedLanguageCode === 'es' && `Ver Portafolio`}
+       </div>
+       </div>
+       </div>
+       </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style={{display: 'flex', 
+justifyContent: 'space-around', 
+width: '90vw',
+marginTop: '35px',
+  marginBottom: '120px'
+}}>
   <div style={{
       color: '#ffffff', 
       background: '#2E7D32', // gray '#999999', 
@@ -511,7 +604,9 @@ alignItems: 'center',
       alignItems: 'center',// Centers the text vertically inside the button
       cursor: 'pointer',
       fontSize: '20px'     
-    }} onClick={handleRequestPageClick}>
+    }} 
+    onClick={handleRequestPageClick}>
+      
       {selectedLanguageCode === 'en' && `Request`}
       {selectedLanguageCode === 'es' && `Pedido`}
     </div>
@@ -524,8 +619,7 @@ alignItems: 'center',
                         </div>
                         </div>
 
-
-</div>) : (<div>
+) : (<div>
 <PersonaKYC/>
 </div>)}
 

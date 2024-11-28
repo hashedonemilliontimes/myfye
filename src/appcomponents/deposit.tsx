@@ -24,6 +24,7 @@ import FailImage from '../assets/FailImage.png';
 import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
 import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
+
 function Deposit() {
 
     const MINIMUM_DEPOSIT_VALUE = 1.0
@@ -50,8 +51,8 @@ function Deposit() {
     const busdEthBalance = useSelector((state: any) => state.userWalletData.busdEthBalance);
     const usdySolBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
     const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
+    const depositWithdrawProductType = useSelector((state: any) => state.userWalletData.depositWithdrawProductType);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
-
     const [usdyQuoteOutput, setusdyQuoteOutput] = useState(0); 
     
     const walletName = useSelector((state: any) => state.userWalletData.type);
@@ -154,7 +155,8 @@ function Deposit() {
             setErrorMessage('')
             dispatch(setShowEarnDepositPage(false)) 
             //dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
-            dispatch(setusdySolValue(usdySolBalance+usdyQuoteOutput))
+            
+
           }, 3000);
       }).catch((error) => {
           console.error(error);
@@ -405,7 +407,17 @@ function Deposit() {
 
             const inputAmount: number = convertToSmallestDenomination;
             const inputCurrency: string = currencySelected;
-            const outputCurrency: string = 'usdySol';
+            let outputCurrency: string = '';
+
+            console.log('Current depositWithdrawProductType:', depositWithdrawProductType);
+
+
+            if (depositWithdrawProductType == 'Earn') {
+              outputCurrency = 'usdySol'
+            } else if (depositWithdrawProductType == 'Crypto') {
+              outputCurrency = 'btcSol'
+            }
+
             console.log('signDeposit', primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
             const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
           } 
@@ -462,9 +474,8 @@ function Deposit() {
           console.log('saving update with micro usd amount', newDepositAmount * 1000000);
         
 
+          if (depositWithdrawProductType == 'Earn') {
           const quote = await getSwapQuote()
-
-          
           const newUSDYBalance = Number(usdySolBalance) + Number(quote.outAmount/1000000)
 
           setusdyQuoteOutput(quote.outAmount/1000000)
@@ -473,9 +484,18 @@ function Deposit() {
               updatingBalance: true,
               hotBalanceUSDY: newUSDYBalance
           }, { merge: true });
-  
+        }
+
+        let transactionType = ''
+
+        if (depositWithdrawProductType == 'Earn') {
+          transactionType = 'deposit'
+        } else if (depositWithdrawProductType == 'Crypto') {
+          transactionType = 'cryptoDeposit'
+        }
+        
           const docRef = await addDoc(transactionsCollectionRef, {
-            type: 'deposit',
+            type: transactionType,
             time: new Date().toISOString(),
             amount: newDepositAmount,
             currency: currencySelected,
@@ -494,8 +514,8 @@ function Deposit() {
 
     async function getSwapQuote() {
 
-      const inputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-      const outputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
+      const inputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // USDC mint
+      const outputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6'; // USDY mint
 
       const quoteResponse = await fetch(
         `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${newDepositAmount* 1000000}&slippageBps=50`
@@ -669,9 +689,21 @@ function Deposit() {
     ) : (
       <div style={{marginTop: '10px', fontSize: '25px', opacity: depositInProgress ? 0 : 1}}>
       
-      {selectedLanguageCode === 'en' && `Start saving... safely`}
-      {selectedLanguageCode === 'es' && `
-Empieza a ahorrar... de forma segura`}
+      { depositWithdrawProductType === 'Crypto' && (
+        <>
+        {selectedLanguageCode === 'en' && `Hold your own Bitcoin`}
+        {selectedLanguageCode === 'es' && `Sostén tu propio bitcoin`}
+        </>
+      )}
+
+      { depositWithdrawProductType === 'Earn' && (
+        <>
+        {selectedLanguageCode === 'en' && `Start saving... safely`}
+        {selectedLanguageCode === 'es' && `Empieza a ahorrar... de forma segura`}
+        </>
+      )}
+
+
       </div>
     )}
 

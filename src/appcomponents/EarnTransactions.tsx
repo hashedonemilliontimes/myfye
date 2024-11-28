@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import bankIcon from '../assets/bankIcon.png'
 import LoadingAnimation from '../components/loadingAnimation';
+import myfyeEarnGreen from '../assets/myfyeEarnGreen.png';
 
 function EarnTransactions() {
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -51,7 +52,16 @@ function EarnTransactions() {
 </div>
 
             ) : (
+
+
                 <div style={{marginTop: window.innerHeight < 700 ? '15px' : '30px'}}>
+
+<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+<img style={{ width: '180px', height: 'auto'}}src={myfyeEarnGreen}/>
+</div>
+
+
+
                 {transactions.length == 0 ? (
                     <div>
                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>

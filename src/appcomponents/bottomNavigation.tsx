@@ -9,7 +9,8 @@ import cash from '../assets/cash.png';
 import { setShowPayPage, setShowEarnPage, setShowWalletPage,
   setShowAccountHistory, setShowProfileMenu, setShowSendPage,
   setShowRequestPage, setShowWithdrawStablecoinPage, 
-  setShowEarnWithdrawPage, setShowEarnDepositPage
+  setShowEarnWithdrawPage, setShowEarnDepositPage,
+  setShowCryptoPage
  } from '../redux/userWalletData';
 import EarnPage from '../appcomponents/EarnPage';
 import Menu from '../appcomponents/menu';
@@ -42,6 +43,7 @@ function BottomNav() {
         dispatch(setShowProfileMenu(false))
         dispatch(setShowEarnPage(false))
         dispatch(setShowWalletPage(false))
+        dispatch(setShowCryptoPage(false))
       };
 
 
@@ -53,6 +55,7 @@ function BottomNav() {
         dispatch(setShowProfileMenu(false))
         dispatch(setShowPayPage(false))
         dispatch(setShowWalletPage(false))
+        dispatch(setShowCryptoPage(false))
       };
 
       const handleWalletPageClick = () => {
@@ -63,6 +66,7 @@ function BottomNav() {
         dispatch(setShowProfileMenu(false))
         dispatch(setShowEarnPage(false))
         dispatch(setShowPayPage(false))
+        dispatch(setShowCryptoPage(false))
       };
 
       const handleProfileMenuClick = () => {
@@ -88,6 +92,7 @@ function BottomNav() {
         dispatch(setShowWithdrawStablecoinPage(false))
         dispatch(setShowEarnWithdrawPage(false))
         dispatch(setShowEarnDepositPage(false))
+        dispatch(setShowCryptoPage(false))
       };
     
       const animationStyle = `
@@ -140,6 +145,7 @@ function BottomNav() {
           gap: '0px',
           ...(animateEarn ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
+        onAnimationStart={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
         onClick={handleEarnPageClick}
       >
         <img
@@ -168,6 +174,7 @@ function BottomNav() {
           gap: '0px',
           ...(animatePay ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
+        onAnimationStart={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
         onClick={handlePayPageClick}
       >
         <img
@@ -197,6 +204,7 @@ function BottomNav() {
           gap: '5px',
           ...(animateHome ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
+        onAnimationStart={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
         onClick={handleHomePageClick}
       >
         <img
@@ -226,6 +234,7 @@ function BottomNav() {
           gap: '0px',
           ...(animateWallet ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
+        onAnimationStart={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
         onClick={handleWalletPageClick}
       >
         <img
@@ -253,6 +262,7 @@ function BottomNav() {
           gap: '0px',
           ...(animateProfile ? { animation: 'growShrink 0.5s ease-in-out' } : {})
         }}
+        onAnimationStart={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
         onClick={handleProfileMenuClick}
       >
         <img
