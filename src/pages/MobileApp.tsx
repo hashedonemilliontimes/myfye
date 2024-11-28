@@ -626,11 +626,23 @@ marginTop: '35px',
 
   </>
 ) : (<>
-      <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', marginTop: '40px' }}>
+      <div style={{
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        alignItems: 'center' }}>
 
         <div>
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <img src={myfyelogo} style={{width: '100px', height: 'auto', marginBottom: '30px'}}></img>
+          <img
+            style={{
+              width: '80vw',
+              maxWidth: '300px',
+              marginTop: '-20px'
+            }}
+            src={myfyelogo}
+            alt="My Fye Logo"
+          />
           </div>
         </div>
         <LoadingAnimation/>
@@ -649,7 +661,6 @@ marginTop: '35px',
     flexDirection: 'column',
     justifyContent: 'center',
     height: '100vh',
-    background: 'linear-gradient(to top, #4CD964, white 14%)', // Green to white gradient
   }}
 >
   <img

@@ -13,7 +13,7 @@ function LanguagePage() {
     const [showMenu, setShowMenu] = useState(false);
     const dispatch = useDispatch()
     const navigate = useNavigate();
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const [menuPosition, setMenuPosition] = useState('-800px'); 
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
     const { lang } = useParams();
@@ -31,7 +31,7 @@ function LanguagePage() {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-110vh'); // Move the menu off-screen
+          setMenuPosition('-800px'); // Move the menu off-screen
         }
       }, [showMenu]);
     
@@ -95,7 +95,7 @@ onClick={handleMenuClick}></img>
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
-        height: '90vh',
+        height: '700px', // random number to cover home page
         backgroundColor: 'white',
         width: '92vw',
         transition: 'top 0.5s ease', // Animate the left property

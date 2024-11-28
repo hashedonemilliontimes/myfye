@@ -32,7 +32,7 @@ function WalletPage() {
     const [swapButtonActive, setSwapButtonActive] = useState(true);
     const [currencySelected, setcurrencySelected] = useState('');
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
+    const [menuPosition, setMenuPosition] = useState('-800px'); 
   const transactionStatus = useSelector((state: any) => state.userWalletData.walletSwapTransactionStatus) 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -74,7 +74,7 @@ function WalletPage() {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-110vh'); // Move the menu off-screen
+          setMenuPosition('-800px'); // Move the menu off-screen
           setcurrencySelected('usd');
           setErrorMessage('');
           if (usdcSolBalance>=1 || usdtSolBalance>=1) {
@@ -380,7 +380,7 @@ function WalletPage() {
         position: 'absolute',
         top: menuPosition,
         left: 0, // Use state variable for position
-        height: '90vh',
+        height: '700px', // random number to cover home page
         backgroundColor: 'white',
         width: '100vw',
         overflowX: 'hidden',

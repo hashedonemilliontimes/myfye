@@ -29,7 +29,7 @@ function PayPage() {
   const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const showPayPage = useSelector((state: any) => state.userWalletData.showPayPage);
     const dispatch = useDispatch();
-    const [menuPosition, setMenuPosition] = useState('-135vh'); 
+    const [menuPosition, setMenuPosition] = useState('-930px'); 
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -146,7 +146,7 @@ function PayPage() {
         if (showPayPage) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
-          setMenuPosition('-135vh'); // Move the menu off-screen
+          setMenuPosition('-930px'); // Move the menu off-screen
         }
       }, [showPayPage]);
     
@@ -283,6 +283,7 @@ function PayPage() {
         top: menuPosition,
         left: 0, // Use state variable for position
         padding: '15px',
+        height: '830px', // random number to cover home page
         minHeight: '130vh',
         backgroundColor: 'white',
         width: '94vw',
@@ -626,7 +627,7 @@ justifyContent: 'space-around',}} onClick={fadePieChartOpacity}>
   boxShadow: '2px 5px 15px rgba(0, 0, 0, 0.1), -2px 5px 15px rgba(0, 0, 0, 0.1)',
   padding: '10px',
   paddingBottom: '20px',
-  marginTop: '15px'
+  marginTop: '15px',
 }}>
 <div style={{fontSize: '25px', fontWeight: 'bold', marginTop: currentUserContacts ? '15px' : '60px'}}>
 {selectedLanguageCode === 'en' && `Refer a friend!`}
