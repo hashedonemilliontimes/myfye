@@ -151,10 +151,10 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       var transaction = VersionedTransaction.deserialize(new Uint8Array(swapTransactionBuf));
       console.log('transaction', transaction);
 
-      //const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+      const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
 
-      const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
-      connection = new Connection(HELIUS_RPC);
+      // const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
+      connection = new Connection(QUICKNODE_RPC);
 
       const { blockhash: latestBlockHash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
