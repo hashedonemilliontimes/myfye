@@ -76,11 +76,14 @@ function Withdraw() {
           setWithdrawal(`${btcSolBalance}`)
         }
         setfeeAmount(0.1)
-        setWithdrawalButtonActive(true)
-        if (usdyBalance < 0.0001) {
+        if (depositWithdrawProductType == 'Earn' && usdyBalance > 0.0001) {
+          setWithdrawalButtonActive(true)
+        } else if (depositWithdrawProductType == 'Crypto' && btcSolBalance*106647 > 0.001) { // hardcode BTC price
+          setWithdrawalButtonActive(true)
+        } else {
           setWithdrawalButtonActive(false)
         }
-      }, [usdyBalance, btcSolBalance]);
+      }, [usdyBalance, btcSolBalance, depositWithdrawProductType]);
 
       useEffect(() => {
         if (showMenu) {
@@ -125,7 +128,6 @@ function Withdraw() {
           } else if (depositWithdrawProductType == 'Crypto') {
             dispatch(setbtcSolValue(0.0));
           }
-
           
 
           setTimeout(() => {
@@ -164,7 +166,8 @@ function Withdraw() {
       const handleCashOutButtonClick = async () => {
 
           console.log('Withdraw usdyBalance: ', usdyBalance)
-          if (usdyBalance >= 0.9) {
+          if ((depositWithdrawProductType == 'Earn' && usdyBalance >= 0.9) || 
+          (depositWithdrawProductType == 'Crypto' && btcSolBalance >= 0.000008)) { // Hardcoded value of bitcoin
             const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
             if (isTransactionsEnabled) {
             setErrorMessageColor('#222222');

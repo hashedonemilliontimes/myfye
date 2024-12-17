@@ -233,7 +233,7 @@ async function transactionSenderAndConfirmationWaiter({
   try {
     abortableResender();
     const lastValidBlockHeight =
-      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 60;
+      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 70;
 
     console.log('Starting transaction confirmation...');
     await Promise.race([
@@ -247,7 +247,7 @@ async function transactionSenderAndConfirmationWaiter({
         "confirmed"
       ).catch((e) => {
         console.error('Error during confirmTransaction:', e);
-        throw e;
+        // throw e;
       }),
       new Promise(async (resolve, reject) => {
         while (!abortSignal.aborted) {
