@@ -1,0 +1,50 @@
+{
+  "name": "myfye",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@privy-io/react-auth": "^1.98.1",
+    "@reduxjs/toolkit": "^2.5.0",
+    "@solana/spl-token": "^0.3.11",
+    "@solana/web3.js": "^1.95.8",
+    "chart.js": "^4.4.7",
+    "cra-template-typescript": "1.2.0",
+    "firebase": "^11.1.0",
+    "promise-retry": "^2.0.1",
+    "qrcode.react": "^3.2.0",
+    "react": "^19.0.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.0.2",
+    "react-scripts": "5.0.1",
+    "redux": "^5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
