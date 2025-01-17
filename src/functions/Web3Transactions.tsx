@@ -16,7 +16,7 @@ import {
   SystemProgram, 
   Transaction, 
   TransactionInstruction,
-  VersionedTransaction } from "@solana/web3.js";
+  VersionedTransaction, } from "@solana/web3.js";
 import {useSendTransaction} from '@privy-io/react-auth';
   const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // Mainnet USDC mint address
   const USDT_MINT_ADDRESS = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'; // Replace with actual USDT mint address on Solana
@@ -139,19 +139,30 @@ export const tokenTransfer = async (
         transaction.feePayer = payer;
         transaction.recentBlockhash = blockhashInfo.blockhash;
         transaction.lastValidBlockHeight = blockhashInfo.lastValidBlockHeight;
-
-  
-        console.log('Sender address: ', payerPubKey);
-        console.log('amountSmallestDenomination: ', amountSmallestDenomination);
-        
   
       try {
         
 
         console.log('Wallet', wallet)
-        
+        /*
         await wallet.signTransaction!(transaction, connection);
         const transactionId = await wallet.sendTransaction!(transaction, connection);
+        */
+
+        /*
+        const signedTX = await wallet.signTransaction(
+          transaction
+        );*/
+
+        const transactionId = await wallet.sendTransaction!(transaction, connection);
+        
+        /*
+        const transactionId = await sendAndConfirmTransaction(
+          connection,
+          signedTX.serialize(),
+          [], //Signers
+        );
+        */
         console.log('SendTransaction: ', transactionId)
 
         if (transactionId) {
@@ -177,7 +188,6 @@ export const tokenTransfer = async (
           console.log("Transaction Failed: transactionID: ", transactionId);
           return false;
         }
-       return true;
   
       } catch (error) {
         console.error("Transaction Failed with error: ", error);

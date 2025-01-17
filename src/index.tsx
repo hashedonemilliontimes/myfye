@@ -10,6 +10,8 @@ import { getAnalytics } from "firebase/analytics";
 import { getFunctions } from "firebase/functions";
 import { PrivyProvider } from "@privy-io/react-auth";
 
+
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
@@ -17,7 +19,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    
     <PrivyProvider
       appId="cm4ucmtf8091nkywlgy9os418"
       config={{
@@ -26,18 +27,27 @@ root.render(
           theme: 'light',
           accentColor: '#447E26',
           logo: 'https://project-eli-lewitt.s3.us-west-2.amazonaws.com/logo512.png',
-          walletChainType: 'solana-only'
+          walletChainType: 'solana-only',
         },
         embeddedWallets: {
           createOnLogin: 'off',
         },
-        solanaClusters: [{ name: 'mainnet-beta', rpcUrl: 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/' }]
+        solanaClusters: [
+          {
+            name: 'mainnet-beta',
+            rpcUrl: 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/',
+          },
+        ],
       }}
+      children={
+        <Provider store={store} children={<App />}>
+        </Provider>
+      }
     >
-      <Provider store={store} children={<App />} />
     </PrivyProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
+
 
 
 const firebaseConfig = {

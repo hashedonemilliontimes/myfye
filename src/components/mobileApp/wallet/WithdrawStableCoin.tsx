@@ -108,7 +108,6 @@ function WithdrawStableCoin() {
 
 
       const handleQuarterButtonClick = () => {
-        console.log("Handling button click", balanceSelected);
         if (balanceSelected>0.001) {
           const newWithdrawal = (0.25 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
@@ -121,7 +120,6 @@ function WithdrawStableCoin() {
       };
       
       const handleHalfButtonClick = () => {
-        console.log("Handling button click", balanceSelected);
         if (balanceSelected>0.0001) {
           const newWithdrawal = (0.5 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
@@ -134,7 +132,6 @@ function WithdrawStableCoin() {
       };
       
       const handleTwoThirdsButtonClick = () => {
-        console.log("Handling button click", balanceSelected);
         if (balanceSelected>0.0001) {
           const newWithdrawal = (0.75 * balanceSelected);
           console.log("Setting deposit to:", newWithdrawal); // Added logging
@@ -147,7 +144,6 @@ function WithdrawStableCoin() {
       };
       
       const handleAllButtonClick = () => {
-        console.log("Handling button click", balanceSelected);
         if (balanceSelected>0.0001) {
           const newWithdrawal = Math.floor(balanceSelected * 100) / 100;
           console.log("Setting deposit to:", newWithdrawal); // Added logging
@@ -261,7 +257,7 @@ function WithdrawStableCoin() {
             console.log('Requesting new transaction currencySelected', currencySelected)
 
             const wallet = wallets[0];
-            if (!ready || !wallet) return;
+            //if (!ready || !wallet) return;
 
            const transactionSuccess = await tokenTransfer(
             publicKey, 

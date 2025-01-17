@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@privy-io/react-auth": "^1.98.1",
+    "@privy-io/react-auth": "^2.0.1",
     "@reduxjs/toolkit": "^2.5.0",
     "@solana/spl-token": "^0.3.11",
     "@solana/web3.js": "^1.95.8",
