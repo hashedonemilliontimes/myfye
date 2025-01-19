@@ -5,10 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { saveNewTransaction } from '../../../functions/SaveNewTransaction.tsx';
 import { swap } from '../../../functions/Swaps.tsx';
 import { useDispatch } from 'react-redux';
-import { setusdcSolValue, setusdtSolValue,
+import { setusdcSolValue, 
+  setusdtSolValue,
   setSwapDepositTransactionStatus, 
-  settotalInvestingValue, setShowSwapDepositPage, setpyusdSolValue,
-  seteurcSolValue, setShouldShowBottomNav, 
+  settotalInvestingValue, 
+  setShowSwapDepositPage, 
+  setpyusdSolValue,
+  seteurcSolValue, 
+  setShouldShowBottomNav, 
   setusdySolValue} from '../../../redux/userWalletData.tsx';
 import LoadingAnimation from '../../LoadingAnimation.tsx';
 import backButton from '../assets/backButton3.png';
@@ -19,6 +23,8 @@ import eurcSol from '../assets/eurcSol.png';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import FailImage from '../assets/FailImage.png';
 import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
+import {useSolanaWallets} from '@privy-io/react-auth/solana';
+
 // TO DO: disabled transactions 
 // import {getUserTransactionsEnabled} from '../helpers/getUserData';
 
@@ -77,6 +83,7 @@ function Deposit() {
     const navigate = useNavigate();
     const [newDepositAmount, setnewDepositAmount] = useState(0);
 
+    const { wallets } = useSolanaWallets();
 
     useEffect(() => {
       if (showMenu) {
@@ -402,11 +409,13 @@ function Deposit() {
               outputCurrency = 'btcSol'
             }
 
-            const primaryWallet = null // TO DO: get privy private wallet
-            console.log('signDeposit', primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
-            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
-          } 
+            const wallet = wallets[0];
+            
+            console.log('signing Deposit', wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
+            const signDepositSuccess = await swap(wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
 
+            console.log('signDepositSuccess', signDepositSuccess);
+          } 
         }
 
       };

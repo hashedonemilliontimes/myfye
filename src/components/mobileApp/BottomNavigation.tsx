@@ -26,10 +26,6 @@ function BottomNav() {
     const [animateProfile, setAnimateProfile] = useState(false);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
-    useEffect(() => {
-      console.log('shouldShowBottomNav:', shouldShowBottomNav);
-    }, [shouldShowBottomNav]);
-
     const [showMenu, setShowMenu] = useState(false);
     
       const handlePayPageClick = () => {

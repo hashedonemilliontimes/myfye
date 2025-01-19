@@ -1,11 +1,14 @@
 import promiseRetry from "promise-retry";
-import { ComputeBudgetProgram, 
-    PublicKey, Connection,
-    VersionedTransaction,
-    BlockhashWithExpiryBlockHeight,
-    TransactionExpiredBlockheightExceededError,
-    VersionedTransactionResponse, } from "@solana/web3.js";
-import { setSwapWithdrawTransactionStatus,
+import { 
+  ComputeBudgetProgram, 
+  PublicKey, 
+  Connection,
+  VersionedTransaction,
+  BlockhashWithExpiryBlockHeight,
+  TransactionExpiredBlockheightExceededError,
+  VersionedTransactionResponse, } from "@solana/web3.js";
+import { 
+  setSwapWithdrawTransactionStatus,
   setSwapDepositTransactionStatus,
   setWalletSwapTransactionStatus
  } from '../redux/userWalletData.tsx'; // For managing UI
@@ -31,8 +34,10 @@ const BTC_MINT_ADDRESS = 'cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij';
   //window.Buffer = Buffer;
 
 
-  
-export const swap = async (primaryWallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
+  const RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
+  const connection = new Connection(RPC);
+
+export const swap = async (wallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
     outputCurrency: String, dispatch: Function, type: String) => {
   
     console.log('running swap with data: ', publicKey, inputAmount, inputCurrency, outputCurrency)
@@ -52,7 +57,7 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
             console.log('Got quote for swap');
             const amountInt = Math.round(quote.outAmount);
             const amountBigInt = BigInt(amountInt);
-            swapTransaction(primaryWallet, quote, publicKey, dispatch, type);
+            swapTransaction(wallet, quote, publicKey, dispatch, type);
         })
         .catch(error => {
           updateUI(dispatch, type, 'Fail')
@@ -94,26 +99,20 @@ export const swap = async (primaryWallet: any, publicKey: String, inputAmount: n
     }
   }
 
-  const swapTransaction = async (primaryWallet: any, quoteData: any, receiverPubKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) => {
+  const swapTransaction = async (wallet: any, quoteData: any, receiverPubKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) => {
             
-    const swapTransactionSignature = await getJupiterSwapTransaction(primaryWallet, quoteData, receiverPubKey, dispatch, type)
+    const swapTransactionSignature = await getJupiterSwapTransaction(wallet, quoteData, receiverPubKey, dispatch, type)
 
 
 };
 
-async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any, 
+async function getJupiterSwapTransaction(wallet: any, quoteResponse: any, 
   userPublicKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) {
   try {
 
     window.Buffer = Buffer;
-  
-    if (primaryWallet) {
-      let connection: any = await (
-        primaryWallet as any
-      ).connector.getConnection();
-  
-      if (!connection) return false;
-
+    
+    
       const response = await fetch('https://quote-api.jup.ag/v6/swap', {
           method: 'POST',
           headers: {
@@ -127,10 +126,11 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
                 // auto wrap and unwrap SOL. default is true
                 wrapAndUnwrapSol: true,
                 // jup.ag frontend default max for user
-                dynamicSlippage: { "maxBps": 500 },
+                dynamicSlippage: { "maxBps": 1000 },
                 dynamicComputeUnitLimit: true, // allow dynamic compute limit instead of max 1,400,000
                 // custom priority fee
-                priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "veryHigh", "maxLamports": 3000000000}},
+                priorityLevel: "veryHigh"
+                //priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "veryHigh", "maxLamports": 3000000000}},
           })
       });
 
@@ -145,34 +145,16 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
       var transaction = VersionedTransaction.deserialize(new Uint8Array(swapTransactionBuf));
       console.log('transaction', transaction);
 
-      const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
-
-      // const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
-      connection = new Connection(QUICKNODE_RPC);
 
       const { blockhash: latestBlockHash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
       transaction.message.recentBlockhash = latestBlockHash;
 
-      let signedTransaction = await (primaryWallet as any).connector.signTransaction({ transaction: transaction });
-      
+
+      const signedTransaction = await wallet.signTransaction(transaction);
       updateUI(dispatch, type, 'Signed')
-      
-      const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
-      const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
-      const serializedTransaction = Buffer.from(signedVersionedTransaction.serialize());
 
-
-      // Simulation
-      /*
-      const simulationResult = await connection.simulateTransaction(signedVersionedTransaction);
-
-      if (simulationResult.value.err) {
-          console.log("Simulation failed:", simulationResult.value.err);
-      } else {
-          console.log("Simulation succeeded. Logs:", simulationResult.value.logs);
-      }
-      */
+      const serializedTransaction = Buffer.from(signedTransaction.serialize());
 
       const sendTransactionResponse = await transactionSenderAndConfirmationWaiter({
         connection,
@@ -182,6 +164,7 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
             lastValidBlockHeight: lastValidBlockHeight // Pass the last valid block height
           }
       });
+      
       if (sendTransactionResponse) {
         console.log(`Transaction succeeded: https://solscan.io/tx/${response}`);
         updateUI(dispatch, type, 'Success')
@@ -189,10 +172,11 @@ async function getJupiterSwapTransaction(primaryWallet: any, quoteResponse: any,
         console.log('Transaction failed due to block height expiration or other issue');
         updateUI(dispatch, type, 'Fail')
       }
+
       
-    } else {
-      updateUI(dispatch, type, 'Fail')
-    }
+
+
+
   } catch (error) {
     updateUI(dispatch, type, 'Fail')
     console.error('Error with swap transaction', error);
@@ -216,7 +200,7 @@ async function transactionSenderAndConfirmationWaiter({
   const abortableResender = async () => {
     while (!abortSignal.aborted) {
       try {
-        await wait(2_000);
+        await wait(1_000);
         await connection.sendRawTransaction(serializedTransaction, SEND_OPTIONS);
       } catch (e: any) {
         console.warn(`Resending transaction failed: ${e.message}`);
@@ -227,7 +211,7 @@ async function transactionSenderAndConfirmationWaiter({
   try {
     abortableResender();
     const lastValidBlockHeight =
-      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 70;
+      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 5;
 
     console.log('Starting transaction confirmation...');
     await Promise.race([
@@ -310,3 +294,78 @@ function updateUI(dispatch: any, type: String, status: string): void {
   }
 
 }
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+//      const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransaction);
+
+
+
+
+
+      //const transactionId = await wallet.sendTransaction!(transaction, connection);
+
+            /*
+      console.log('SendTransaction: ', transactionId)
+
+      if (transactionId) {
+        let transactionConfirmed = false
+        for (let attempt = 1; attempt <= 3 && !transactionConfirmed; attempt++) {
+          try {
+            const confirmation = await connection.confirmTransaction(transactionId, 'confirmed');
+            console.log('got confirmation', confirmation, 'on attempt', attempt);
+            if (confirmation && confirmation.value && confirmation.value.err === null) {
+              console.log(`Transaction successful: https://solscan.io/tx/${transactionId}`);
+              updateUI(dispatch, type, 'Success')
+              return true;
+            }
+            } catch (error) {
+              console.error('Error sending transaction or in post-processing:', error, 'on attempt', attempt);
+            }
+            if (!transactionConfirmed) {
+              await delay(1000); // Delay in milliseconds
+            }
+          }
+          console.log("Transaction Uncomfirmed");
+          updateUI(dispatch, type, 'Fail')
+          return false
+      } else {
+        console.log("Transaction Failed: transactionID: ", transactionId);
+        updateUI(dispatch, type, 'Fail')
+        return false;
+      }
+        */
+
+
+
+
+
+
+
+
+      
+      // const signedTransaction = await wallet.signTransaction(transaction);
+      // updateUI(dispatch, type, 'Signed')
+      
+      //const signedTransactionBuffer = new Uint8Array(Buffer.from(signedTransaction));
+     // const signedVersionedTransaction = VersionedTransaction.deserialize(signedTransactionBuffer);
+      //const serializedTransaction = Buffer.from(signedVersionedTransaction.serialize());
+
+      // const serializedTransaction = Buffer.from(signedTransaction.serialize());
+
+
+
+
+      // Simulation
+      /*
+      const simulationResult = await connection.simulateTransaction(signedTransaction);
+
+      if (simulationResult.value.err) {
+          console.log("Simulation failed:", simulationResult.value.err);
+      } else {
+          console.log("Simulation succeeded. Logs:", simulationResult.value.logs);
+      }
+          */

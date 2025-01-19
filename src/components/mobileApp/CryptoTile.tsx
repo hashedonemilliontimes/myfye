@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import myfyeCrypto from '../../assets/myfyeCrypto.png'
 import { useSelector, useDispatch } from 'react-redux';
-import { setDepositWithdrawProductType } from '../../redux/userWalletData.tsx';
+import { 
+  setShowCryptoPage, 
+  setDepositWithdrawProductType} from '../../redux/userWalletData.tsx';
 
 export default function CryptoTile() {
 
@@ -12,6 +14,7 @@ export default function CryptoTile() {
 
     const handleCryptoPageClick = () => {
         dispatch(setDepositWithdrawProductType('Crypto'))
+        dispatch(setShowCryptoPage(true));
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
       };
 

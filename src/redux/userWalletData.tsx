@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserWalletDataState {
+  wallet: any,
   currentUserID: string;
   currentUserFirstName: string;
   currentUserLastName: string;
@@ -49,9 +50,11 @@ interface UserWalletDataState {
   selectedLanguageCode: string,
   depositWithdrawProductType: string;
   passKeyState: string;
+  privyWalletReady: boolean;
 }
 
 const initialUserWalletData: UserWalletDataState = {
+  wallet: false,
   isConnected: false,
   type: '',
   pubKey: '',
@@ -99,7 +102,8 @@ const initialUserWalletData: UserWalletDataState = {
   selectedLanguageCode: '',
   currentUserID: '',
   depositWithdrawProductType: 'Earn',
-  passKeyState: 'initial'
+  passKeyState: 'initial',
+  privyWalletReady: false
 };
 
 
@@ -108,6 +112,9 @@ export const userWalletDataSlice = createSlice({
   name: 'userWalletData',
   initialState: initialUserWalletData,
   reducers: {
+    setWallet: (state, action: PayloadAction<any>) => {
+      state.wallet = action.payload;
+    },
     setWalletConnected: (state, action: PayloadAction<boolean>) => {
       state.isConnected = action.payload;
     },
@@ -255,11 +262,14 @@ export const userWalletDataSlice = createSlice({
   setPassKeyState: (state, action: PayloadAction<string>) => {
     state.passKeyState= action.payload;
   }, 
-  
+  setPrivyWalletReady: (state, action: PayloadAction<boolean>) => {
+    state.privyWalletReady= action.payload;
+  }, 
   },
 });
 
-export const { setWalletConnected, 
+export const { 
+  setWallet, setWalletConnected, 
   setWalletType, setWalletPubKey,
   settotalInvestingValue,
   setsolValue, setusdcSolValue, setusdtSolValue, setpyusdSolValue, 
@@ -282,7 +292,8 @@ export const { setWalletConnected,
   setRecentlyUsedSolanaAddresses, 
   setShowContactPopup, setSelectedLanguageCode,
   setcurrentUserID, setDepositWithdrawProductType,
-  setPassKeyState
+  setPassKeyState,
+  setPrivyWalletReady
   
 } = userWalletDataSlice.actions;
 

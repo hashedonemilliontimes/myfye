@@ -10,7 +10,8 @@ import {
     setCurrentUserKYCVerified,
     setcurrentUserEmail,
     setWalletPubKey,
-    setPassKeyState
+    setPassKeyState,
+    setPriceOfUSDYinUSDC
     } from '../redux/userWalletData.tsx';
 import { 
     getFirestore, 
@@ -22,12 +23,16 @@ import {
     Connection, 
     } from "@solana/web3.js";
 import {useLoginWithPasskey} from '@privy-io/react-auth';
+import { useSelector } from 'react-redux';
 
-const HandleUserLogIn = async (user: any, dispatch: Function): Promise<{ success: boolean;}> => {
+const HandleUserLogIn = async (
+  user: any, 
+  dispatch: Function,
+  priceOfUSDYinUSDC: number ): Promise<{ success: boolean;}> => {
 
     console.log('user', user)
 
-    console.log('user wallet', user.wallet)
+    console.log('user wallet', user.wallet);
 
     // Set some user data
     dispatch(setcurrentUserEmail(user.email.address))
@@ -40,8 +45,10 @@ const HandleUserLogIn = async (user: any, dispatch: Function): Promise<{ success
       }
     }
     
+
     try {
         await Promise.all([
+          getUSDYPriceQuote(priceOfUSDYinUSDC, dispatch),
           getUserBalances(user.wallet.address, dispatch),
           getUserData(user.wallet.address, dispatch),
         ]);
@@ -87,6 +94,7 @@ const getUserBalances = async (pubKey: string, dispatch: Function) => {
     
           dispatch(setusdcSolValue(Number(tokenBalances.usdc)));
           dispatch(setusdtSolValue(Number(tokenBalances.usdt)));
+          console.log('setting USDY: ', tokenBalances.usdy);
           dispatch(setusdySolValue(Number(tokenBalances.usdy)));
           dispatch(setpyusdSolValue(Number(tokenBalances.pyusd)));
           dispatch(seteurcSolValue(Number(tokenBalances.eurc)));
@@ -119,8 +127,8 @@ export const TokenBalances = async (address: string): Promise<{
       btc: 0,
     };
   
-    const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
-    const connection = new Connection(QUICKNODE_RPC);
+    const RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
+    const connection = new Connection(RPC);
   
     const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; 
     const USDT_MINT_ADDRESS = 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'; 
@@ -202,6 +210,34 @@ const UpdatePasskey = async (dispatch: Function) => {
 
   dispatch(setPassKeyState('done'));
 
+}
+
+const getUSDYPriceQuote = async (price: number, dispatch: Function): Promise<boolean> => {
+
+  if (price <= 0.01) {
+      const quote = await getSwapQuote()
+      const priceInUSD = quote.outAmount/1000000
+      if (priceInUSD && priceInUSD>0.01) {
+          dispatch(setPriceOfUSDYinUSDC(quote.outAmount/1000000))
+      } else {
+          dispatch(setPriceOfUSDYinUSDC(1.05))
+      }
+      
+  }
+
+  async function getSwapQuote() {
+
+      const outputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      const inputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
+
+      const quoteResponse = await fetch(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${1* 1000000}&slippageBps=50`
+      ).then(response => response.json());
+      
+      return quoteResponse
+    }
+
+  return true
 }
 
 export { HandleUserLogIn, UpdatePasskey }

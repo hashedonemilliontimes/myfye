@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import menuIcon from '../../assets/menuIcon.png';
+import menuIcon from '../../../assets/menuIcon.png';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { swap } from '../../functions/Swaps.tsx';
+import { swap } from '../../../functions/Swaps.tsx';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, setusdtSolValue,
   setSwapDepositTransactionStatus,
   settotalInvestingValue, setShowSwapDepositPage, setpyusdSolValue,
   seteurcSolValue, setShouldShowBottomNav, 
-  setusdySolValue} from '../../redux/userWalletData.tsx';
-import LoadingAnimation from '../../components/LoadingAnimation.tsx';
-import backButton from '../../assets/backButton3.png';
-import solIcon from '../../assets/solIcon.png';
-import usdcSol from '../../assets/usdcSol.png';
-import usdtSol from '../../assets/usdtSol.png';
-import eurcSol from '../../assets/eurcSol.png';
+  setusdySolValue} from '../../../redux/userWalletData.tsx';
+import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
+import backButton from '../../../assets/backButton3.png';
+import solIcon from '../../../assets/solIcon.png';
+import usdcSol from '../../../assets/usdcSol.png';
+import usdtSol from '../../../assets/usdtSol.png';
+import eurcSol from '../../../assets/eurcSol.png';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import FailImage from '../../assets/FailImage.png';
+import FailImage from '../../../assets/FailImage.png';
 import { getFirestore, doc, collection, setDoc, addDoc } from 'firebase/firestore';
-import GetUserTransactionsEnabled from '../../functions/GetUserTransactionsEnabled.tsx';
+import GetUserTransactionsEnabled from '../../../functions/GetUserTransactionsEnabled.tsx';
+
+import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 
 function SwapDeposit() {
@@ -81,7 +83,10 @@ function SwapDeposit() {
     const navigate = useNavigate();
     const [newDepositAmount, setnewDepositAmount] = useState(0);
 
+    const { wallets } = useSolanaWallets();
 
+    //wallets[0].signTransaction()
+    
     useEffect(() => {
       if (showMenu) {
         setMenuPosition('0'); // Bring the menu into view
@@ -228,6 +233,7 @@ function SwapDeposit() {
         }
         setselectedDepositPortion('75%');
       };
+      
       
       const handleAllButtonClick = () => {
         if (balanceSelectedInUSD>0.0001) {
@@ -399,8 +405,11 @@ function SwapDeposit() {
               outputCurrency = 'btcSol'
             }
 
-            console.log('signDeposit', primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
-            const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
+            const wallet = wallets[0];
+                        
+            console.log('signing Deposit', wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
+            const signDepositSuccess = await swap(wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
+
           } 
 
         }

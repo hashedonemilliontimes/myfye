@@ -20,20 +20,16 @@ import {
     getDoc,
     setDoc,
     arrayUnion } from 'firebase/firestore';
-    import {
-      usePrivy,
-      useSolanaWallets} from '@privy-io/react-auth';
   import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
   import getUserTransactionsEnabled from '../../../functions/GetUserTransactionsEnabled.tsx';
-import { tokenTransfer } from '../../../functions/Web3Transactions.tsx';
+import { tokenTransfer } from '../../../functions/Transaction.tsx';
+import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 function WithdrawStableCoin() {
   const showWithdrawStablecoinPage = useSelector((state: any) => state.userWalletData.showWithdrawStablecoinPage);
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageColor, setErrorMessageColor] = useState('#222222');
     const [currencySelected, setcurrencySelected] = useState('usdcSol');
-    const {user} = usePrivy();
-    const {ready, wallets} = useSolanaWallets();
     const [addressCopied, setaddressCopied] = useState(false); 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
@@ -58,8 +54,9 @@ function WithdrawStableCoin() {
     const db = getFirestore();
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
-    
+    const ready = useSelector((state: any) => state.userWalletData.privyWalletReady);
 
+    const { wallets} = useSolanaWallets();
     
 
     useEffect(() => {
@@ -256,8 +253,11 @@ function WithdrawStableCoin() {
 
             console.log('Requesting new transaction currencySelected', currencySelected)
 
-            const wallet = wallets[0];
+
             //if (!ready || !wallet) return;
+
+            const wallet = wallets[0];
+        
 
            const transactionSuccess = await tokenTransfer(
             publicKey, 

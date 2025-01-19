@@ -35,7 +35,7 @@ root.render(
         solanaClusters: [
           {
             name: 'mainnet-beta',
-            rpcUrl: 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/',
+            rpcUrl: 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4',
           },
         ],
       }}

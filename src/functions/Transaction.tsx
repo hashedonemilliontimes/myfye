@@ -24,8 +24,9 @@ import {useSendTransaction} from '@privy-io/react-auth';
   const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
   const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 
-  const QUICKNODE_RPC = 'https://attentive-wispy-borough.solana-mainnet.discover.quiknode.pro/580b0865bae2f3f5904e56150ea7b41069fd06cd/';
-  const connection = new Connection(QUICKNODE_RPC);
+  const RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
+  const connection = new Connection(RPC);
+
 
 export const tokenTransfer = async (
     payerPubKey: string, 
@@ -35,13 +36,14 @@ export const tokenTransfer = async (
     wallet: any
     ): Promise<boolean> => {
   
-    window.Buffer = Buffer;
+
+      const PRIORITY_RATE = 100100; // MICRO_LAMPORTS 1^-15 solana  250000
+      const PRIORITY_FEE_IX = ComputeBudgetProgram.setComputeUnitPrice({microLamports: PRIORITY_RATE});
 
     console.log("Running in tokenTransfer");
       
-      const blockhashInfo = await connection.getLatestBlockhash();
+      
 
-      const payer = new PublicKey(payerPubKey);
       const senderPublicKey = new PublicKey(payerPubKey);
       console.log('receiverPubKey', receiverPubKey)
       const destinationPublicKey = new PublicKey(receiverPubKey);
@@ -73,7 +75,7 @@ export const tokenTransfer = async (
         );
         
         if (!payerAccountInfo) {
-          throw new Error(currencySelected + " account not found for payer.");
+          throw new Error(currencySelected + " account not found for payer.", payerAccountInfo);
         } else {
           console.log(currencySelected + " account found for payer.");
         }
@@ -124,22 +126,39 @@ export const tokenTransfer = async (
   
         const programIdKey = new PublicKey(programId);
 
+        console.log("CREATE TRANSFER INSTRUCTION");
+        console.log("senderTokenAccount", senderTokenAccount);
+        console.log("receiverTokenAccount", receiverTokenAccount);
+
         const transferInstruction = createTransferInstruction(
           senderTokenAccount, // Source account: PublicKey
           receiverTokenAccount, // Destination account: PublicKey
-          senderTokenAccount, // Owner of source account: PublicKey
+          senderPublicKey, // Owner of source account: PublicKey
           amountSmallestDenomination, // Amount: number | bigint
           [], // multiSigners
           programIdKey, // Amount: number | bigint
         );
 
+        const blockhashInfo = await connection.getLatestBlockhash();
+
+        console.log('Got Blockhash');
+        
         // Create the priority transaction
         const transaction = new Transaction();
         transaction.add(transferInstruction);
-        transaction.feePayer = payer;
+        transaction.feePayer = senderPublicKey;
         transaction.recentBlockhash = blockhashInfo.blockhash;
         transaction.lastValidBlockHeight = blockhashInfo.lastValidBlockHeight;
   
+        
+        // Create the priority transaction
+        const txPriority = new Transaction();
+        txPriority.add(transferInstruction);
+        txPriority.add(PRIORITY_FEE_IX); // Add priority fee instruction
+        txPriority.feePayer = senderPublicKey;
+        txPriority.recentBlockhash = blockhashInfo.blockhash;
+        txPriority.lastValidBlockHeight = blockhashInfo.lastValidBlockHeight;
+
       try {
         
 
@@ -154,7 +173,8 @@ export const tokenTransfer = async (
           transaction
         );*/
 
-        const transactionId = await wallet.sendTransaction!(transaction, connection);
+        const transactionId = await wallet.sendTransaction!(txPriority, connection);
+        
         
         /*
         const transactionId = await sendAndConfirmTransaction(
