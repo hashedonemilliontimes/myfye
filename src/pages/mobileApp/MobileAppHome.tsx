@@ -43,6 +43,7 @@ import {
 import WalletPage from './WalletPage.tsx';
 import MainDepositPage from '../../components/mobileApp/wallet/MainDepositPage.tsx';
 import SwapDeposit from './SwapPages/SwapDepositPage.tsx';
+import SwapWithdraw from './SwapPages/SwapWithdrawPage.tsx';
 import PrivyUseSolanaWallets from '../../components/PrivyUseSolanaWallets.tsx';
 
 
@@ -86,9 +87,7 @@ function WebAppInner() {
       if (authenticated) {
         try {
           if (!(user?.wallet)) {
-          } else {
-            console.log('user has a wallet');
-          }
+          } 
           await HandleUserLogIn(user, dispatch, priceOfUSDYinUSDC);
         } catch (error) {
           console.error('Error during login:', error);
@@ -148,6 +147,7 @@ function WebAppInner() {
 <ProfilePage/>
 <MainDepositPage/>
 <SwapDeposit/>
+<SwapWithdraw/>
 <CryptoPage/>
   
   {ANNOUNCMENT_MESSAGE && (

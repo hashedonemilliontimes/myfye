@@ -4,8 +4,11 @@ import { useSelector } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
 import PieChartComponent from '../../components/PieChart.tsx';
 import myfyeEarnGreen from '../../assets/myfyeEarnGreen.png';
-import { setShouldShowBottomNav, setShowEarnPage,
-  setShowSwapWithdrawPage, setShowSwapDepositPage,
+import { 
+  setShouldShowBottomNav, 
+  setShowEarnPage,
+  setShowSwapWithdrawPage, 
+  setShowSwapDepositPage,
   setDepositWithdrawProductType } from '../../redux/userWalletData.tsx';
 import { useDispatch } from 'react-redux';
 import InvestmentValue from '../../components/mobileApp/InvestmentValue.tsx';

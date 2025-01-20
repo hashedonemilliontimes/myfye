@@ -32,8 +32,6 @@ const HandleUserLogIn = async (
 
     console.log('user', user)
 
-    console.log('user wallet', user.wallet);
-
     // Set some user data
     dispatch(setcurrentUserEmail(user.email.address))
     dispatch(setWalletPubKey(user.wallet.address))
@@ -52,7 +50,6 @@ const HandleUserLogIn = async (
           getUserBalances(user.wallet.address, dispatch),
           getUserData(user.wallet.address, dispatch),
         ]);
-        console.log('User balances and data fetched successfully');
         return { success: true };
       } catch (e) {
         console.error('Error fetching user data or balances:', e);
@@ -94,7 +91,6 @@ const getUserBalances = async (pubKey: string, dispatch: Function) => {
     
           dispatch(setusdcSolValue(Number(tokenBalances.usdc)));
           dispatch(setusdtSolValue(Number(tokenBalances.usdt)));
-          console.log('setting USDY: ', tokenBalances.usdy);
           dispatch(setusdySolValue(Number(tokenBalances.usdy)));
           dispatch(setpyusdSolValue(Number(tokenBalances.pyusd)));
           dispatch(seteurcSolValue(Number(tokenBalances.eurc)));

@@ -12,6 +12,7 @@ import {
   setSwapDepositTransactionStatus,
   setWalletSwapTransactionStatus
  } from '../redux/userWalletData.tsx'; // For managing UI
+import { HELIUS_API_KEY } from '../env.ts';
 
 // Swapping pairs
 const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -34,7 +35,7 @@ const BTC_MINT_ADDRESS = 'cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij';
   //window.Buffer = Buffer;
 
 
-  const RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
+  const RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
   const connection = new Connection(RPC);
 
 export const swap = async (wallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
@@ -83,11 +84,11 @@ export const swap = async (wallet: any, publicKey: String, inputAmount: number, 
       inputMintAddress = BTC_MINT_ADDRESS;
     }
     console.log('getting swap quote with amount', microInputAmount, 'inputMint', inputMintAddress, 'outputMint', outputMint)
-    console.log(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=500`)
+    console.log(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=300`)
     
     try {
       const quoteResponse = await fetch(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=500`
+        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=300`
       ).then(response => response.json());
   
       return quoteResponse;
@@ -119,19 +120,19 @@ async function getJupiterSwapTransaction(wallet: any, quoteResponse: any,
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-                // quoteResponse from /quote api
-                quoteResponse,
-                // user public key to be used for the swap
-                userPublicKey: userPublicKey,
-                // auto wrap and unwrap SOL. default is true
-                wrapAndUnwrapSol: true,
-                // jup.ag frontend default max for user
-                dynamicSlippage: { "maxBps": 1000 },
-                dynamicComputeUnitLimit: true, // allow dynamic compute limit instead of max 1,400,000
-                // custom priority fee
-                priorityLevel: "veryHigh"
-                //priorityLevelWithMaxLamports: {"priorityLevelWithMaxLamports": {"priorityLevel": "veryHigh", "maxLamports": 3000000000}},
-          })
+                quoteResponse, // quoteResponse from /quote api
+                userPublicKey: userPublicKey, // user public key to be used for the swap
+                dynamicComputeUnitLimit: true, // Set this to true to get the best optimized CU usage.
+                dynamicSlippage: { // This will set an optimized slippage to ensure high success rate
+                  maxBps: 300 // Make sure to set a reasonable cap here to prevent MEV
+                },
+                  prioritizationFeeLamports: {
+                  priorityLevelWithMaxLamports: {
+                    maxLamports: 10000000,
+                    priorityLevel: "veryHigh" // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
+                  }
+                }
+              })
       });
 
       if (!response.ok) {
@@ -150,7 +151,38 @@ async function getJupiterSwapTransaction(wallet: any, quoteResponse: any,
 
       transaction.message.recentBlockhash = latestBlockHash;
 
+      const transactionId = await wallet.sendTransaction!(transaction, connection);
 
+      console.log('transactionId', transactionId);
+      
+      if (transactionId) {
+        let transactionConfirmed = false
+        for (let attempt = 1; attempt <= 3 && !transactionConfirmed; attempt++) {
+          try {
+            const confirmation = await connection.confirmTransaction(transactionId, 'confirmed');
+            console.log('got confirmation', confirmation, 'on attempt', attempt);
+            if (confirmation && confirmation.value && confirmation.value.err === null) {
+              console.log(`Transaction successful: https://solscan.io/tx/${transactionId}`);
+              updateUI(dispatch, type, 'Success')
+              return true;
+            }
+            } catch (error) {
+              console.error('Error sending transaction or in post-processing:', error, 'on attempt', attempt);
+            }
+            if (!transactionConfirmed) {
+              await delay(1000); // Delay in milliseconds
+            }
+          }
+          console.log("Transaction Uncomfirmed");
+          updateUI(dispatch, type, 'Fail')
+          return false
+      } else {
+        console.log("Transaction Failed: transactionID: ", transactionId);
+        updateUI(dispatch, type, 'Fail')
+        return false;
+      }
+
+      /*
       const signedTransaction = await wallet.signTransaction(transaction);
       updateUI(dispatch, type, 'Signed')
 
@@ -172,7 +204,7 @@ async function getJupiterSwapTransaction(wallet: any, quoteResponse: any,
         console.log('Transaction failed due to block height expiration or other issue');
         updateUI(dispatch, type, 'Fail')
       }
-
+*/
       
 
 
@@ -211,7 +243,7 @@ async function transactionSenderAndConfirmationWaiter({
   try {
     abortableResender();
     const lastValidBlockHeight =
-      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 5;
+      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 25;
 
     console.log('Starting transaction confirmation...');
     await Promise.race([
@@ -227,6 +259,10 @@ async function transactionSenderAndConfirmationWaiter({
         console.error('Error during confirmTransaction:', e);
         // throw e; Getting premature failures when the chain actually
         // ends up approving the transaction
+        if (e instanceof TransactionExpiredBlockheightExceededError) {
+          
+          throw e;
+        }
       }),
       new Promise(async (resolve, reject) => {
         while (!abortSignal.aborted) {
@@ -246,9 +282,11 @@ async function transactionSenderAndConfirmationWaiter({
   } catch (e) {
     if (e instanceof TransactionExpiredBlockheightExceededError) {
       console.error('TransactionExpiredBlockheightExceededError:', e);
+      controller.abort();
+      console.log("e instanceof TransactionExpiredBlockheightExceededError");
       return null;
     } else {
-      console.error('Unknown error during confirmation:', e);
+      console.error('Error during confirmation:', e);
       throw e;
     }
   } finally {

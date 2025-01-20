@@ -11,11 +11,11 @@ import { getFunctions } from "firebase/functions";
 import { PrivyProvider } from "@privy-io/react-auth";
 
 
-
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const HELIUS_API_KEY = process.env.REACT_APP_HELIUS_API_KEY;
 
 root.render(
   <React.StrictMode>
@@ -35,7 +35,7 @@ root.render(
         solanaClusters: [
           {
             name: 'mainnet-beta',
-            rpcUrl: 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4',
+            rpcUrl: `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`,
           },
         ],
       }}
@@ -66,4 +66,4 @@ const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const functions = getFunctions(app);
   
-export { app, db, functions };
+export { app, db, functions, HELIUS_API_KEY };

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import menuIcon from '../../assets/menuIcon.png';
 import { useSelector } from 'react-redux';
 import backButton from '../../assets/backButton3.png';
-import Deposit from '../../components/mobileApp/earnSwaps/Deposit.tsx';
-import Withdraw from '../../components/mobileApp/earnSwaps/Withdraw.tsx';
 import HoldingsPortfolio from '../../components/mobileApp/earnSwaps/HoldingsPortfolio.tsx';
 import PieChartComponent from '../../components/PieChart.tsx';
 import myfyeCryptoGreen from '../../assets/myfyeCryptoGreen.png';
@@ -63,13 +61,15 @@ function CryptoPage() {
   
     const handleWithdrawPageClick = () => {
       dispatch(setShouldShowBottomNav(false))
-      dispatch(setShowSwapDepositPage(true))
+      dispatch(setShowSwapWithdrawPage(true))
+      dispatch(setDepositWithdrawProductType('Crypto'))
       
     };
 
     const handleDepositPageClick = () => {
       dispatch(setShouldShowBottomNav(false))
       dispatch(setShowSwapDepositPage(true))
+      dispatch(setDepositWithdrawProductType('Crypto'))
     };
       
     return (

@@ -67,12 +67,6 @@ function WithdrawStableCoin() {
         
       }, [usdcSolBalance]);
 
-      
-      useEffect(() => {
-        console.log('useSolanaWallets().ready', ready)
-          
-        }, [ready]);
-
 
     useEffect(() => {
         if (showWithdrawStablecoinPage) {
@@ -107,7 +101,6 @@ function WithdrawStableCoin() {
       const handleQuarterButtonClick = () => {
         if (balanceSelected>0.001) {
           const newWithdrawal = (0.25 * balanceSelected);
-          console.log("Setting deposit to:", newWithdrawal); // Added logging
         setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
         checkForValidInput(addressText, String(newWithdrawal));
         } else {
@@ -119,7 +112,6 @@ function WithdrawStableCoin() {
       const handleHalfButtonClick = () => {
         if (balanceSelected>0.0001) {
           const newWithdrawal = (0.5 * balanceSelected);
-          console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
         }else {
@@ -131,7 +123,6 @@ function WithdrawStableCoin() {
       const handleTwoThirdsButtonClick = () => {
         if (balanceSelected>0.0001) {
           const newWithdrawal = (0.75 * balanceSelected);
-          console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
         } else {
@@ -143,7 +134,6 @@ function WithdrawStableCoin() {
       const handleAllButtonClick = () => {
         if (balanceSelected>0.0001) {
           const newWithdrawal = Math.floor(balanceSelected * 100) / 100;
-          console.log("Setting deposit to:", newWithdrawal); // Added logging
           setAmountText(String(newWithdrawal.toFixed(2).toString().replace(/\.?0+$/, '')))
           checkForValidInput(addressText, String(newWithdrawal));
         } else {
@@ -250,8 +240,6 @@ function WithdrawStableCoin() {
             }
             const convertToSmallestDenomination = amountToNumber* 10 *10 *10 *10 *10 *10;
             setWithdrawalButtonActive(false); // Deactivate button here
-
-            console.log('Requesting new transaction currencySelected', currencySelected)
 
 
             //if (!ready || !wallet) return;

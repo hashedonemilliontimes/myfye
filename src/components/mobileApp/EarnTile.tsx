@@ -15,6 +15,8 @@ export default function EarnTile() {
       };
 
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+    const usdySolBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+
     return (
         <div style={{
             background: '#ffffff',

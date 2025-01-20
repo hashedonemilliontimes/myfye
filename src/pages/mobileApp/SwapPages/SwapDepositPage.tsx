@@ -4,10 +4,14 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { swap } from '../../../functions/Swaps.tsx';
 import { useDispatch } from 'react-redux';
-import { setusdcSolValue, setusdtSolValue,
+import { setusdcSolValue, 
+  setusdtSolValue,
   setSwapDepositTransactionStatus,
-  settotalInvestingValue, setShowSwapDepositPage, setpyusdSolValue,
-  seteurcSolValue, setShouldShowBottomNav, 
+  settotalInvestingValue, 
+  setShowSwapDepositPage, 
+  setpyusdSolValue,
+  seteurcSolValue, 
+  setShouldShowBottomNav, 
   setusdySolValue} from '../../../redux/userWalletData.tsx';
 import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
 import backButton from '../../../assets/backButton3.png';
@@ -126,6 +130,7 @@ function SwapDeposit() {
 
 
     useEffect(() => {
+      console.log('transactionStatus', transactionStatus);
       if (transactionStatus === 'Signed') {
         setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
         setErrorMessageColor('#60A05B')
@@ -407,7 +412,6 @@ function SwapDeposit() {
 
             const wallet = wallets[0];
                         
-            console.log('signing Deposit', wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit')
             const signDepositSuccess = await swap(wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
 
           } 

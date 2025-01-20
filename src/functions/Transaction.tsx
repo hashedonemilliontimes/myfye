@@ -1,3 +1,4 @@
+import { HELIUS_API_KEY } from '../env.ts';
 import { 
     createTransferInstruction, 
     TOKEN_PROGRAM_ID } from '@solana/spl-token';
@@ -24,10 +25,6 @@ import {useSendTransaction} from '@privy-io/react-auth';
   const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
   const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 
-  const RPC = 'https://mainnet.helius-rpc.com/?api-key=a4b0eee7-b375-4650-8b75-6cb352b6f3c4';
-  const connection = new Connection(RPC);
-
-
 export const tokenTransfer = async (
     payerPubKey: string, 
     receiverPubKey: string, 
@@ -37,7 +34,7 @@ export const tokenTransfer = async (
     ): Promise<boolean> => {
   
 
-      const PRIORITY_RATE = 100100; // MICRO_LAMPORTS 1^-15 solana  250000
+      const PRIORITY_RATE = 1001000; // MICRO_LAMPORTS 1^-15 solana  250000
       const PRIORITY_FEE_IX = ComputeBudgetProgram.setComputeUnitPrice({microLamports: PRIORITY_RATE});
 
     console.log("Running in tokenTransfer");
@@ -64,6 +61,10 @@ export const tokenTransfer = async (
       }
   
       console.log('Searching with program id: ', programId)
+      
+      const RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+      const connection = new Connection(RPC);
+    
         const payerParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
           senderPublicKey,
           { programId: new PublicKey(programId) }
