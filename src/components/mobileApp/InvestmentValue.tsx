@@ -9,7 +9,7 @@ function InvestmentValue() {
     const currentValue: number = usdyBalance
   
     const [upBy, setUpBy] = useState(currentValue);
-    const zero = 0.0
+    const MINIMUM_VALUE = 0.001
   
     let upByPrecision = 9;
   
@@ -44,12 +44,20 @@ function InvestmentValue() {
   }, [upByPrecision]);
 
 
-
-    return(
-        <div style={{width: '220px'}}>
-        {upBy.toFixed(upByPrecision).split('.')[0].toLocaleString() + '.' + upBy.toFixed(upByPrecision).split('.')[1]}
+    if (usdyBalance < MINIMUM_VALUE) {
+        return(
+        <div style={{textAlign: 'center'}}>
+            0.00
         </div>
-    )
+        )
+    } else {
+        return(
+            <div style={{width: '220px'}}>
+            {upBy.toFixed(upByPrecision).split('.')[0].toLocaleString() + '.' + upBy.toFixed(upByPrecision).split('.')[1]}
+            </div>
+        )
+    }
+
 
 }
 

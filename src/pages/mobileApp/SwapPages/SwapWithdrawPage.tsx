@@ -70,9 +70,9 @@ function SwapWithdraw() {
         } else if (depositWithdrawProductType == 'Crypto') {
           setWithdrawal(`${btcSolBalance}`)
         }
-        if (depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC > 0.99) {
+        if (depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC > MINIMUM_VALUE) {
           setWithdrawalButtonActive(true)
-        } else if (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC > 0.99) { // hardcode BTC price
+        } else if (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC > MINIMUM_VALUE) { // hardcode BTC price
           setWithdrawalButtonActive(true)
         } else {
           setWithdrawalButtonActive(false)
