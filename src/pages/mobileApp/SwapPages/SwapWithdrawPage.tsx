@@ -19,6 +19,7 @@ import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 function SwapWithdraw() {
 
+  const MINIMUM_VALUE = 0.01
   const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
   const showMenu = useSelector((state: any) => state.userWalletData.showSwapWithdrawPage)
   const db = getFirestore();
@@ -156,8 +157,8 @@ function SwapWithdraw() {
       const handleCashOutButtonClick = async () => {
 
           console.log('Withdraw usdyBalance: ', usdyBalance)
-          if ((depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC >= 0.99) || 
-          (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC >= 0.99)) { 
+          if ((depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC >= MINIMUM_VALUE) || 
+          (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC >= MINIMUM_VALUE)) { 
             // TO DO: user transactions enabled
             // const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
             const transactionsEnabled = true
@@ -232,7 +233,7 @@ function SwapWithdraw() {
             }
           } 
         } else {
-          setErrorMessage('Sorry, the minimum withdrawal is $1')
+          setErrorMessage(`Sorry, the minimum withdrawal is $${MINIMUM_VALUE}`)
           setWithdrawalInProgress(false)
         }
       

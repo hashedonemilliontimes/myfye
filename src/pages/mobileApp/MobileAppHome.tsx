@@ -63,7 +63,7 @@ function WebAppInner() {
 
   const dispatch = useDispatch();
 
-  const [userDataLoaded, setUserDataLoaded] = useState(true); // To do: get user data
+  const [userDataLoaded, setUserDataLoaded] = useState(false); // To do: get user data
   const ANNOUNCMENT_MESSAGE = ''
 
   const {user, ready, authenticated, login, linkPasskey} = usePrivy();
@@ -87,6 +87,7 @@ function WebAppInner() {
             priceOfUSDYinUSDC, 
             priceOfBTCinUSDC,
             priceOfEURCinUSDC);
+            setUserDataLoaded(true);
         } catch (error) {
           console.error('Error during login:', error);
         }

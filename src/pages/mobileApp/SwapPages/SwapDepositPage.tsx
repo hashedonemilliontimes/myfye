@@ -30,7 +30,7 @@ import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 function SwapDeposit() {
 
-    const MINIMUM_DEPOSIT_VALUE = 1.0
+    const MINIMUM_DEPOSIT_VALUE = 0.01
 
     const functions = getFunctions();
     const db = getFirestore();
@@ -376,8 +376,8 @@ function SwapDeposit() {
           } else if (depositToNumber > balanceSelectedInUSD) {
             setErrorMessage('Insufficient balance');
             setErrorMessageColor('#A90900')
-          } else if (depositToNumber < 0.9) {
-            setErrorMessage('Minimum: $1');
+          } else if (depositToNumber < MINIMUM_DEPOSIT_VALUE) {
+            setErrorMessage(`Minimum: $${MINIMUM_DEPOSIT_VALUE}`);
             setErrorMessageColor('#A90900')
           } else if (!isTransactionsEnabled) {
               setErrorMessageColor('#222222');

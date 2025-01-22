@@ -44,19 +44,12 @@ function InvestmentValue() {
   }, [upByPrecision]);
 
 
-if (upBy < 0.9) {
-    return(
-<div style={{width: '90px'}}>
-{zero.toFixed(2).split('.')[0].toLocaleString() + '.' + zero.toFixed(2).split('.')[1]}
-</div>
-    )
-} else {
+
     return(
         <div style={{width: '220px'}}>
         {upBy.toFixed(upByPrecision).split('.')[0].toLocaleString() + '.' + upBy.toFixed(upByPrecision).split('.')[1]}
         </div>
     )
-}
 
 }
 
