@@ -64,6 +64,7 @@ function WebAppInner() {
   const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
   const userPassKeyState = useSelector((state: any) => state.userWalletData.passKeyState);
   const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+  const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
   const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
   const KYCVerifired = useSelector((state: any) => state.userWalletData.currentUserKYCVerified);
   const db = getFirestore();
@@ -88,7 +89,11 @@ function WebAppInner() {
         try {
           if (!(user?.wallet)) {
           } 
-          await HandleUserLogIn(user, dispatch, priceOfUSDYinUSDC);
+          await HandleUserLogIn(
+            user, 
+            dispatch, 
+            priceOfUSDYinUSDC, 
+            priceOfBTCinUSDC);
         } catch (error) {
           console.error('Error during login:', error);
         }

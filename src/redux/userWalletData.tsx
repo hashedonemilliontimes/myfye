@@ -22,9 +22,9 @@ interface UserWalletDataState {
   usdtEthBalance: number,
   busdEthBalance: number,
   currentUserKYCVerified: boolean,
-  earnWithdrawTransactionStatus: string,
-  earnDepositTransactionStatus: string,
-  walletSwapTransactionStatus: string,
+  swapWithdrawTransactionStatus: string,
+  swapDepositTransactionStatus: string,
+  swapFXTransactionStatus: string,
   updatingBalance: boolean,
   hotBalanceUSDY: number,
   shouldShowBottomNav: boolean,
@@ -45,6 +45,7 @@ interface UserWalletDataState {
   showSwapWithdrawPage: boolean,
   showSwapDepositPage: boolean,
   priceOfUSDYinUSDC: number,
+  priceOfBTCinUSDC: number,
   recentlyUsedSolanaAddresses: string[],
   showContactPopup: boolean,
   selectedLanguageCode: string,
@@ -74,9 +75,9 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserFirstName: '',
   currentUserLastName: '',
   currentUserEmail: '',
-  earnWithdrawTransactionStatus: 'string',
-  earnDepositTransactionStatus: 'string',
-  walletSwapTransactionStatus: 'string',
+  swapWithdrawTransactionStatus: '',
+  swapDepositTransactionStatus: '',
+  swapFXTransactionStatus: '',
   updatingBalance: false,
   hotBalanceUSDY: 0,
   shouldShowBottomNav: true,
@@ -97,6 +98,7 @@ const initialUserWalletData: UserWalletDataState = {
   showSwapWithdrawPage: false,
   showSwapDepositPage: false,
   priceOfUSDYinUSDC: 0,
+  priceOfBTCinUSDC: 0,
   recentlyUsedSolanaAddresses: [],
   showContactPopup: false,
   selectedLanguageCode: '',
@@ -179,13 +181,13 @@ export const userWalletDataSlice = createSlice({
     state.currentUserEmail = action.payload;
   },
   setSwapWithdrawTransactionStatus: (state, action: PayloadAction<string>) => {
-    state.earnWithdrawTransactionStatus = action.payload;
+    state.swapWithdrawTransactionStatus = action.payload;
   },
   setSwapDepositTransactionStatus: (state, action: PayloadAction<string>) => {
-    state.earnDepositTransactionStatus = action.payload;
+    state.swapDepositTransactionStatus = action.payload;
   },
-  setWalletSwapTransactionStatus: (state, action: PayloadAction<string>) => {
-    state.walletSwapTransactionStatus = action.payload;
+  setSwapFXTransactionStatus: (state, action: PayloadAction<string>) => {
+    state.swapFXTransactionStatus = action.payload;
   },
   setUpdatingBalance: (state, action: PayloadAction<boolean>) => {
     state.updatingBalance = action.payload;
@@ -247,6 +249,9 @@ export const userWalletDataSlice = createSlice({
   setPriceOfUSDYinUSDC: (state, action: PayloadAction<number>) => {
     state.priceOfUSDYinUSDC = action.payload;
   },
+  setPriceOfBTCinUSDC: (state, action: PayloadAction<number>) => {
+    state.priceOfBTCinUSDC = action.payload;
+  },
   setRecentlyUsedSolanaAddresses: (state, action: PayloadAction<string[]>) => {
     state.recentlyUsedSolanaAddresses = action.payload;
   },
@@ -278,8 +283,10 @@ export const {
   setusdcEthValue, setusdtEthValue, setbusdEthValue, 
   setCurrentUserKYCVerified,
   setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setSwapDepositTransactionStatus,
-  setSwapWithdrawTransactionStatus, setWalletSwapTransactionStatus,
+  setcurrentUserEmail, 
+  setSwapWithdrawTransactionStatus,
+  setSwapDepositTransactionStatus,
+  setSwapFXTransactionStatus,
    setUpdatingBalance,
   setShouldShowBottomNav, setShowPayPage, setShowSendPage,
   setShowWithdrawStablecoinPage, setShowBanxaPopUp,
@@ -289,6 +296,7 @@ export const {
   setShowProfileMenu, setShowSwapWithdrawPage,
   setShowSwapDepositPage, setHotBalanceUSDY,
   setPriceOfUSDYinUSDC, 
+  setPriceOfBTCinUSDC,
   setRecentlyUsedSolanaAddresses, 
   setShowContactPopup, setSelectedLanguageCode,
   setcurrentUserID, setDepositWithdrawProductType,

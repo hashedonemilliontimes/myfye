@@ -30,6 +30,7 @@ function EarnPage() {
         if (showMenu) {
           setMenuPosition('0'); // Bring the menu into view
         } else {
+          dispatch(setShouldShowBottomNav(true));
           setMenuPosition('-150vh'); // Move the menu off-screen
           
           setcurrencySelected('');

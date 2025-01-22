@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import backButton from '../../../assets/backButton3.png';
 import { getFunctions } from 'firebase/functions';
-import { setusdySolValue, setbtcSolValue } from '../../../redux/userWalletData.tsx';
+import { setusdySolValue, setbtcSolValue, setusdcSolValue } from '../../../redux/userWalletData.tsx';
 import { swap } from '../../../functions/Swaps.tsx';
 import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
 import { setShowSwapWithdrawPage, 
     setSwapWithdrawTransactionStatus, 
     setShouldShowBottomNav } from '../../../redux/userWalletData.tsx';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-
 import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 // TO DO: disabled transactions 
@@ -23,27 +22,29 @@ function SwapWithdraw() {
   const [withdrawalInProgress, setWithdrawalInProgress] = useState(false);
   const showMenu = useSelector((state: any) => state.userWalletData.showSwapWithdrawPage)
   const db = getFirestore();
-    const [feeAmount, setfeeAmount] = useState(0.1);
-    const dispatch = useDispatch();
-    const [currencySelected, setcurrencySelected] = useState('');
-    const functions = getFunctions();
-    const [menuPosition, setMenuPosition] = useState('-110vh'); 
-    const [errorMessage, setErrorMessage] = useState('');
-    const [errorMessageColor, setErrorMessageColor] = useState('#222222');
-    const [withdrawalButtonActive, setWithdrawalButtonActive] = useState(false);
-    const [confirmButtonActive, setconfirmButtonActive] = useState(false);
-    const [reviewButtonClicked, setreviewButtonClicked] = useState(false); 
-    const [withdrawal, setWithdrawal] = useState('');
-    const [selectedWithdrawalPortion, setselectedWithdrawalPortion] = useState('');
-    const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
-    const depositWithdrawProductType = useSelector((state: any) => state.userWalletData.depositWithdrawProductType);
-    const [shouldNotify, setShouldNotify] = useState(false);
-    const transactionStatus = useSelector((state: any) => state.userWalletData.swapWithdrawTransactionStatus);
-    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
-    const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
-    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
-    const { wallets } = useSolanaWallets();
+  const [feeAmountInUSD, setfeeAmountInUSD] = useState(0.1);
+  const dispatch = useDispatch();
+  const [currencySelected, setcurrencySelected] = useState('');
+  const functions = getFunctions();
+  const [menuPosition, setMenuPosition] = useState('-110vh'); 
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageColor, setErrorMessageColor] = useState('#222222');
+  const [withdrawalButtonActive, setWithdrawalButtonActive] = useState(false);
+  const [confirmButtonActive, setconfirmButtonActive] = useState(false);
+  const [reviewButtonClicked, setreviewButtonClicked] = useState(false); 
+  const [withdrawal, setWithdrawal] = useState('');
+  const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+  const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
+  const [selectedWithdrawalPortion, setselectedWithdrawalPortion] = useState('');
+  const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
+  const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
+  const depositWithdrawProductType = useSelector((state: any) => state.userWalletData.depositWithdrawProductType);
+  const [shouldNotify, setShouldNotify] = useState(false);
+  const transactionStatus = useSelector((state: any) => state.userWalletData.swapWithdrawTransactionStatus);
+  const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
+  const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+  const { wallets } = useSolanaWallets();
+  const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
 
     useEffect(() => {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -68,15 +69,18 @@ function SwapWithdraw() {
         } else if (depositWithdrawProductType == 'Crypto') {
           setWithdrawal(`${btcSolBalance}`)
         }
-        setfeeAmount(0.1)
-        if (depositWithdrawProductType == 'Earn' && usdyBalance > 0.0001) {
+        if (depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC > 0.99) {
           setWithdrawalButtonActive(true)
-        } else if (depositWithdrawProductType == 'Crypto' && btcSolBalance*106647 > 0.001) { // hardcode BTC price
+        } else if (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC > 0.99) { // hardcode BTC price
           setWithdrawalButtonActive(true)
         } else {
           setWithdrawalButtonActive(false)
         }
-      }, [usdyBalance, btcSolBalance, depositWithdrawProductType]);
+      }, [usdyBalance, 
+        btcSolBalance, 
+        depositWithdrawProductType,
+        priceOfUSDYinUSDC,
+        priceOfBTCinUSDC]);
 
       useEffect(() => {
         if (showMenu) {
@@ -90,7 +94,7 @@ function SwapWithdraw() {
       }, [showMenu]);
     
       useEffect(() => {
-
+        console.log("Transaction status", transactionStatus)
         if (transactionStatus === 'Signed') {
           setErrorMessageColor('#60A05B')
           setErrorMessage('Swapping, Please Wait')
@@ -103,7 +107,7 @@ function SwapWithdraw() {
         }
 
         if (transactionStatus === 'Success') {
-
+          updateUserBalance();
           setErrorMessageColor('#60A05B')
           if (selectedLanguageCode == 'es') {
             setErrorMessage('Exito!');
@@ -114,24 +118,17 @@ function SwapWithdraw() {
           console.log('Calling handleWithdrawal with pubKey: ', publicKey, ' usdyBalance: ', usdyBalance);
           const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
           const withdrawalToNumber = Number(cleanedWithdrawal);
-          handleWithdrawSuccess(withdrawalToNumber)
-
-          if (depositWithdrawProductType == 'Earn') {
-            dispatch(setusdySolValue(0.0));
-          } else if (depositWithdrawProductType == 'Crypto') {
-            dispatch(setbtcSolValue(0.0));
-          }
-          
+          handleWithdrawSuccess(withdrawalToNumber);
 
           setTimeout(() => {
             setErrorMessage('')
             setconfirmButtonActive(false);
-            setreviewButtonClicked(false)
-            setWithdrawalInProgress(false)
+            setreviewButtonClicked(false);
+            setWithdrawalInProgress(false);
             setWithdrawal('')
-            setfeeAmount(0)
+            setfeeAmountInUSD(0.1)
             handleMenuClick()
-          }, 4000);
+          }, 1500);
       }
       if (transactionStatus === 'Fail') {
 
@@ -159,82 +156,85 @@ function SwapWithdraw() {
       const handleCashOutButtonClick = async () => {
 
           console.log('Withdraw usdyBalance: ', usdyBalance)
-          if ((depositWithdrawProductType == 'Earn' && usdyBalance >= 0.9) || 
-          (depositWithdrawProductType == 'Crypto' && btcSolBalance >= 0.000008)) { // Hardcoded value of bitcoin
+          if ((depositWithdrawProductType == 'Earn' && usdyBalance*priceOfUSDYinUSDC >= 0.99) || 
+          (depositWithdrawProductType == 'Crypto' && btcSolBalance*priceOfBTCinUSDC >= 0.99)) { 
             // TO DO: user transactions enabled
             // const isTransactionsEnabled = await getUserTransactionsEnabled(user!.userId!);
-            const isTransactionsEnabled = true
-            if (isTransactionsEnabled) {
-            setErrorMessageColor('#222222');
+            const transactionsEnabled = true
+            if (transactionsEnabled) {
+
+              let feeAmountNativeSmallestDenomination: number = 0;
+
+              if (depositWithdrawProductType == 'Earn') {
+                feeAmountNativeSmallestDenomination = Math.round((feeAmountInUSD/priceOfUSDYinUSDC)* 1e6);
+              } 
+              
+              if (depositWithdrawProductType == 'Crypto') {
+                feeAmountNativeSmallestDenomination =Math.round(feeAmountInUSD/priceOfBTCinUSDC* 1e8);
+              }
+
+
+              
+              // update UI
+              setErrorMessage('Check your wallet...')
+              setErrorMessageColor('#60A05B')
+              setWithdrawalInProgress(true)
+
+              if (!isNaN(feeAmountNativeSmallestDenomination)) {
+          
+              let convertToSmallestDenomination = 0;
+              if (depositWithdrawProductType == 'Earn') {
+                convertToSmallestDenomination =  Math.round(usdyBalance * 1e6);
+              } else if (depositWithdrawProductType == 'Crypto') {
+                convertToSmallestDenomination =  Math.round(btcSolBalance * 1e8);
+              }
+
+              setShouldNotify(true)
+              
+              // inputAmount is total balance minus fee
+              const inputAmount: number = convertToSmallestDenomination;
+
+              let inputCurrency: String = '';
+              if (depositWithdrawProductType == 'Earn') {
+                inputCurrency = 'usdySol'
+              } else if (depositWithdrawProductType == 'Crypto') {
+                inputCurrency = 'btcSol'
+              }
+              const outputCurrency: String = 'usdcSol';
+
+              const wallet = wallets[0];
+
+              console.log("Calling swap with input amount", convertToSmallestDenomination);
+              console.log("Calling swap with input fee", feeAmountNativeSmallestDenomination);
+              
+              const signWithdrawalSuccess = await swap(
+                wallet, 
+                publicKey, 
+                convertToSmallestDenomination, 
+                inputCurrency!, 
+                outputCurrency!, 
+                dispatch, 
+                'withdraw',
+                feeAmountNativeSmallestDenomination
+              );
+
+              setShouldNotify(false)
+            } else {
+              setErrorMessage('Error when processing fee, the amount may be too low, please contact support')
+              setErrorMessageColor('#000000')
+              setWithdrawalInProgress(false)
+            }
+          } else {
             if (selectedLanguageCode == 'es') {
               setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
             } else {
               setErrorMessage('Transactions disabled, please contact Myfye support')
             }
-          
-        const cleanedWithdrawal = withdrawal.replace(/[\s$,!#%&*()A-Za-z]/g, '');
-        const withdrawalToNumber = Number(cleanedWithdrawal);
-      
-        const finalAmount = withdrawalToNumber - feeAmount
-
-        setErrorMessage('Check your wallet...')
-        setErrorMessageColor('#60A05B')
-        setWithdrawalInProgress(true)
-
-        if (!isNaN(withdrawalToNumber)) {
-          
-          if (depositWithdrawProductType == 'Earn' && withdrawalToNumber < 0.5) {
-            console.log('funds', withdrawalToNumber)
-            setErrorMessage('Insufficient Funds')
-            setErrorMessageColor('#000000')
-            console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
-            setWithdrawalInProgress(false)
-          
-          } else {
-          
-          
-          // take off a small amount because USDY changes 
-          let convertToSmallestDenomination = 0;
-          if (depositWithdrawProductType == 'Earn') {
-            convertToSmallestDenomination =  Math.round(usdyBalance * 1e6);
-          } else if (depositWithdrawProductType == 'Crypto') {
-            convertToSmallestDenomination =  Math.round(btcSolBalance * 1e8);
-          }
-
-          setShouldNotify(true)
-          
-
-          const inputAmount: number = convertToSmallestDenomination;
-          let inputCurrency: String = '';
-          if (depositWithdrawProductType == 'Earn') {
-            inputCurrency = 'usdySol'
-          } else if (depositWithdrawProductType == 'Crypto') {
-            inputCurrency = 'btcSol'
-          }
-          const outputCurrency: String = 'usdcSol';
-
-          const wallet = wallets[0];
-          const signWithdrawalSuccess = await swap(wallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'deposit');
-
-          setShouldNotify(false)
-        }
+          } 
         } else {
-          setErrorMessage('Insufficient Funds')
-          setErrorMessageColor('#000000')
-          console.log('withdrawalToNumber', withdrawalToNumber, 'usdySolBalance', usdyBalance)
+          setErrorMessage('Sorry, the minimum withdrawal is $1')
           setWithdrawalInProgress(false)
         }
-      } else {
-        if (selectedLanguageCode == 'es') {
-          setErrorMessage('Transacciones deshabilitadas, comuníquese con el soporte de Myfye');
-        } else {
-          setErrorMessage('Transactions disabled, please contact Myfye support')
-        }
-      } 
-      } else {
-        setErrorMessage('Sorry, the minimum withdrawal is $1')
-        setWithdrawalInProgress(false)
-      }
       
       };
 
@@ -255,6 +255,30 @@ function SwapWithdraw() {
          // To Do nice animation for withdraw complete
          
         }
+      }
+
+      const updateUserBalance = () => {
+        
+        if (depositWithdrawProductType == 'Earn') {
+          const newUSDCBalance = usdcSolBalance + (usdyBalance/priceOfUSDYinUSDC);
+
+          console.log("Setting setusdySolValue to", 0)
+          console.log("Setting susdcSolBalance to", newUSDCBalance)
+
+          dispatch(setusdySolValue(0));
+          dispatch(setusdcSolValue(newUSDCBalance))
+
+        } else if (depositWithdrawProductType == 'Crypto') {
+          
+          const newUSDCBalance = usdcSolBalance + (btcSolBalance/priceOfBTCinUSDC);
+
+          console.log("Setting setbtcSolValue to", 0)
+          console.log("Setting susdcSolBalance to", newUSDCBalance)
+
+          dispatch(setbtcSolValue(0));
+          dispatch(setusdcSolValue(newUSDCBalance))
+        }
+        
       }
 
       const errorLabelText = () => {
@@ -370,7 +394,7 @@ alignItems: 'center'}}>
 
 { depositWithdrawProductType === 'Crypto' && (
         <span>
-$ {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+$ {(btcSolBalance * priceOfBTCinUSDC).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
         </span>
       )}
 
@@ -387,9 +411,10 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}
 
 {selectedLanguageCode === 'en' && `Fee: `}
 {selectedLanguageCode === 'es' && `Tarifa: `}
-{feeAmount > 0 ? (<>
-          $ {(feeAmount.toFixed(6).split('.')[0].toLocaleString() + '.' + feeAmount.toFixed(6).split('.')[1]).replace(/\.?0+$/, '')}
-          </>) : (<></>)}
+<div>&nbsp;1%</div>
+{ /* feeAmountInUSD > 0 ? (<>
+          $ {(feeAmountInUSD.toFixed(6).split('.')[0].toLocaleString() + '.' + feeAmountInUSD.toFixed(6).split('.')[1]).replace(/\.?0+$/, '')}
+          </>) : (<></>) */ }
       </div>
       </div>
 
@@ -408,13 +433,13 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}
 
       { depositWithdrawProductType === 'Crypto' && (
         <span>
-<div style={{ fontSize: '36px'}}>{((btcSolBalance * 95000)-feeAmount).toFixed(4).toLocaleString()}</div>
+<div style={{ fontSize: '36px'}}>{((btcSolBalance * priceOfBTCinUSDC)-feeAmountInUSD).toFixed(4).toLocaleString()}</div>
         </span>
       )}
 
       { depositWithdrawProductType === 'Earn' && (
         <span>
-      <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)-feeAmount).toFixed(4).toLocaleString()}</div>
+      <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)-feeAmountInUSD).toFixed(4).toLocaleString()}</div>
         </span>
       )}
 

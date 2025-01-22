@@ -10,7 +10,7 @@ import {
   setShowWalletPage, 
   setShowWithdrawStablecoinPage, 
   setShowDepositStablecoinPage, 
-  setWalletSwapTransactionStatus,
+  setSwapFXTransactionStatus,
  } from '../../redux/userWalletData.tsx';
 import history from '../assets/history.png';
 import WalletTransactions from '../../components/mobileApp/wallet/WalletTransactions.tsx';
@@ -31,7 +31,7 @@ function WalletPage() {
     const [currencySelected, setcurrencySelected] = useState('');
     const [showTransactionHistory, setshowTransactionHistory] = useState(false);
     const [menuPosition, setMenuPosition] = useState('-800px'); 
-  const transactionStatus = useSelector((state: any) => state.userWalletData.walletSwapTransactionStatus) 
+  const transactionStatus = useSelector((state: any) => state.userWalletData.swapFXTransactionStatus) 
     const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
     const [Message, setMessage] = useState('');
     const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
@@ -136,7 +136,7 @@ function WalletPage() {
           setErrorMessageColor('#000000')
           setTimeout(() => {
             setTransactionInProgress(false);
-            dispatch(setWalletSwapTransactionStatus(''))
+            dispatch(setSwapFXTransactionStatus(''))
           }, 3000);
         }
       }, [transactionStatus]);
@@ -223,7 +223,7 @@ function WalletPage() {
       amountSelected = eurcSolBalance;
       inputCurrency = 'eurcSol';
     } else {
-      dispatch(setWalletSwapTransactionStatus('Fail'))
+      dispatch(setSwapFXTransactionStatus('Fail'))
     }
 
     if (amountSelected < 1.0) {
@@ -232,7 +232,7 @@ function WalletPage() {
         'Insufficient balance');
     } else {
 
-      dispatch(setWalletSwapTransactionStatus('Unsigned'))
+      dispatch(setSwapFXTransactionStatus('Unsigned'))
 
       const convertToSmallestDenomination = Math.round(amountSelected * 1e6);
       setTransactionInProgress(true); 

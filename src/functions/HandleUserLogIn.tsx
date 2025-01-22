@@ -11,7 +11,8 @@ import {
     setcurrentUserEmail,
     setWalletPubKey,
     setPassKeyState,
-    setPriceOfUSDYinUSDC
+    setPriceOfUSDYinUSDC,
+    setPriceOfBTCinUSDC
     } from '../redux/userWalletData.tsx';
 import { 
     getFirestore, 
@@ -28,7 +29,8 @@ import { useSelector } from 'react-redux';
 const HandleUserLogIn = async (
   user: any, 
   dispatch: Function,
-  priceOfUSDYinUSDC: number ): Promise<{ success: boolean;}> => {
+  priceOfUSDYinUSDC: number,
+  priceOfBTCinUSDC: number ): Promise<{ success: boolean;}> => {
 
     console.log('user', user)
 
@@ -47,6 +49,7 @@ const HandleUserLogIn = async (
     try {
         await Promise.all([
           getUSDYPriceQuote(priceOfUSDYinUSDC, dispatch),
+          getBTCPriceQuote(priceOfBTCinUSDC, dispatch),
           getUserBalances(user.wallet.address, dispatch),
           getUserData(user.wallet.address, dispatch),
         ]);
@@ -216,15 +219,45 @@ const getUSDYPriceQuote = async (price: number, dispatch: Function): Promise<boo
       if (priceInUSD && priceInUSD>0.01) {
           dispatch(setPriceOfUSDYinUSDC(quote.outAmount/1000000))
       } else {
-          dispatch(setPriceOfUSDYinUSDC(1.05))
+          dispatch(setPriceOfUSDYinUSDC(1.06)) // default to $1.06
       }
       
   }
 
   async function getSwapQuote() {
 
-      const outputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-      const inputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
+      const outputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' // USDC
+      const inputMintAddress = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6'; // USDY
+
+      const quoteResponse = await fetch(
+        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${1* 1000000}&slippageBps=50`
+      ).then(response => response.json());
+      
+      return quoteResponse
+    }
+
+  return true
+}
+
+
+const getBTCPriceQuote = async (price: number, dispatch: Function): Promise<boolean> => {
+
+  if (price <= 0.01) {
+      const quote = await getSwapQuote()
+      const priceInUSD = quote.outAmount/1000000
+      if (priceInUSD && priceInUSD>0.01) {
+          console.log("Setting BTC PRice", quote.outAmount/10000)
+          dispatch(setPriceOfBTCinUSDC(quote.outAmount/10000))
+      } else {
+          dispatch(setPriceOfBTCinUSDC(100000)) // default to $100,000
+      }
+      
+  }
+
+  async function getSwapQuote() {
+
+      const outputMintAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // USDC
+      const inputMintAddress = 'cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij'; // BTC
 
       const quoteResponse = await fetch(
         `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${1* 1000000}&slippageBps=50`

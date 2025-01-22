@@ -8,11 +8,13 @@ import {
   TransactionExpiredBlockheightExceededError,
   VersionedTransactionResponse, } from "@solana/web3.js";
 import { 
+  setSwapFXTransactionStatus,
   setSwapWithdrawTransactionStatus,
-  setSwapDepositTransactionStatus,
-  setWalletSwapTransactionStatus
+  setSwapDepositTransactionStatus
  } from '../redux/userWalletData.tsx'; // For managing UI
 import { HELIUS_API_KEY } from '../env.ts';
+import calculateBasisPoints from'./CalculateBasisPoints.tsx';
+import getTokenAccountData from "./GetTokenAccount.tsx";
 
 // Swapping pairs
 const USDC_MINT_ADDRESS = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -22,73 +24,108 @@ const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
 const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
 const BTC_MINT_ADDRESS = 'cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij';
   
-  type TransactionSenderAndConfirmationWaiterArgs = {
-    connection: Connection;
-    serializedTransaction: Buffer;
-    blockhashWithExpiryBlockHeight: BlockhashWithExpiryBlockHeight;
-  };
-  
-  const SEND_OPTIONS = {
-    skipPreflight: true,
-  };
+type TransactionSenderAndConfirmationWaiterArgs = {
+  connection: Connection;
+  serializedTransaction: Buffer;
+  blockhashWithExpiryBlockHeight: BlockhashWithExpiryBlockHeight;
+};
 
-  //window.Buffer = Buffer;
+const SEND_OPTIONS = {
+  skipPreflight: true,
+};
 
+const RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+const connection = new Connection(RPC);
 
-  const RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-  const connection = new Connection(RPC);
+function mintAddress(currencyCode: String): String {
+  let mintAddress = USDC_MINT_ADDRESS;
+  if (currencyCode === 'usdcSol') {
+      mintAddress = USDC_MINT_ADDRESS;
+  } else if (currencyCode === 'usdtSol') {
+      mintAddress = USDT_MINT_ADDRESS;
+  } else if (currencyCode === 'usdySol') {
+    mintAddress = USDY_MINT_ADDRESS;
+  } else if (currencyCode === 'pyusdSol') {
+    mintAddress = PYUSD_MINT_ADDRESS;
+  } else if (currencyCode === 'eurcSol') {
+    mintAddress = EURC_MINT_ADDRESS;
+  } else if (currencyCode === 'btcSol') {
+    mintAddress = BTC_MINT_ADDRESS;
+  }
+  return mintAddress;
+}
 
-export const swap = async (wallet: any, publicKey: String, inputAmount: number, inputCurrency: String, 
-    outputCurrency: String, dispatch: Function, type: String) => {
+export const swap = async (
+  wallet: any, 
+  publicKey: String, 
+  inputAmount: number, 
+  inputCurrency: String, 
+  outputCurrency: String, 
+  dispatch: Function, 
+  type: String,
+  microPlatformFeeAmount: number = 0
+) => {
   
-    console.log('running swap with data: ', publicKey, inputAmount, inputCurrency, outputCurrency)
-  
-    // Output mint
-    let output_mint = USDY_MINT_ADDRESS;
-    if (outputCurrency == 'usdcSol') {
-      output_mint = USDC_MINT_ADDRESS
-    } else if (outputCurrency == 'eurcSol') {
-      output_mint = EURC_MINT_ADDRESS
-    } else if (outputCurrency == 'btcSol') {
-      output_mint = BTC_MINT_ADDRESS
-    }
-  
-    getSwapQuote(inputAmount, inputCurrency, output_mint)
-        .then(quote => {
-            console.log('Got quote for swap');
-            const amountInt = Math.round(quote.outAmount);
-            const amountBigInt = BigInt(amountInt);
-            swapTransaction(wallet, quote, publicKey, dispatch, type);
-        })
-        .catch(error => {
-          updateUI(dispatch, type, 'Fail')
-          console.error('Error calling getSwapQuote retrying becuase error: ', error)
-  });
+  console.log("microPlatformFeeAmount", microPlatformFeeAmount)
+  // Output mint
+  const output_mint = mintAddress(outputCurrency);
+  // Input mint
+  const inputMint = mintAddress(inputCurrency);
+
+  let platformFeeAccountData: any;
+
+  if (microPlatformFeeAmount > 0) {
+    platformFeeAccountData = await getTokenAccountData(
+      'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn',
+      inputMint,
+      'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+    )
+
+  }
+  console.log("Got token account", platformFeeAccountData)
+
+  getSwapQuote(
+    inputAmount, 
+    inputCurrency, 
+    output_mint,
+    microPlatformFeeAmount
+  )
+      .then(quote => {
+          swapTransaction(
+            wallet, 
+            quote, 
+            publicKey, 
+            dispatch, 
+            type,
+            platformFeeAccountData);
+      })
+      .catch(error => {
+        updateUI(dispatch, type, 'Fail')
+        console.error('Error calling getSwapQuote retrying becuase error: ', error)
+      });
   }
 
-  async function getSwapQuote(microInputAmount: number, inputCurrencyType: String, outputMint: String = USDY_MINT_ADDRESS) {
+  async function getSwapQuote(
+    microInputAmount: number, 
+    inputCurrencyType: String, 
+    outputMint: String = USDY_MINT_ADDRESS,
+    microPlatformFeeAmount: number = 0
+  ) {
 
     // Input mint
-    let inputMintAddress = USDC_MINT_ADDRESS;
-    if (inputCurrencyType === 'usdcSol') {
-        inputMintAddress = USDC_MINT_ADDRESS;
-    } else if (inputCurrencyType === 'usdtSol') {
-        inputMintAddress = USDT_MINT_ADDRESS;
-    } else if (inputCurrencyType === 'usdySol') {
-      inputMintAddress = USDY_MINT_ADDRESS;
-    } else if (inputCurrencyType === 'pyusdSol') {
-      inputMintAddress = PYUSD_MINT_ADDRESS;
-    } else if (inputCurrencyType === 'eurcSol') {
-      inputMintAddress = EURC_MINT_ADDRESS;
-    } else if (inputCurrencyType === 'btcSol') {
-      inputMintAddress = BTC_MINT_ADDRESS;
-    }
-    console.log('getting swap quote with amount', microInputAmount, 'inputMint', inputMintAddress, 'outputMint', outputMint)
-    console.log(`https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=300`)
+    const inputMintAddress = mintAddress(inputCurrencyType);
     
     try {
+      let url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=300`;
+
+      console.log("microPlatformFeeAmount", microPlatformFeeAmount)
+      if (microPlatformFeeAmount > 0) {
+        url += `&platformFeeBps=100`
+      } 
+
+      console.log("Quote url", url);
       const quoteResponse = await fetch(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMint}&amount=${microInputAmount}&slippageBps=300`
+        url
       ).then(response => response.json());
   
       return quoteResponse;
@@ -100,18 +137,49 @@ export const swap = async (wallet: any, publicKey: String, inputAmount: number, 
     }
   }
 
-  const swapTransaction = async (wallet: any, quoteData: any, receiverPubKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) => {
-            
-    const swapTransactionSignature = await getJupiterSwapTransaction(wallet, quoteData, receiverPubKey, dispatch, type)
+  const swapTransaction = async (
+    wallet: any, 
+    quoteData: any, 
+    receiverPubKey: String, 
+    dispatch: Function, 
+    type: String,
+    platformFeeAccountData: any
+  ) => {
+    
+  
+    // get the platform fee account
+    let platformFeeAccount: PublicKey | null = null;
+    if (platformFeeAccountData?.pubkey) {
+      platformFeeAccount = new PublicKey(platformFeeAccountData.pubkey);
+    }
+
+    console.log("platformFeeAccount", platformFeeAccount)
+
+    const swapTransactionSignature = await getJupiterSwapTransaction(
+      wallet, 
+      quoteData, 
+      receiverPubKey, 
+      dispatch, 
+      type,
+      platformFeeAccount)
 
 
 };
 
-async function getJupiterSwapTransaction(wallet: any, quoteResponse: any, 
-  userPublicKey: String, dispatch: Function, type: String, wrapAndUnwrapSol = true) {
+async function getJupiterSwapTransaction(
+  wallet: any, 
+  quoteResponse: any, 
+  userPublicKey: String, 
+  dispatch: Function, 
+  type: String, 
+  platformFeeAccountPubKey: PublicKey | null) {
+
+    console.log("platformFeeAccountPubKey", platformFeeAccountPubKey);
   try {
 
     window.Buffer = Buffer;
+    
+
     
     
       const response = await fetch('https://quote-api.jup.ag/v6/swap', {
@@ -120,19 +188,20 @@ async function getJupiterSwapTransaction(wallet: any, quoteResponse: any,
               'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-                quoteResponse, // quoteResponse from /quote api
-                userPublicKey: userPublicKey, // user public key to be used for the swap
-                dynamicComputeUnitLimit: true, // Set this to true to get the best optimized CU usage.
-                dynamicSlippage: { // This will set an optimized slippage to ensure high success rate
-                  maxBps: 300 // Make sure to set a reasonable cap here to prevent MEV
-                },
-                  prioritizationFeeLamports: {
-                  priorityLevelWithMaxLamports: {
-                    maxLamports: 10000000,
-                    priorityLevel: "veryHigh" // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
-                  }
-                }
-              })
+            quoteResponse, // quoteResponse from /quote api
+            userPublicKey: userPublicKey, // user public key to be used for the swap
+            dynamicComputeUnitLimit: true, // Set this to true to get the best optimized CU usage.
+            dynamicSlippage: { // This will set an optimized slippage to ensure high success rate
+              maxBps: 300 // Make sure to set a reasonable cap here to prevent MEV
+            },
+            prioritizationFeeLamports: {
+              priorityLevelWithMaxLamports: {
+                maxLamports: 10000000,
+                priorityLevel: "veryHigh" // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
+              }
+            },
+            feeAccount: platformFeeAccountPubKey
+          })
       });
 
       if (!response.ok) {
@@ -328,7 +397,7 @@ function updateUI(dispatch: any, type: String, status: string): void {
   } else if (type == 'deposit') {
     dispatch(setSwapDepositTransactionStatus(status)); // Update UI
   } else {
-    dispatch(setWalletSwapTransactionStatus(status)); // Update UI
+    dispatch(setSwapFXTransactionStatus(status)); // Update UI
   }
 
 }

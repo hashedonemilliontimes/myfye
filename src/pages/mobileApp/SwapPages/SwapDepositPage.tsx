@@ -12,7 +12,8 @@ import { setusdcSolValue,
   setpyusdSolValue,
   seteurcSolValue, 
   setShouldShowBottomNav, 
-  setusdySolValue} from '../../../redux/userWalletData.tsx';
+  setusdySolValue,
+  setbtcSolValue} from '../../../redux/userWalletData.tsx';
 import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
 import backButton from '../../../assets/backButton3.png';
 import solIcon from '../../../assets/solIcon.png';
@@ -42,7 +43,8 @@ function SwapDeposit() {
     const [networkSelected, setNetworkSelected] = useState('solana'); 
     const [currencySelected, setcurrencySelected] = useState('');
     const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
-
+    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
+    const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
     const [menuPosition, setMenuPosition] = useState('-110vh'); 
     const pieChartOpacity = useSelector((state: any) => state.userWalletData.pieChartOpacity);
     const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
@@ -57,6 +59,7 @@ function SwapDeposit() {
     const depositWithdrawProductType = useSelector((state: any) => state.userWalletData.depositWithdrawProductType);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
     const [usdyQuoteOutput, setusdyQuoteOutput] = useState(0); 
+    const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
     
     const walletName = useSelector((state: any) => state.userWalletData.type);
 
@@ -70,7 +73,7 @@ function SwapDeposit() {
 
     const dispatch = useDispatch();
     const [depositButtonActive, setDepositButtonActive] = useState(false);
-    const transactionStatus = useSelector((state: any) => state.userWalletData.earnDepositTransactionStatus)
+    const transactionStatus = useSelector((state: any) => state.userWalletData.swapDepositTransactionStatus)
     const [deposit, setDeposit] = useState('');
     const [selectedDepositPortion, setselectedDepositPortion] = useState('');
     const cryptoList = useSelector((state: any) => state.userWalletData.cryptoList)
@@ -148,7 +151,7 @@ function SwapDeposit() {
             //dispatch(setShouldShowBottomNav(true)) // Need to show bottom nav again
             
 
-          }, 3000);
+          }, 1500);
       }).catch((error) => {
           console.error(error);
           setErrorMessage(selectedLanguageCode === 'es' ? 
@@ -422,9 +425,19 @@ function SwapDeposit() {
 
       const updateUserBalance = () => {
         const newUSDBalance = balanceSelectedInUSD-newDepositAmount
+        
+        if (depositWithdrawProductType == 'Earn') {
+          const newUSDYBalance = usdySolBalance+(newDepositAmount/priceOfUSDYinUSDC)
+          console.log("setting new usdy balance", newUSDYBalance)
+          dispatch(setusdySolValue(newUSDYBalance))
+        } else if (depositWithdrawProductType == 'Crypto') {
+          
+          const newBTCBalance = btcSolBalance+(newDepositAmount/priceOfBTCinUSDC)
+          console.log("setting new btc balance", newBTCBalance)
+          dispatch(setbtcSolValue(newBTCBalance))
+        }
 
         console.log("setting new usdc balance", newUSDBalance)
-
         if (currencySelected == "usdcSol") {
           dispatch(setusdcSolValue(newUSDBalance));
         } else if (currencySelected == "usdtSol") {

@@ -21,6 +21,7 @@ function CryptoPage() {
     const [menuPosition, setMenuPosition] = useState('-150vh'); 
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
     const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
+    const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
 
     useEffect(() => {
         if (showMenu) {
@@ -148,7 +149,7 @@ function CryptoPage() {
     $ <span style={{ fontSize: '35px' }}>
       
     <div>
-    {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    {(btcSolBalance * priceOfBTCinUSDC).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
   </div>
 
     </span>

@@ -9,6 +9,7 @@ export default function CryptoTile() {
 
     const dispatch = useDispatch();
     
+    const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
     const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
     const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
 
@@ -39,7 +40,7 @@ export default function CryptoTile() {
     $ <span style={{ fontSize: '35px' }}>
 
     <div>
-    {(btcSolBalance * 95000).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    {(btcSolBalance * priceOfBTCinUSDC).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
   </div>
 
     </span>
