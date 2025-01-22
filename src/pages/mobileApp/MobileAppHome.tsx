@@ -54,20 +54,12 @@ function WebAppInner() {
   const {showMfaEnrollmentModal} = useMfaEnrollment();
 
   const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
-  const lastNameUI = useSelector((state: any) => state.userWalletData.currentUserLastName);
-  const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-  const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-  const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
-  const btcSolBalance = useSelector((state: any) => state.userWalletData.btcSolBalance);
-  const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
-  const shouldShowBottomNav = useSelector((state: any) => state.userWalletData.shouldShowBottomNav );
-  const userEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
   const userPassKeyState = useSelector((state: any) => state.userWalletData.passKeyState);
   const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
   const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
+  const priceOfEURCinUSDC = useSelector((state: any) => state.userWalletData.priceOfEURCinUSDC);
   const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
   const KYCVerifired = useSelector((state: any) => state.userWalletData.currentUserKYCVerified);
-  const db = getFirestore();
 
   const dispatch = useDispatch();
 
@@ -93,7 +85,8 @@ function WebAppInner() {
             user, 
             dispatch, 
             priceOfUSDYinUSDC, 
-            priceOfBTCinUSDC);
+            priceOfBTCinUSDC,
+            priceOfEURCinUSDC);
         } catch (error) {
           console.error('Error during login:', error);
         }

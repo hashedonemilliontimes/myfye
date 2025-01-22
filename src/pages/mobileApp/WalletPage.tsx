@@ -11,6 +11,9 @@ import {
   setShowWithdrawStablecoinPage, 
   setShowDepositStablecoinPage, 
   setSwapFXTransactionStatus,
+  seteurcSolValue,
+  setusdcSolValue,
+  setusdtSolValue
  } from '../../redux/userWalletData.tsx';
 import history from '../assets/history.png';
 import WalletTransactions from '../../components/mobileApp/wallet/WalletTransactions.tsx';
@@ -22,136 +25,156 @@ import eurcSol from '../../assets/eurcSol.png';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { swap } from '../../functions/Swaps.tsx';
 import LoadingAnimation from '../../components/LoadingAnimation.tsx';
+import {useSolanaWallets} from '@privy-io/react-auth/solana';
 
 function WalletPage() {
-    const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
-    const primaryWallet = null; // TO DO connect user wallet
-    const dispatch = useDispatch()
-    const [swapButtonActive, setSwapButtonActive] = useState(true);
-    const [currencySelected, setcurrencySelected] = useState('');
-    const [showTransactionHistory, setshowTransactionHistory] = useState(false);
-    const [menuPosition, setMenuPosition] = useState('-800px'); 
+  const showMenu = useSelector((state: any) => state.userWalletData.showWalletPage);
+  const dispatch = useDispatch()
+  const [swapButtonActive, setSwapButtonActive] = useState(true);
+  const [currencySelected, setcurrencySelected] = useState('');
+  const [showTransactionHistory, setshowTransactionHistory] = useState(false);
+  const [menuPosition, setMenuPosition] = useState('-800px'); 
   const transactionStatus = useSelector((state: any) => state.userWalletData.swapFXTransactionStatus) 
-    const currentUserEmail = useSelector((state: any) => state.userWalletData.currentUserEmail);
-    const [Message, setMessage] = useState('');
-    const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
-    const [showQRCode, setshowQRCode] = useState(false);
-    const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
-    const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
-    const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
-    const pyusdSolBalance = useSelector((state: any) => state.userWalletData.pyusdSolBalance);
-    const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
-    const usdyBalance = useSelector((state: any) => state.userWalletData.usdySolBalance);
-    const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
-    const [qrCodeURL, setqrCodeURL] = useState(''); 
-    const [showWalletInfoPopup, setShowWalletInfoPopup] = useState(false); 
-    const [showSwapPopup, setShowSwapPopup] = useState(false); 
-    const [addressCopied, setAddressCopied] = useState(false);
-    const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [errorMessageColor, setErrorMessageColor] = useState('#A90900');
-    const [transactionInProgress, setTransactionInProgress] = useState(false);
-    const connectedWallets = useSelector((state: any) => state.userWalletData.connectedWallets);
-    const walletName = useSelector((state: any) => state.userWalletData.type);
-  const MYFYE_SERVER_ADDRESS = "DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn"
+  const publicKey = useSelector((state: any) => state.userWalletData.pubKey);
+  const [showQRCode, setshowQRCode] = useState(false);
+  const updatingBalance = useSelector((state: any) => state.userWalletData.updatingBalance);
+  const usdcSolBalance = useSelector((state: any) => state.userWalletData.usdcSolBalance);
+  const usdtSolBalance = useSelector((state: any) => state.userWalletData.usdtSolBalance);
+  const eurcSolBalance = useSelector((state: any) => state.userWalletData.eurcSolBalance);
+  const priceOfEURCinUSDC = useSelector((state: any) => state.userWalletData.priceOfEURCinUSDC);
+  const [qrCodeURL, setqrCodeURL] = useState(''); 
+  const [showWalletInfoPopup, setShowWalletInfoPopup] = useState(false); 
+  const [showSwapPopup, setShowSwapPopup] = useState(false); 
+  const [addressCopied, setAddressCopied] = useState(false);
+  const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageColor, setErrorMessageColor] = useState('#A90900');
+  const [transactionInProgress, setTransactionInProgress] = useState(false);
+  const { wallets } = useSolanaWallets();
+
+  useEffect(() => {
+    const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
+    const params = new URLSearchParams({
+      size: "150x150", // Size of the QR code
+      data: publicKey, // Data to encode
+    });
+    setqrCodeURL(`${baseUrl}?${params.toString()}`);
+  }, [publicKey]);
+
+  const removeWhitespace = (str: string) => {
+      return str.replace(/\s/g, '');
+    };
+
+  useEffect(() => {
+      if (showMenu) {
+        setMenuPosition('0'); // Bring the menu into view
+      } else {
+        setMenuPosition('-800px'); // Move the menu off-screen
+        setcurrencySelected('usd');
+        setErrorMessage('');
+        if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+          setSwapButtonActive(true)
+        }
+      }
+    }, [showMenu]);
+
 
     useEffect(() => {
-      const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
-      const params = new URLSearchParams({
-        size: "150x150", // Size of the QR code
-        data: publicKey, // Data to encode
-      });
-      setqrCodeURL(`${baseUrl}?${params.toString()}`);
-    }, [publicKey]);
+      
+      if (currencySelected == 'usd') {
+        if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+          setSwapButtonActive(true)
+          } else {
+            setSwapButtonActive(false)
+          }
+      } else if (currencySelected == 'eur') {
+        if (eurcSolBalance >= 1) {
+          setSwapButtonActive(true)
+          } else {
+            setSwapButtonActive(false)
+          }
+      }
 
-    const removeWhitespace = (str: string) => {
-        return str.replace(/\s/g, '');
-      };
+    }, [currencySelected, usdcSolBalance, usdtSolBalance, eurcSolBalance]);
 
-    useEffect(() => {
+    const handleMenuClick = () => {
+      if (showTransactionHistory) {
+        toggleShowTransactionHistory()
+      } else {
         if (showMenu) {
-          setMenuPosition('0'); // Bring the menu into view
-        } else {
-          setMenuPosition('-800px'); // Move the menu off-screen
-          setcurrencySelected('usd');
-          setErrorMessage('');
-          if (usdcSolBalance>=1 || usdtSolBalance>=1) {
-            setSwapButtonActive(true)
-          }
+          dispatch(setShowWalletPage(false))
         }
-      }, [showMenu]);
+      }
+      
+    };
 
-
-      useEffect(() => {
-        
-        if (currencySelected == 'usd') {
-          if (usdcSolBalance>=1 || usdtSolBalance>=1) {
-            setSwapButtonActive(true)
-            } else {
-              setSwapButtonActive(false)
-            }
-        } else if (currencySelected == 'eur') {
-          if (eurcSolBalance >= 1) {
-            setSwapButtonActive(true)
-            } else {
-              setSwapButtonActive(false)
-            }
-        }
-
-      }, [currencySelected]);
-
-      const handleMenuClick = () => {
-        if (showTransactionHistory) {
-          toggleShowTransactionHistory()
-        } else {
-          if (showMenu) {
-            dispatch(setShowWalletPage(false))
-          }
-        }
-        
-      };
-
-      useEffect(() => {
-        if (transactionStatus === 'Unsigned') {
-          setErrorMessage(selectedLanguageCode === 'es' ? 'Por favor firme la transacción' : 'Please sign the transaction');
-          setErrorMessageColor('#60A05B')  
-        }
-        if (transactionStatus === 'Signed') {
-          setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
-          setErrorMessageColor('#60A05B')
-        }
-        if (transactionStatus === 'Success') {
-            setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
-            setErrorMessageColor('#60A05B')
-            setTimeout(() => {
-              setErrorMessage('')
-              setTransactionInProgress(false);
-              setShowSwapPopup(false);
-            }, 3000);
-  
-        } else if (transactionStatus === 'Fail') {
-          setErrorMessage(selectedLanguageCode === 'es' ? 
-            'La transacción falló, por favor intente de nuevo' : 
-            'Swap failed, please try again');
-          setErrorMessageColor('#000000')
+    useEffect(() => {
+      if (transactionStatus === 'Unsigned') {
+        setErrorMessage(selectedLanguageCode === 'es' ? 'Por favor firme la transacción' : 'Please sign the transaction');
+        setErrorMessageColor('#60A05B')  
+      }
+      if (transactionStatus === 'Signed') {
+        setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
+        setErrorMessageColor('#60A05B')
+      }
+      if (transactionStatus === 'Success') {
+          setErrorMessage(selectedLanguageCode === 'es' ? '¡Éxito!' : 'Success!');
+          setErrorMessageColor('#60A05B');
+          updateUserBalance();
           setTimeout(() => {
+            setErrorMessage('')
             setTransactionInProgress(false);
-            dispatch(setSwapFXTransactionStatus(''))
+            setShowSwapPopup(false);
+          }, 1500);
+          setTimeout(() => {
+            if (currencySelected == 'usd') {
+              setcurrencySelected('eur');
+            }
+            if (currencySelected == 'eur') {
+              setcurrencySelected('usd');
+            }
           }, 3000);
-        }
-      }, [transactionStatus]);
+      } else if (transactionStatus === 'Fail') {
+        setErrorMessage(selectedLanguageCode === 'es' ? 
+          'La transacción falló, por favor intente de nuevo' : 
+          'Swap failed, please try again');
+        setErrorMessageColor('#000000')
+        setTimeout(() => {
+          setTransactionInProgress(false);
+          dispatch(setSwapFXTransactionStatus(''))
+        }, 3000);
+      }
+    }, [transactionStatus]);
 
-      function copyWalletAddress() {
-        navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
-            .then(() => {
-                setAddressCopied(true);
-                setTimeout(() => {
-                    setAddressCopied(false);
-                }, 2000); // Set addressCopied to false after 2 seconds
-            })
-            .catch(err => {
-                console.error('Failed to copy the address: ', err);
-            });
+    const updateUserBalance = () => {
+      const conversionRate = 1.04; // 1 EUR = 1.04 USD
+    
+      // Successful swap, update UI
+      if (currencySelected === 'usd') {
+        if (usdtSolBalance > usdcSolBalance) {
+          dispatch(seteurcSolValue(parseFloat((usdtSolBalance / conversionRate).toFixed(5))));
+          dispatch(setusdtSolValue(0));
+        } else {
+          dispatch(seteurcSolValue(parseFloat((usdcSolBalance / conversionRate).toFixed(5))));
+          dispatch(setusdcSolValue(0));
+        }
+      } else if (currencySelected === 'eur') {
+        dispatch(setusdcSolValue(parseFloat((eurcSolBalance * conversionRate).toFixed(5))));
+        dispatch(seteurcSolValue(0));
+      }
+    };
+
+    function copyWalletAddress() {
+      navigator.clipboard.writeText(publicKey) // Assume publicKey is available in your component's scope
+          .then(() => {
+              setAddressCopied(true);
+              setTimeout(() => {
+                  setAddressCopied(false);
+              }, 2000); // Set addressCopied to false after 2 seconds
+          })
+          .catch(err => {
+              console.error('Failed to copy the address: ', err);
+          });
     }
 
       const handleWithdrawButtonClick = () => {
@@ -237,9 +260,17 @@ function WalletPage() {
       const convertToSmallestDenomination = Math.round(amountSelected * 1e6);
       setTransactionInProgress(true); 
   
-  
+      const wallet = wallets[0];
+                
       const inputAmount: number = convertToSmallestDenomination;
-      const signDepositSuccess = swap(primaryWallet, publicKey, inputAmount, inputCurrency!, outputCurrency!, dispatch, 'walletSwap');
+      const signDepositSuccess = swap(
+        wallet, 
+        publicKey, 
+        inputAmount,
+        inputCurrency!, 
+        outputCurrency!, 
+        dispatch, 
+        'walletSwap');
 
     }
 
@@ -516,7 +547,7 @@ style={{width: 'auto', height: '55px'}}/>
 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '90%'}}>
 <div style={{marginTop: '10px', fontSize: '30px', fontWeight: 'bold', width: '100px'}}>
 
-  ~{currencySelected == 'usd' ? ((usdcSolBalance > usdtSolBalance ? (usdcSolBalance) : (usdtSolBalance))*0.89).toFixed(2) : (eurcSolBalance*1.096).toFixed(2)}
+  ~{currencySelected == 'usd' ? ((usdcSolBalance > usdtSolBalance ? (usdcSolBalance) : (usdtSolBalance))/priceOfEURCinUSDC).toFixed(2) : (eurcSolBalance*priceOfEURCinUSDC).toFixed(2)}
 </div>
 
 
