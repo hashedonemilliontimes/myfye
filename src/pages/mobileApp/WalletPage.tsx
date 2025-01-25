@@ -51,6 +51,7 @@ function WalletPage() {
   const [errorMessageColor, setErrorMessageColor] = useState('#A90900');
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const { wallets } = useSolanaWallets();
+  const MINIMUM_SWAP_VALUE = 0.01
 
   useEffect(() => {
     const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
@@ -72,7 +73,7 @@ function WalletPage() {
         setMenuPosition('-800px'); // Move the menu off-screen
         setcurrencySelected('usd');
         setErrorMessage('');
-        if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+        if (usdcSolBalance>=MINIMUM_SWAP_VALUE || usdtSolBalance>=MINIMUM_SWAP_VALUE) {
           setSwapButtonActive(true)
         }
       }
@@ -82,13 +83,13 @@ function WalletPage() {
     useEffect(() => {
       
       if (currencySelected == 'usd') {
-        if (usdcSolBalance>=1 || usdtSolBalance>=1) {
+        if (usdcSolBalance>=MINIMUM_SWAP_VALUE || usdtSolBalance>=MINIMUM_SWAP_VALUE) {
           setSwapButtonActive(true)
           } else {
             setSwapButtonActive(false)
           }
       } else if (currencySelected == 'eur') {
-        if (eurcSolBalance >= 1) {
+        if (eurcSolBalance >= MINIMUM_SWAP_VALUE) {
           setSwapButtonActive(true)
           } else {
             setSwapButtonActive(false)
@@ -249,7 +250,7 @@ function WalletPage() {
       dispatch(setSwapFXTransactionStatus('Fail'))
     }
 
-    if (amountSelected < 1.0) {
+    if (amountSelected < MINIMUM_SWAP_VALUE) {
       setErrorMessage(selectedLanguageCode === 'es' ? 
         'Saldo insuficiente' : 
         'Insufficient balance');
