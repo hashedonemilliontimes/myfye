@@ -14,7 +14,7 @@ import { useDispatch } from 'react-redux';
 import InvestmentValue from '../../components/mobileApp/InvestmentValue.tsx';
 import history from '../../assets/history.png';
 // to do earn transaciton histroy
-// import EarnTransactions from './EarnTransactions';
+import EarnTransactions from '../../components/mobileApp/earnSwaps/EarnTransactions.tsx';
 // to do portfolio breakdown
 // import PortfolioPopup from './PortfolioBreakdown';
 
@@ -58,8 +58,10 @@ function EarnPage() {
       if (!showTransactionHistory) {
         dispatch(setShouldShowBottomNav(false))
       } else {
+        
         dispatch(setShouldShowBottomNav(true))
       }
+      console.log("showTransactionHistory", !showTransactionHistory);
       setshowTransactionHistory(!showTransactionHistory)
 
     };
@@ -271,7 +273,7 @@ backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
         ) : (
 
           <div style={{marginTop: '50px'}}>
-{/*<EarnTransactions/>*/}
+            <EarnTransactions/>
 
 
           </div>

@@ -16,9 +16,7 @@ function InvestmentValue() {
   
     useEffect(() => {
 
-        console.log('priceOfUSDYinUSDC', priceOfUSDYinUSDC)
-        console.log('usdyBalance', usdyBalance)
-            setUpBy(usdyBalance*priceOfUSDYinUSDC);
+        setUpBy(usdyBalance*priceOfUSDYinUSDC);
     }, [usdyBalance, priceOfUSDYinUSDC]);
 
     if (currentValue >= 10) {

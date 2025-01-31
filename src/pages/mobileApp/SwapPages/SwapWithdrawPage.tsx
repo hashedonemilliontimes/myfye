@@ -92,10 +92,10 @@ function SwapWithdraw() {
 
           setcurrencySelected('');
         }
+        console.log(priceOfBTCinUSDC);
       }, [showMenu]);
     
       useEffect(() => {
-        console.log("Transaction status", transactionStatus)
         if (transactionStatus === 'Signed') {
           setErrorMessageColor('#60A05B')
           setErrorMessage('Swapping, Please Wait')
@@ -243,8 +243,22 @@ function SwapWithdraw() {
 
         const transactionsCollectionRef = collection(db, 'earnTransactions');
 
+        let transactionType = ''
+
+        if (depositWithdrawProductType == 'Earn') {
+          transactionType = 'withdrawal'
+        } else if (depositWithdrawProductType == 'Crypto') {
+          transactionType = 'cryptoWithdrawal'
+        }
+
+        let withdrawalAmount = withdrawalToNumber;
+
+        if (depositWithdrawProductType == 'Crypto') {
+          withdrawalAmount = withdrawalToNumber * priceOfBTCinUSDC;
+        }
+
         const docRef = await addDoc(transactionsCollectionRef, {
-          type: 'withdrawal',
+          type: transactionType,
           time: new Date().toISOString(),
           amount: withdrawalToNumber,
           currencySelected: 'usdySol',

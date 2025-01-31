@@ -133,7 +133,6 @@ function SwapDeposit() {
 
 
     useEffect(() => {
-      console.log('transactionStatus', transactionStatus);
       if (transactionStatus === 'Signed') {
         setErrorMessage(selectedLanguageCode === 'es' ? 'Intercambio, por favor espera' : 'Swapping, Please Wait');
         setErrorMessageColor('#60A05B')
@@ -463,6 +462,7 @@ function SwapDeposit() {
 
     async function handleBalanceIsUpdating() {
       const pubKeyDocRef = doc(db, 'pubKeys', publicKey);
+
       const transactionsCollectionRef = collection(db, 'earnTransactions');
       try {
           console.log('saving update with micro usd amount', newDepositAmount * 1000000);

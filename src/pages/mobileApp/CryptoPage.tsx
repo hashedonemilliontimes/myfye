@@ -11,7 +11,7 @@ import { setShouldShowBottomNav, setShowEarnPage,
     setShowCryptoPage } from '../../redux/userWalletData.tsx';
 import { useDispatch } from 'react-redux';
 import history from '../../assets/history.png';
-//import EarnTransactions from './EarnTransactions';
+import EarnTransactions from '../../components/mobileApp/earnSwaps/EarnTransactions.tsx';
 
 function CryptoPage() {
     const showMenu = useSelector((state: any) => state.userWalletData.showCryptoPage);
@@ -33,6 +33,11 @@ function CryptoPage() {
         }
       }, [showMenu]);
     
+
+      useEffect(() => {
+          console.log("showTransactionHistory", showTransactionHistory)
+      }, [showTransactionHistory]);
+
       const handleMenuClick = () => {
 
         if (showTransactionHistory) {
@@ -50,6 +55,7 @@ function CryptoPage() {
     };
 
     const toggleShowTransactionHistory = () => {
+      
       
       if (!showTransactionHistory) {
         dispatch(setShouldShowBottomNav(false))
@@ -274,7 +280,7 @@ backgroundColor: '#60A05B', textAlign: 'center', width: '75vw'}}>
         ) : (
 
           <div style={{marginTop: '50px'}}>
-            {/* replace with crypto transactions*/}
+            <EarnTransactions/>
 
 
           </div>
