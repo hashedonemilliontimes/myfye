@@ -10,6 +10,7 @@
     "chart.js": "^4.4.7",
     "cra-template-typescript": "1.2.0",
     "firebase": "^11.1.0",
+    "postcss": "^8.5.1",
     "promise-retry": "^2.0.1",
     "qrcode.react": "^3.2.0",
     "react": "^19.0.0",
