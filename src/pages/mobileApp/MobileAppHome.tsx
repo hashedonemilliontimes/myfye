@@ -36,6 +36,7 @@ import SwapDeposit from './SwapPages/SwapDepositPage.tsx';
 import SwapWithdraw from './SwapPages/SwapWithdrawPage.tsx';
 import PrivyUseSolanaWallets from '../../components/PrivyUseSolanaWallets.tsx';
 import SendPage from './SendPage.tsx';
+import RequestPage from './RequestPage.tsx';
 
 function WebAppInner() {
 
@@ -128,9 +129,6 @@ function WebAppInner() {
   <>
 {/* 
   <PayPage/>
-  <SendPage/>
-  <RequestPage/>
-  
   <AccountHistory/>
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
@@ -145,6 +143,7 @@ function WebAppInner() {
 <SwapDeposit/>
 <SwapWithdraw/>
 <CryptoPage/>
+<RequestPage/>
   
   {ANNOUNCMENT_MESSAGE && (
   <div style={{textAlign: 'center', fontSize: '14px', 
