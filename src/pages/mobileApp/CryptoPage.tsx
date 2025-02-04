@@ -35,7 +35,6 @@ function CryptoPage() {
     
 
       useEffect(() => {
-          console.log("showTransactionHistory", showTransactionHistory)
       }, [showTransactionHistory]);
 
       const handleMenuClick = () => {

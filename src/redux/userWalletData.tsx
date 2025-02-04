@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import User from '../functions/UserInterface.tsx';
 
 interface UserWalletDataState {
   wallet: any,
@@ -53,6 +54,7 @@ interface UserWalletDataState {
   depositWithdrawProductType: string;
   passKeyState: string;
   privyWalletReady: boolean;
+  users: User[]
 }
 
 const initialUserWalletData: UserWalletDataState = {
@@ -107,7 +109,8 @@ const initialUserWalletData: UserWalletDataState = {
   currentUserID: '',
   depositWithdrawProductType: 'Earn',
   passKeyState: 'initial',
-  privyWalletReady: false
+  privyWalletReady: false,
+  users: []
 };
 
 
@@ -275,6 +278,9 @@ export const userWalletDataSlice = createSlice({
   setPrivyWalletReady: (state, action: PayloadAction<boolean>) => {
     state.privyWalletReady= action.payload;
   }, 
+  setUsers: (state, action: PayloadAction<User[]>) => {
+    state.users= action.payload;
+  }, 
   },
 });
 
@@ -307,7 +313,8 @@ export const {
   setShowContactPopup, setSelectedLanguageCode,
   setcurrentUserID, setDepositWithdrawProductType,
   setPassKeyState,
-  setPrivyWalletReady
+  setPrivyWalletReady,
+  setUsers
   
 } = userWalletDataSlice.actions;
 

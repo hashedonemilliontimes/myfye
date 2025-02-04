@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-/*
-import { setusdcSolValue, setusdtSolValue, setbusdSolValue, 
-  setusdcEthValue, setusdtEthValue, setbusdEthValue, setWalletPubKey,
-  addConnectedWallets, setShowEarnPage, setShowCryptoPage, setShowRequestPage,
-  setWalletType, setcurrentUserFirstName, setcurrentUserLastName,
-  setcurrentUserEmail, setusdySolValue, setpyusdSolValue,
-  seteurcSolValue, setShowSendPage, 
-  setShowWalletDepositPage, setShouldShowBottomNav, 
-  setShowWithdrawStablecoinPage, setShowWalletPage,
-clearContacts, setcurrentUserID,
-setbtcSolValue, setDepositWithdrawProductType} from '../redux/userWalletData';
-*/
 import { setShowMainDepositPage } from '../../redux/userWalletData.tsx';
 import ProfilePage from './ProfilePage.tsx';
 import EarnPage from './EarnPage.tsx';
@@ -39,13 +27,15 @@ import {
   useMfaEnrollment} from '@privy-io/react-auth';
 import { 
   HandleUserLogIn,
-  UpdatePasskey } from '../../functions/HandleUserLogIn.tsx';
+  UpdatePasskey,
+  getUsers
+ } from '../../functions/HandleUserLogIn.tsx';
 import WalletPage from './WalletPage.tsx';
 import MainDepositPage from '../../components/mobileApp/wallet/MainDepositPage.tsx';
 import SwapDeposit from './SwapPages/SwapDepositPage.tsx';
 import SwapWithdraw from './SwapPages/SwapWithdrawPage.tsx';
 import PrivyUseSolanaWallets from '../../components/PrivyUseSolanaWallets.tsx';
-
+import SendPage from './SendPage.tsx';
 
 function WebAppInner() {
 
@@ -60,7 +50,7 @@ function WebAppInner() {
   const priceOfEURCinUSDC = useSelector((state: any) => state.userWalletData.priceOfEURCinUSDC);
   const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
   const KYCVerifired = useSelector((state: any) => state.userWalletData.currentUserKYCVerified);
-
+  const users = useSelector((state: any) => state.userWalletData.users);
   const dispatch = useDispatch();
 
   const [userDataLoaded, setUserDataLoaded] = useState(false); // To do: get user data
@@ -73,6 +63,7 @@ function WebAppInner() {
 
   // Disable login when Privy is not ready or the user is already authenticated
   const disableLogin = !ready || (ready && authenticated);
+
 
 
   useEffect(() => {
@@ -88,6 +79,8 @@ function WebAppInner() {
             priceOfBTCinUSDC,
             priceOfEURCinUSDC);
             setUserDataLoaded(true);
+
+            
         } catch (error) {
           console.error('Error during login:', error);
         }
@@ -104,6 +97,10 @@ function WebAppInner() {
   // Get all users
   // Get contacts
   // Get uncreaters user balance
+
+  useEffect(() => {
+    getUsers(dispatch);
+  }, []);
 
   useEffect(() => {
     console.log(state)
@@ -140,7 +137,7 @@ function WebAppInner() {
 <Withdraw/>
 
 */}
-
+<SendPage/>
 <WalletPage/>
 <EarnPage/>
 <ProfilePage/>

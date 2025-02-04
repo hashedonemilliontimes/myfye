@@ -1,1 +1,2 @@
 export const HELIUS_API_KEY = process.env.REACT_APP_HELIUS_API_KEY;
+export const REACT_APP_PRIVY_APP_SECRET = process.env.REACT_APP_PRIVY_APP_SECRET;

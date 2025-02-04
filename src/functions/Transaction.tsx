@@ -37,12 +37,7 @@ export const tokenTransfer = async (
       const PRIORITY_RATE = 1001000; // MICRO_LAMPORTS 1^-15 solana  250000
       const PRIORITY_FEE_IX = ComputeBudgetProgram.setComputeUnitPrice({microLamports: PRIORITY_RATE});
 
-    console.log("Running in tokenTransfer");
-      
-      
-
       const senderPublicKey = new PublicKey(payerPubKey);
-      console.log('receiverPubKey', receiverPubKey)
       const destinationPublicKey = new PublicKey(receiverPubKey);
 
       let mintAddress: string;
@@ -59,8 +54,6 @@ export const tokenTransfer = async (
         mintAddress = PYUSD_MINT_ADDRESS;
         programId = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'
       }
-  
-      console.log('Searching with program id: ', programId)
       
       const RPC = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
       const connection = new Connection(RPC);
@@ -96,40 +89,64 @@ export const tokenTransfer = async (
           const newTokenAccount = httpsCallable(functions, 'createNewTokenAccount');
         
           try {
-            const result = await newTokenAccount({
+            const result = newTokenAccount({
               payerPubKey: payerPubKey,
               receiverPubKey: receiverPubKey,
               mintAddress: mintAddress!,
               programId: programId,
             });
-        
-            console.log("Got the new token account from fucntions! result", result);
 
-            // Assuming the function returns the needed account info in result.data
-            receiverAccountInfo = result.data;
+            // the create new account promise is not working 
+            // on the backend so try waiting 10 seconds and then 
+            // search for it again
+
+            let attempts = 0;
+            const maxAttempts = 10;
             
+            while (attempts < maxAttempts) {
+                console.log("Looking for newly created token account (Attempt " + (attempts + 1) + ")");
+                
+                await new Promise(resolve => setTimeout(resolve, 8000)); // Wait 8 seconds
+            
+                const receiverParsedTokenAccounts = await connection.getParsedTokenAccountsByOwner(
+                    destinationPublicKey,
+                    { programId: new PublicKey(programId) }
+                );
+            
+                receiverAccountInfo = receiverParsedTokenAccounts.value.find(
+                    (accountInfo: { account: { data: { parsed: { info: { mint: string } } } } }) => 
+                        accountInfo.account.data.parsed.info.mint === mintAddress
+                );
+            
+                if (receiverAccountInfo) {
+                    console.log(currencySelected + " account found for receiver.");
+                    break; // Exit loop if the account is found
+                }
+            
+                attempts++;
+            }
+            
+            if (!receiverAccountInfo) {
+                throw new Error("Token account not found after 10 attempts.");
+            }
+
           } catch (error) {
             console.error("Failed to create or fetch the token account:", error);
+            return false;
           }
         } else {
           console.log(currencySelected + " account found for receiver.");
         }
   
         if (!payerAccountInfo || !receiverAccountInfo) {
-          throw new Error(currencySelected + " account not found for payer or receiver.");
+          console.error(currencySelected + " account not found");
+          return false;
         }
-  
-        // console.log("payerUsdcAccountInfo", JSON.stringify(payerUsdcAccountInfo, null, 2));
-        // console.log("receiverUsdcAccountInfo", JSON.stringify(receiverUsdcAccountInfo, null, 2));
   
         const senderTokenAccount = new PublicKey(payerAccountInfo.pubkey);
         const receiverTokenAccount = new PublicKey(receiverAccountInfo.pubkey);
   
         const programIdKey = new PublicKey(programId);
-
-        console.log("CREATE TRANSFER INSTRUCTION");
-        console.log("senderTokenAccount", senderTokenAccount);
-        console.log("receiverTokenAccount", receiverTokenAccount);
 
         const transferInstruction = createTransferInstruction(
           senderTokenAccount, // Source account: PublicKey
@@ -141,8 +158,6 @@ export const tokenTransfer = async (
         );
 
         const blockhashInfo = await connection.getLatestBlockhash();
-
-        console.log('Got Blockhash');
         
         // Create the priority transaction
         const transaction = new Transaction();
@@ -162,8 +177,6 @@ export const tokenTransfer = async (
 
       try {
         
-
-        console.log('Wallet', wallet)
         /*
         await wallet.signTransaction!(transaction, connection);
         const transactionId = await wallet.sendTransaction!(transaction, connection);
@@ -184,7 +197,6 @@ export const tokenTransfer = async (
           [], //Signers
         );
         */
-        console.log('SendTransaction: ', transactionId)
 
         if (transactionId) {
           let transactionConfirmed = false
