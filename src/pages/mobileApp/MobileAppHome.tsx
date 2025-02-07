@@ -37,6 +37,7 @@ import SwapWithdraw from './SwapPages/SwapWithdrawPage.tsx';
 import PrivyUseSolanaWallets from '../../components/PrivyUseSolanaWallets.tsx';
 import SendPage from './SendPage.tsx';
 import RequestPage from './RequestPage.tsx';
+import PayPage from './PayPage.tsx';
 
 function WebAppInner() {
 
@@ -128,7 +129,6 @@ function WebAppInner() {
 {userDataLoaded ? (
   <>
 {/* 
-  <PayPage/>
   <AccountHistory/>
   <NewUserPreviousBalanceNotification/>
   <ProfileMenu/>
@@ -144,6 +144,7 @@ function WebAppInner() {
 <SwapWithdraw/>
 <CryptoPage/>
 <RequestPage/>
+<PayPage/>
   
   {ANNOUNCMENT_MESSAGE && (
   <div style={{textAlign: 'center', fontSize: '14px', 
