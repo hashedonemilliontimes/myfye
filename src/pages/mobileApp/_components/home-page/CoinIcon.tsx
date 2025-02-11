@@ -1,16 +1,18 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useMemo } from "react";
 
-const CoinIcon = ({ type }) => {
+const CoinIcon = ({ src }) => {
   return (
-    <div
+    <img
+      src={src}
       className="aspect-ratio-square"
       css={css`
         border-radius: var(--border-radius-circle);
-        background-color: red;
+        width: var(--size-600);
+        overflow: hidden;
+        object-fit: cover;
       `}
-    ></div>
+    />
   );
 };
 

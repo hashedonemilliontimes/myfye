@@ -10,6 +10,7 @@ const HomePage = () => {
       css={css`
         container: home / size;
         height: 100%;
+        padding: 0 var(--size-250);
       `}
     >
       <Tabs></Tabs>

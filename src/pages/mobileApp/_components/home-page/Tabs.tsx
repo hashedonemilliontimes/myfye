@@ -108,7 +108,7 @@ const Tabs = () => {
       tabPanel.scrollWidth * (index / tabs.length),
       {
         type: "spring",
-        bounce: 0.2,
+        bounce: 0,
         duration: 0.6,
         onUpdate: (v) => {
           tabPanel.scrollLeft = v;
