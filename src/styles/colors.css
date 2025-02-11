@@ -1,69 +1,69 @@
 :root {
-  --clr-white: #fff;
-  --clr-black: #fff;
+  --clr-white: #f8fbfc;
+  --clr-black: #000407;
 
-  --clr-neutral-100: #fff;
-  --clr-neutral-200: #fff;
-  --clr-neutral-300: #fff;
-  --clr-neutral-400: #fff;
-  --clr-neutral-500: #fff;
-  --clr-neutral-600: #fff;
-  --clr-neutral-700: #fff;
-  --clr-neutral-800: #fff;
-  --clr-neutral-900: #fff;
+  --clr-neutral-100: #f3f6f8;
+  --clr-neutral-200: #dde4e8;
+  --clr-neutral-300: #b6bec3;
+  --clr-neutral-400: #929ba1;
+  --clr-neutral-500: #5f696f;
+  --clr-neutral-600: #48535a;
+  --clr-neutral-700: #36424a;
+  --clr-neutral-800: #273138;
+  --clr-neutral-900: #202c33;
 
-  --clr-purple-100: #fff;
-  --clr-purple-200: #fff;
-  --clr-purple-300: #fff;
-  --clr-purple-400: #fff;
-  --clr-purple-500: #fff;
-  --clr-purple-600: #fff;
-  --clr-purple-700: #fff;
-  --clr-purple-800: #fff;
-  --clr-purple-900: #fff;
+  --clr-purple-100: #f4ebf7;
+  --clr-purple-200: #e4cded;
+  --clr-purple-300: #be88d4;
+  --clr-purple-400: #a352c4;
+  --clr-purple-500: #68138a;
+  --clr-purple-600: #520a6f;
+  --clr-purple-700: #3e0555;
+  --clr-purple-800: #35034a;
+  --clr-purple-900: #2a023b;
 
-  --clr-red-100: #fff;
-  --clr-red-200: #fff;
-  --clr-red-300: #fff;
-  --clr-red-400: #fff;
-  --clr-red-500: #fff;
-  --clr-red-600: #fff;
-  --clr-red-700: #fff;
-  --clr-red-800: #fff;
-  --clr-red-900: #fff;
+  --clr-red-100: #f7ece9;
+  --clr-red-200: #f2cfc5;
+  --clr-red-300: #d8917b;
+  --clr-red-400: #cb7054;
+  --clr-red-500: #8f2c0e;
+  --clr-red-600: #742007;
+  --clr-red-700: #541502;
+  --clr-red-800: #481202;
+  --clr-red-900: #3b0f02;
 
-  --clr-yellow-100: #fff;
-  --clr-yellow-200: #fff;
-  --clr-yellow-300: #fff;
-  --clr-yellow-400: #fff;
-  --clr-yellow-500: #fff;
-  --clr-yellow-600: #fff;
-  --clr-yellow-700: #fff;
-  --clr-yellow-800: #fff;
-  --clr-yellow-900: #fff;
+  --clr-yellow-100: #f7f5eb;
+  --clr-yellow-200: #e9e2be;
+  --clr-yellow-300: #cbc382;
+  --clr-yellow-400: #b0a44a;
+  --clr-yellow-500: #786b0c;
+  --clr-yellow-600: #625706;
+  --clr-yellow-700: #484003;
+  --clr-yellow-800: #393203;
+  --clr-yellow-900: #2c2702;
 
-  --clr-blue-100: #fff;
-  --clr-blue-200: #fff;
-  --clr-blue-300: #fff;
-  --clr-blue-400: #fff;
-  --clr-blue-500: #fff;
-  --clr-blue-600: #fff;
-  --clr-blue-700: #fff;
-  --clr-blue-800: #fff;
-  --clr-blue-900: #fff;
+  --clr-blue-100: #ecf0f8;
+  --clr-blue-200: #cdd7f0;
+  --clr-blue-300: #8ba2d4;
+  --clr-blue-400: #5f7dc0;
+  --clr-blue-500: #143886;
+  --clr-blue-600: #0f2e72;
+  --clr-blue-700: #0a245c;
+  --clr-blue-800: #061b4a;
+  --clr-blue-900: #051842;
 
-  --clr-green-100: #fff;
-  --clr-green-200: #fff;
-  --clr-green-300: #fff;
-  --clr-green-400: #fff;
-  --clr-green-500: #fff;
-  --clr-green-600: #fff;
-  --clr-green-700: #fff;
-  --clr-green-800: #fff;
-  --clr-green-900: #fff;
+  --clr-green-100: #ecfaf2;
+  --clr-green-200: #caebd6;
+  --clr-green-300: #84d0a1;
+  --clr-green-400: #4fb878;
+  --clr-green-500: #117e3b;
+  --clr-green-600: #0a662d;
+  --clr-green-700: #055122;
+  --clr-green-800: #023f1a;
+  --clr-green-900: #023315;
 
   --clr-accent: var(--clr-green-500);
-  --clr-accent-secondary: var(--clr-green-400);
+  --clr-accent-active: var(--clr-green-600);
 
   --clr-text: var(--clr-neutral-900);
   --clr-text-link: var(--clr-green-500);
@@ -86,6 +86,7 @@
   --clr-surface-raised: var(--clr-neutral-100);
   --clr-surface-lowered: var(--clr-neutral-200);
 
+  --clr-border-divider: var(--clr-neutral-200);
   --clr-border-neutral: var(--clr-neutral-300);
   --clr-border-strong: var(--clr-neutral-400);
   --clr-border-success: var(--clr-green-300);
@@ -103,7 +104,15 @@
   --clr-status-highlight: var(--clr-purple-500);
   --clr-status-notification: var(--clr-green-500);
 
-  --clr-status-neutral-weak: var(--clr-white);
+  --clr-status-neutral-active: var(--clr-neutral-100);
+  --clr-status-success-active: var(--clr-green-600);
+  --clr-status-warning-active: var(--clr-yellow-600);
+  --clr-status-danger-active: var(--clr-red-600);
+  --clr-status-info-active: var(--clr-blue-600);
+  --clr-status-highlight-active: var(--clr-purple-600);
+  --clr-status-notification-active: var(--clr-green-600);
+
+  --clr-status-neutral-weak: var(--clr-neutral-100);
   --clr-status-success-weak: var(--clr-green-100);
   --clr-status-warning-weak: var(--clr-yellow-100);
   --clr-status-danger-weak: var(--clr-red-100);

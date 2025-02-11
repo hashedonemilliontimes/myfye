@@ -1,89 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { setShowMainDepositPage } from '../../redux/userWalletData.tsx';
-import ProfilePage from './ProfilePage.tsx';
-import EarnPage from './EarnPage.tsx';
-import CryptoPage from './CryptoPage.tsx';
-import { useSelector } from 'react-redux';
-import { 
-  getFirestore, 
-  doc, 
-  getDoc } from 'firebase/firestore';
-import { Buffer } from 'buffer';
-import LoadingAnimation from '../../components/LoadingAnimation.tsx';
-import myfyelogo from '../../assets/MyFyeLogo2.png';
-import Language from './LanguagePage.tsx';
-import Support from './Support.tsx';
-import WalletTile from '../../components/mobileApp/WalletTile.tsx';
-import EarnTile from '../../components/mobileApp/EarnTile.tsx';
-import CryptoTile from '../../components/mobileApp/CryptoTile.tsx';
-import BottomNav from '../../components/mobileApp/BottomNavigation.tsx';
-import { 
-  setShowRequestPage,
-  setShowSendPage, } from '../../redux/userWalletData.tsx';
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import ProfilePage from "./ProfilePage.tsx";
+import EarnPage from "./EarnPage.tsx";
+import CryptoPage from "./CryptoPage.tsx";
+import { useSelector } from "react-redux";
+import { Buffer } from "buffer";
+import LoadingAnimation from "../../components/LoadingAnimation.tsx";
+import myfyelogo from "../../assets/MyFyeLogo2.png";
+import Language from "./LanguagePage.tsx";
+import Support from "./Support.tsx";
+import WalletTile from "../../components/mobileApp/WalletTile.tsx";
+import EarnTile from "../../components/mobileApp/EarnTile.tsx";
+import CryptoTile from "../../components/mobileApp/CryptoTile.tsx";
+import BottomNav from "../../components/mobileApp/BottomNavigation.tsx";
+import "../../styles/components.css";
 import {
-  usePrivy, 
+  setShowRequestPage,
+  setShowSendPage,
+} from "../../redux/userWalletData.tsx";
+import {
+  usePrivy,
   useLoginWithPasskey,
-  useMfaEnrollment} from '@privy-io/react-auth';
-import { 
+  useMfaEnrollment,
+} from "@privy-io/react-auth";
+import {
   HandleUserLogIn,
   UpdatePasskey,
-  getUsers
- } from '../../functions/HandleUserLogIn.tsx';
-import WalletPage from './WalletPage.tsx';
-import MainDepositPage from '../../components/mobileApp/wallet/MainDepositPage.tsx';
-import SwapDeposit from './SwapPages/SwapDepositPage.tsx';
-import SwapWithdraw from './SwapPages/SwapWithdrawPage.tsx';
-import PrivyUseSolanaWallets from '../../components/PrivyUseSolanaWallets.tsx';
-import SendPage from './SendPage.tsx';
-import RequestPage from './RequestPage.tsx';
+  getUsers,
+} from "../../functions/HandleUserLogIn.tsx";
+import WalletPage from "./WalletPage.tsx";
+import MainDepositPage from "../../components/mobileApp/wallet/MainDepositPage.tsx";
+import SwapDeposit from "./SwapPages/SwapDepositPage.tsx";
+import SwapWithdraw from "./SwapPages/SwapWithdrawPage.tsx";
+import PrivyUseSolanaWallets from "../../components/PrivyUseSolanaWallets.tsx";
+import SendPage from "./SendPage.tsx";
+import RequestPage from "./RequestPage.tsx";
+import Button from "@/components/ui/button/Button.tsx";
+
+import appLogo from "@/assets/myfyeleaf.png";
+
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
+import AppNavDrawer from "./_components/layout/footer/AppNavDrawer.tsx";
+import Footer from "./_components/layout/footer/Footer.tsx";
+import Header from "./_components/layout/header/Header.tsx";
+import QRCodeDialog from "./_components/layout/header/qr-code/QRCodeDialog.tsx";
+import QRCodeTrigger from "./_components/layout/header/qr-code/QRCodeTrigger.tsx";
+import NavMenu from "./_components/layout/header/nav-menu/NavMenu.tsx";
+import Main from "./_components/layout/main/Main.tsx";
+import HomePage from "./_components/home-page/HomePage.tsx";
 
 function WebAppInner() {
-
   window.Buffer = Buffer;
-  
-  const {showMfaEnrollmentModal} = useMfaEnrollment();
 
-  const firstNameUI = useSelector((state: any) => state.userWalletData.currentUserFirstName);
-  const userPassKeyState = useSelector((state: any) => state.userWalletData.passKeyState);
-  const priceOfUSDYinUSDC = useSelector((state: any) => state.userWalletData.priceOfUSDYinUSDC);
-  const priceOfBTCinUSDC = useSelector((state: any) => state.userWalletData.priceOfBTCinUSDC);
-  const priceOfEURCinUSDC = useSelector((state: any) => state.userWalletData.priceOfEURCinUSDC);
-  const selectedLanguageCode = useSelector((state: any) => state.userWalletData.selectedLanguageCode);
-  const KYCVerifired = useSelector((state: any) => state.userWalletData.currentUserKYCVerified);
+  const { showMfaEnrollmentModal } = useMfaEnrollment();
+
+  const firstNameUI = useSelector(
+    (state: any) => state.userWalletData.currentUserFirstName
+  );
+  const userPassKeyState = useSelector(
+    (state: any) => state.userWalletData.passKeyState
+  );
+  const priceOfUSDYinUSDC = useSelector(
+    (state: any) => state.userWalletData.priceOfUSDYinUSDC
+  );
+  const priceOfBTCinUSDC = useSelector(
+    (state: any) => state.userWalletData.priceOfBTCinUSDC
+  );
+  const priceOfEURCinUSDC = useSelector(
+    (state: any) => state.userWalletData.priceOfEURCinUSDC
+  );
+  const selectedLanguageCode = useSelector(
+    (state: any) => state.userWalletData.selectedLanguageCode
+  );
+  const KYCVerifired = useSelector(
+    (state: any) => state.userWalletData.currentUserKYCVerified
+  );
   const users = useSelector((state: any) => state.userWalletData.users);
   const dispatch = useDispatch();
 
   const [userDataLoaded, setUserDataLoaded] = useState(false); // To do: get user data
-  const ANNOUNCMENT_MESSAGE = ''
+  const ANNOUNCMENT_MESSAGE = "";
 
-  const {user, ready, authenticated, login, linkPasskey} = usePrivy();
-  const {state, loginWithPasskey} = useLoginWithPasskey();
+  const { user, ready, authenticated, login, linkPasskey } = usePrivy();
+  const { state, loginWithPasskey } = useLoginWithPasskey();
 
   const [enrolledInMFA, setEnrolledInMFA] = useState<boolean>(false);
 
   // Disable login when Privy is not ready or the user is already authenticated
   const disableLogin = !ready || (ready && authenticated);
 
-
-
   useEffect(() => {
     const handleLogin = async () => {
       if (authenticated) {
         try {
-          if (!(user?.wallet)) {
-          } 
+          if (!user?.wallet) {
+          }
           await HandleUserLogIn(
-            user, 
-            dispatch, 
-            priceOfUSDYinUSDC, 
+            user,
+            dispatch,
+            priceOfUSDYinUSDC,
             priceOfBTCinUSDC,
-            priceOfEURCinUSDC);
-            setUserDataLoaded(true);
-
-            
+            priceOfEURCinUSDC
+          );
+          setUserDataLoaded(true);
         } catch (error) {
-          console.error('Error during login:', error);
+          console.error("Error during login:", error);
         }
       }
     };
@@ -91,10 +113,10 @@ function WebAppInner() {
     if (user?.mfaMethods[0] == "passkey") {
       setEnrolledInMFA(true);
     }
-  
+
     handleLogin();
   }, [authenticated, user]);
-  // To do: 
+  // To do:
   // Get all users
   // Get contacts
   // Get uncreaters user balance
@@ -104,292 +126,365 @@ function WebAppInner() {
   }, []);
 
   useEffect(() => {
-    console.log(state)
-    if (state.status == 'done') {
-      UpdatePasskey(dispatch)
+    console.log(state);
+    if (state.status == "done") {
+      UpdatePasskey(dispatch);
     }
   }, [state]);
-  
+
   const handleSendPageClick = () => {
     dispatch(setShowSendPage(true));
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   const handleRequestPageClick = () => {
     dispatch(setShowRequestPage(true));
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
-  
+
   if (authenticated) {
-    
     return (
-        <div style={{overflowX: 'hidden', backgroundColor: '#ffffff',}}>
+      // <div style={{ overflowX: "hidden", backgroundColor: "#ffffff" }}>
+      //   {userDataLoaded ? (
+      //     <>
+      //       <SendPage />
+      //       <WalletPage />
+      //       <EarnPage />
+      //       <ProfilePage />
+      //       <MainDepositPage />
+      //       <SwapDeposit />
+      //       <SwapWithdraw />
+      //       <CryptoPage />
+      //       <RequestPage />
+      //       {ANNOUNCMENT_MESSAGE && (
+      //         <div
+      //           style={{
+      //             textAlign: "center",
+      //             fontSize: "14px",
+      //             color: "#ffffff",
+      //             whiteSpace: "nowrap",
+      //             width: "100vw",
+      //             background: "#2E7D32",
+      //             marginBottom: "-10px",
+      //           }}
+      //         >
+      //           {ANNOUNCMENT_MESSAGE}
+      //         </div>
+      //       )}
 
-{userDataLoaded ? (
-  <>
-{/* 
-  <PayPage/>
-  <AccountHistory/>
-  <NewUserPreviousBalanceNotification/>
-  <ProfileMenu/>
-<Withdraw/>
+      //       <div
+      //         style={{
+      //           display: "flex",
+      //           flexDirection: "row",
+      //           justifyContent: "space-between",
+      //           marginTop: "15px",
+      //           marginLeft: "10px",
+      //           alignItems: "center",
+      //           paddingLeft: "10px",
+      //           paddingRight: "10px",
+      //         }}
+      //       >
+      //         <div
+      //           style={{
+      //             fontSize: "25px",
+      //             fontWeight: "bold",
+      //             width: "70vw",
+      //             maxWidth: "550px",
+      //             color: "#222222",
+      //           }}
+      //         >
+      //           {selectedLanguageCode === "en" && `Welcome! ${firstNameUI}`}
+      //           {selectedLanguageCode === "es" && `Hola, ${firstNameUI}`}
+      //         </div>
 
-*/}
-<SendPage/>
-<WalletPage/>
-<EarnPage/>
-<ProfilePage/>
-<MainDepositPage/>
-<SwapDeposit/>
-<SwapWithdraw/>
-<CryptoPage/>
-<RequestPage/>
-  
-  {ANNOUNCMENT_MESSAGE && (
-  <div style={{textAlign: 'center', fontSize: '14px', 
-    color: '#ffffff', whiteSpace: 'nowrap', 
-    width: '100vw', 
-    background: '#2E7D32',
-  marginBottom: '-10px'}}>{ANNOUNCMENT_MESSAGE}</div>
-  )}
+      //         <div style={{ display: "flex", gap: "10px" }}>
+      //           <Language />
+      //           <Support />
 
-<div style={{display: 'flex', flexDirection: 'row', 
-  justifyContent: 'space-between', marginTop: '15px', marginLeft: '10px',
-  alignItems: 'center', paddingLeft: '10px', paddingRight: '10px'}}>
+      //           <PrivyUseSolanaWallets />
+      //         </div>
+      //       </div>
 
+      //       {KYCVerifired ? (
+      //         <div>
+      //           {userPassKeyState === "done" ? (
+      //             <div>
+      //               {enrolledInMFA ? (
+      //                 <div>
+      //                   <div
+      //                     style={{
+      //                       display: "flex",
+      //                       alignItems: "center",
+      //                       flexDirection: "column",
+      //                       color: "#222222",
+      //                       justifyContent: "space-around",
+      //                       overflowX: "hidden",
+      //                     }}
+      //                   >
+      //                     <WalletTile />
+      //                     <EarnTile />
+      //                     <CryptoTile />
 
-<div style={{fontSize: '25px', fontWeight: 'bold', 
-width: '70vw', maxWidth: '550px', color: '#222222'
-  
-}}>
-            {selectedLanguageCode === 'en' && `Welcome! ${firstNameUI}`}
-            {selectedLanguageCode === 'es' && `Hola, ${firstNameUI}`}
-</div>
+      //                     <div
+      //                       style={{
+      //                         display: "flex",
+      //                         justifyContent: "space-around",
+      //                         width: "90vw",
+      //                         marginTop: "35px",
+      //                         marginBottom: "120px",
+      //                       }}
+      //                     >
+      //                       <div
+      //                         style={{
+      //                           color: "#ffffff",
+      //                           background: "#2E7D32", // gray '#999999',
+      //                           borderRadius: "10px",
+      //                           border: "2px solid #2E7D32",
+      //                           fontWeight: "bold",
+      //                           height: "40px",
+      //                           width: "130px",
+      //                           display: "flex", // Makes this div also a flex container
+      //                           justifyContent: "center", // Centers the text horizontally inside the button
+      //                           alignItems: "center", // Centers the text vertically inside the button
+      //                           cursor: "pointer",
+      //                           fontSize: "20px",
+      //                         }}
+      //                         onClick={handleSendPageClick}
+      //                       >
+      //                         {selectedLanguageCode === "en" && `Send`}
+      //                         {selectedLanguageCode === "es" && `Enviar`}
+      //                       </div>
+      //                       <div
+      //                         style={{
+      //                           color: "#ffffff",
+      //                           background: "#2E7D32", // gray '#999999',
+      //                           borderRadius: "10px",
+      //                           border: "2px solid #2E7D32",
+      //                           fontWeight: "bold",
+      //                           height: "40px",
+      //                           width: "130px",
+      //                           display: "flex", // Makes this div also a flex container
+      //                           justifyContent: "center", // Centers the text horizontally inside the button
+      //                           alignItems: "center", // Centers the text vertically inside the button
+      //                           cursor: "pointer",
+      //                           fontSize: "20px",
+      //                         }}
+      //                         onClick={handleRequestPageClick}
+      //                       >
+      //                         {selectedLanguageCode === "en" && `Request`}
+      //                         {selectedLanguageCode === "es" && `Pedido`}
+      //                       </div>
+      //                     </div>
 
-<div style={{display: 'flex', gap: '10px'}}>
-  
-  <Language/>
-  <Support/>
-
-  <PrivyUseSolanaWallets/>
-
-  
-</div>
-</div>
-
-{KYCVerifired ? (
-  <div>
-    
-{
-  (userPassKeyState === 'done') ? ( 
-    <div>
-    {(enrolledInMFA) ? (
-
-
-<div>
-
-<div style={{ display: 'flex',  
-          alignItems: 'center', 
-        flexDirection: 'column', 
-        color: '#222222', 
-        justifyContent: 'space-around',
-        overflowX: 'hidden', }}>
-
-<WalletTile/>
-<EarnTile/>
-<CryptoTile/>
-
-<div style={{display: 'flex', 
-justifyContent: 'space-around', 
-width: '90vw',
-marginTop: '35px',
-  marginBottom: '120px'
-}}>
-  <div style={{
-      color: '#ffffff', 
-      background: '#2E7D32', // gray '#999999', 
-      borderRadius: '10px', 
-      border: '2px solid #2E7D32', 
-      fontWeight: 'bold',
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-    }} onClick={handleSendPageClick}>
-      {selectedLanguageCode === 'en' && `Send`}
-      {selectedLanguageCode === 'es' && `Enviar`}
-    </div>
-    <div style={{
-      color: '#ffffff', 
-      background: '#2E7D32', // gray '#999999', 
-      borderRadius: '10px', 
-      border: '2px solid #2E7D32', 
-      fontWeight: 'bold',
-      height: '40px', 
-      width: '130px',
-      display: 'flex',        // Makes this div also a flex container
-      justifyContent: 'center', // Centers the text horizontally inside the button
-      alignItems: 'center',// Centers the text vertically inside the button
-      cursor: 'pointer',
-      fontSize: '20px'     
-    }} 
-    onClick={handleRequestPageClick}>
-      
-      {selectedLanguageCode === 'en' && `Request`}
-      {selectedLanguageCode === 'es' && `Pedido`}
-    </div>
-  </div>          
-  
-                    <BottomNav/>
-                        </div>
-                        </div>
-
-
-
-    ) : (
-      <div>
-
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-      <div style={{marginTop: '80px'}}>
-        <button onClick={showMfaEnrollmentModal}
-        style={{
-          color: '#ffffff',
-          fontSize: '25px',
-          fontWeight: 'bold',
-          background: '#447E26',
-        borderRadius: '10px', 
-        border: '3px solid #ffffff',
-        padding: '15px',
-        cursor: 'pointer'}}>
-            Enroll in MFA
-          </button>
-          </div>
-          
-        </div>
-          </div>
-
-    )}
-    </div>
-
-
-  ) : (
-    <div>
-
-<div style={{display: 'flex', justifyContent: 'center'}}>
-<div style={{marginTop: '80px'}}>
-  <button onClick={linkPasskey}
-  style={{
-    color: '#ffffff',
-    fontSize: '25px',
-    fontWeight: 'bold',
-    background: '#447E26',
-  borderRadius: '10px', 
-  border: '3px solid #ffffff',
-  padding: '15px',
-  cursor: 'pointer'}}>
-      Create A Passkey
-    </button>
-    </div>
-    
-  </div>
-    </div>
-   )
-}
-
-                        </div>
-
-) : (<div>
-{/*<PersonaKYC/>*/}
-</div>)}
-
-
-  </>
-) : (<>
-      <div style={{
-        display: 'flex', 
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'center' }}>
-
-        <div>
-          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <img
-            style={{
-              width: '80vw',
-              maxWidth: '300px',
-              marginTop: '-20px'
-            }}
-            src={myfyelogo}
-            alt="My Fye Logo"
-          />
-          </div>
-        </div>
-        <LoadingAnimation/>
-      </div>
-</>)}
-
-
+      //                     <BottomNav />
+      //                   </div>
+      //                 </div>
+      //               ) : (
+      //                 <div>
+      //                   <div
+      //                     style={{ display: "flex", justifyContent: "center" }}
+      //                   >
+      //                     <div style={{ marginTop: "80px" }}>
+      //                       <button
+      //                         onClick={showMfaEnrollmentModal}
+      //                         style={{
+      //                           color: "#ffffff",
+      //                           fontSize: "25px",
+      //                           fontWeight: "bold",
+      //                           background: "#447E26",
+      //                           borderRadius: "10px",
+      //                           border: "3px solid #ffffff",
+      //                           padding: "15px",
+      //                           cursor: "pointer",
+      //                         }}
+      //                       >
+      //                         Enroll in MFA
+      //                       </button>
+      //                     </div>
+      //                   </div>
+      //                 </div>
+      //               )}
+      //             </div>
+      //           ) : (
+      //             <div>
+      //               <div style={{ display: "flex", justifyContent: "center" }}>
+      //                 <div style={{ marginTop: "80px" }}>
+      //                   <button
+      //                     onClick={linkPasskey}
+      //                     style={{
+      //                       color: "#ffffff",
+      //                       fontSize: "25px",
+      //                       fontWeight: "bold",
+      //                       background: "#447E26",
+      //                       borderRadius: "10px",
+      //                       border: "3px solid #ffffff",
+      //                       padding: "15px",
+      //                       cursor: "pointer",
+      //                     }}
+      //                   >
+      //                     Create A Passkey
+      //                   </button>
+      //                 </div>
+      //               </div>
+      //             </div>
+      //           )}
+      //         </div>
+      //       ) : (
+      //         <div>{/*<PersonaKYC/>*/}</div>
+      //       )}
+      //     </>
+      //   ) : (
+      //     <>
+      //       <div
+      //         style={{
+      //           display: "flex",
+      //           flexDirection: "column",
+      //           justifyContent: "space-around",
+      //           alignItems: "center",
+      //         }}
+      //       >
+      //         <div>
+      //           <div
+      //             style={{
+      //               display: "flex",
+      //               alignItems: "center",
+      //               justifyContent: "center",
+      //             }}
+      //           >
+      //             <img
+      //               style={{
+      //                 width: "80vw",
+      //                 maxWidth: "300px",
+      //                 marginTop: "-20px",
+      //               }}
+      //               src={myfyelogo}
+      //               alt="My Fye Logo"
+      //             />
+      //           </div>
+      //         </div>
+      //         <LoadingAnimation />
+      //       </div>
+      //     </>
+      //   )}
+      // </div>
+      /* <SendPage />
+          <WalletPage />
+          <EarnPage />
+          <ProfilePage />
+          <MainDepositPage />
+          <SwapDeposit />
+          <SwapWithdraw />
+          <CryptoPage />
+          <RequestPage /> */
+      <div className="site-layout | app-layout">
+        <Header>
+          <NavMenu></NavMenu>
+          <QRCodeDialog />
+        </Header>
+        <Main>
+          <HomePage></HomePage>
+        </Main>
+        <Footer>
+          <AppNavDrawer></AppNavDrawer>
+        </Footer>
       </div>
     );
   } else {
     return (
-<div
-  style={{
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: '100vh',
-  }}
->
-  <img
-    style={{
-      width: '80vw',
-      marginBottom: '50px',
-      marginTop: '-200px',
-      maxWidth: '300px',
-    }}
-    src={myfyelogo}
-    alt="My Fye Logo"
-  />
-
-
-<div>
-  <div style={{color: '#447E26', 
-          fontSize: '25px',
-          marginTop: '-120px',
-          textAlign: 'center'}}>Your Money, Your Phone.<br/>No Bank Needed.</div>
-</div>
-<div style={{marginTop: '40px'}}>
-  {/* Privy widget */}
-  <button disabled={disableLogin} onClick={login}
-  style={{
-    color: '#ffffff',
-    fontSize: '25px',
-    fontWeight: 'bold',
-    background: '#447E26',
-  borderRadius: '10px', 
-  border: '3px solid #ffffff',
-  padding: '15px'}}>
-      Log In
-    </button>
-
-    
-  </div>
-</div>
+      <div
+        className="site-layout"
+        css={css`
+          max-width: 480px;
+          margin-inline: auto;
+        `}
+      >
+        <div
+          css={css`
+            display: grid;
+            grid-template-rows: var(--size-1000) 1fr auto;
+          `}
+          className="login-page | page"
+        >
+          <header
+            css={css`
+              display: block;
+              align-content: center;
+              margin: auto;
+              padding: 0 20px;
+            `}
+          >
+            <img
+              className="aspect-ratio-square"
+              css={css`
+                width: var(--size-800);
+              `}
+              src={appLogo}
+              alt="MyFye"
+            />
+          </header>
+          <main
+            css={css`
+              padding: 0 20px;
+            `}
+          >
+            <div className="slider">
+              <div
+                css={css`
+                  background-color: red;
+                  aspect-ratio: 1;
+                `}
+              ></div>
+            </div>
+            <div
+              css={css`
+                align-content: center;
+              `}
+            >
+              <h1
+                className="heading-l"
+                css={css`
+                  margin-block-end: var(--size-200);
+                `}
+              >
+                Welcome to MyFye
+              </h1>
+              <p className="subtitle">Hold stocks, crypto, USD/EUR, and more</p>
+              <p
+                className="subtitle"
+                css={css`
+                  font-weight: var(--fw-active);
+                  margin-block-start: var(--size-100);
+                `}
+              >
+                Swipe to learn more →
+              </p>
+            </div>
+          </main>
+          <footer
+            css={css`
+              padding: 0 var(--size-250) var(--size-250) var(--size-250);
+            `}
+          >
+            <Button
+              size="large"
+              expand={true}
+              isDisabled={disableLogin}
+              onClick={login}
+            >
+              Get started
+            </Button>
+          </footer>
+        </div>
+      </div>
     );
   }
 }
 
-
 function WebApp() {
   return (
-      <div style={{overflowX: 'hidden'}}>
-      <WebAppInner/>
-      </div>
+    <div style={{ overflowX: "hidden" }}>
+      <WebAppInner />
+    </div>
   );
 }
 

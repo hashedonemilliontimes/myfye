@@ -12,3 +12,20 @@
   --z-index-toast: 900;
   --z-index-modal: 1000;
 }
+
+.controls {
+  --_gap: var(--controls-gap-m);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: fit-content;
+  gap: var(--_gap);
+}
+
+.aspect-ratio-square {
+  aspect-ratio: 1;
+}
+
+.aspect-ratio-16-9 {
+  aspect-ratio: 16/9;
+}
