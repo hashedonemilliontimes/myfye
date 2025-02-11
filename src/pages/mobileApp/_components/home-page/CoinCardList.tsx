@@ -14,20 +14,21 @@ const CoinCardList = ({ coins }) => {
         gap: var(--size-300);
       `}
     >
-      {coins.map((coin) => (
+      {coins.map((coin, i) => (
         <li
           className="coin-card-wrapper"
           css={css`
             display: block;
             width: 100%;
           `}
+          key={`coin-card-${i}`}
         >
           <CoinCard
             title={coin.title}
             type={coin.type}
             currency={coin.currency}
             balance={coin.balance}
-            src={coin.img}
+            img={coin.img}
           />
         </li>
       ))}
