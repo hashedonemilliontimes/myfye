@@ -138,6 +138,7 @@ const Tabs = () => {
         className="tab-list-wrapper"
         css={css`
           position: relative;
+          padding: 0 var(--size-250);
         `}
       >
         <TabList
@@ -196,6 +197,7 @@ const Tabs = () => {
               css={css`
                 width: 100%;
                 flex-shrink: 0;
+                padding: 0 var(--size-250);
               `}
             >
               {tab?.panel()}
