@@ -55,7 +55,7 @@ const Tabs = () => {
 
   // This function transforms the scroll position into the X position
   // or width of the selected tab indicator.
-  let transform = (x, property) => {
+  const transform = (x, property) => {
     if (!tabElements.length) return 0;
 
     // Find the tab index for the scroll X position.

@@ -79,7 +79,7 @@ const QrReader = ({ onClose, ...restProps }) => {
         className="qr-video-wrapper"
         css={css`
           display: grid;
-          aspect-ratio: 0.9;
+          aspect-ratio: 1;
           border-radius: var(--border-radius-medium);
           color: var(--clr-white);
           overflow: hidden;

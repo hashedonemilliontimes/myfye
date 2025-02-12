@@ -31,8 +31,12 @@ const CashPanel = () => {
 
   return (
     <div className="cash-panel">
-      <BalanceTitle balance={3218} />
-      <CoinCardList coins={coins} />
+      <section className="balance-container">
+        <BalanceTitle balance={3218} />
+      </section>
+      <section className="coins-container">
+        <CoinCardList coins={coins} />
+      </section>
     </div>
   );
 };

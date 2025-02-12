@@ -17,80 +17,104 @@ const DashboardPanel = () => {
     <div
       className="dashboard-panel"
       css={css`
-        padding-bottom: var(--size-250);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        min-height: fit-content;
+        height: 100%;
+        > * {
+          width: 100%;
+        }
       `}
     >
-      <BalanceTitle balance={3218} />
-      <menu
-        className="no-scrollbar"
-        css={css`
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          gap: var(--controls-gap-small);
-          width: 100%;
-          overflow-x: auto;
-          padding: 0 var(--size-250);
-        `}
-      >
-        <li>
-          <Button size="small" icon={ArrowCircleUpIcon}>
-            Send
-          </Button>
-        </li>
-        <li>
-          <Button size="small" icon={ArrowCircleDownIcon}>
-            Receive
-          </Button>
-        </li>
-        <li>
-          <Button size="small" icon={ArrowLineDownIcon}>
-            Deposit
-          </Button>
-        </li>
-        <li>
-          <Button size="small" icon={ArrowLineUpIcon}>
-            Withdraw
-          </Button>
-        </li>
-      </menu>
-      <div
-        className="pie-chart-wrapper"
+      <section className="balance-container">
+        <BalanceTitle balance={3218} />
+        <menu
+          className="no-scrollbar"
+          css={css`
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: var(--controls-gap-small);
+            overflow-x: auto;
+            padding: 0 var(--size-250);
+          `}
+        >
+          <li>
+            <Button size="small" icon={ArrowCircleUpIcon}>
+              Send
+            </Button>
+          </li>
+          <li>
+            <Button size="small" icon={ArrowCircleDownIcon}>
+              Receive
+            </Button>
+          </li>
+          <li>
+            <Button size="small" icon={ArrowLineDownIcon}>
+              Deposit
+            </Button>
+          </li>
+          <li>
+            <Button size="small" icon={ArrowLineUpIcon}>
+              Withdraw
+            </Button>
+          </li>
+        </menu>
+      </section>
+      <section
+        className="pie-chart-container"
         css={css`
           height: 364px;
           margin-block-start: var(--size-200);
           padding: 0 var(--size-250);
         `}
       >
-        <PieChart
-          data={[
+        <div
+          className="pie-chart-wrapper"
+          css={css`
+            width: 100%;
+            height: 100%;
+          `}
+        >
+          <PieChart
+            data={[
+              {
+                id: "Cash",
+                label: "Cash",
+                value: 321,
+                color: "var(--clr-green-300)",
+              },
+              {
+                id: "Crypto",
+                label: "Crypto",
+                value: 135,
+                color: "var(--clr-green-400)",
+              },
+            ]}
+          ></PieChart>
+        </div>
+      </section>
+      <section
+        className="cta-carousel-container"
+        css={css`
+          padding-bottom: var(--size-250);
+        `}
+      >
+        <CTACarousel
+          slides={[
             {
-              id: "Cash",
-              label: "Cash",
-              value: 321,
-              color: "var(--clr-green-300)",
+              title: "Earn up to 4.6% APY with USDY",
+              subtitle: "Invest with ONDO US Dollar Yield (USDY)",
+              icon: "test",
             },
-            {
-              id: "Crypto",
-              label: "Crypto",
-              value: 135,
-              color: "var(--clr-green-400)",
-            },
+            { title: "Test", subtitle: "test", icon: "test" },
+            { title: "Test", subtitle: "test", icon: "test" },
+            { title: "Test", subtitle: "test", icon: "test" },
           ]}
-        ></PieChart>
-      </div>
-      <CTACarousel
-        slides={[
-          {
-            title: "Earn up to 4.6% APY with USDY",
-            subtitle: "Invest with ONDO US Dollar Yield (USDY)",
-            icon: "test",
-          },
-          { title: "Test", subtitle: "test", icon: "test" },
-          { title: "Test", subtitle: "test", icon: "test" },
-          { title: "Test", subtitle: "test", icon: "test" },
-        ]}
-      ></CTACarousel>
+        ></CTACarousel>
+      </section>
     </div>
   );
 };

@@ -12,7 +12,7 @@ const CTACard = ({ title, subtitle, icon }) => {
         padding: var(--size-300);
         width: calc(100% - var(--size-500));
         border-radius: var(--border-radius-medium);
-        border: 1px solid var(--clr-neutral-200);
+        box-shadow: var(--box-shadow-card);
         align-content: center;
       `}
     >

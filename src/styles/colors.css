@@ -87,14 +87,14 @@
   --clr-surface-lowered: var(--clr-neutral-200);
 
   --clr-border-divider: var(--clr-neutral-200);
-  --clr-border-neutral: var(--clr-neutral-300);
-  --clr-border-strong: var(--clr-neutral-400);
-  --clr-border-success: var(--clr-green-300);
-  --clr-border-warning: var(--clr-yellow-300);
-  --clr-border-danger: var(--clr-red-300);
-  --clr-border-info: var(--clr-blue-300);
-  --clr-border-progress: var(--clr-green-300);
-  --clr-border-hover: var(--clr-neutral-400);
+  --clr-border-neutral: var(--clr-neutral-200);
+  --clr-border-strong: var(--clr-neutral-300);
+  --clr-border-success: var(--clr-green-200);
+  --clr-border-warning: var(--clr-yellow-200);
+  --clr-border-danger: var(--clr-red-200);
+  --clr-border-info: var(--clr-blue-200);
+  --clr-border-progress: var(--clr-green-200);
+  --clr-border-hover: var(--clr-neutral-300);
 
   --clr-status-neutral: var(--clr-white);
   --clr-status-success: var(--clr-green-500);

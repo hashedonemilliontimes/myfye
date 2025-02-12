@@ -95,6 +95,7 @@ const QRCodeDialog = () => {
                   display: grid;
                   grid-template-rows: 4rem 1fr;
                   height: ${window.screen.height}px;
+                  overflow-y: auto;
                 `}
                 aria-labelledby={id}
               >
