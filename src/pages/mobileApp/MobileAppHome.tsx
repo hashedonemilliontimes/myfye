@@ -436,56 +436,66 @@ function WebAppInner() {
           </header>
           <main
             css={css`
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              align-items: center;
               padding: 0 var(--size-250);
             `}
           >
-            <div
-              className="slider"
-              css={css`
-                margin-block-start: var(--size-600);
-              `}
-            >
+            <section className="slider-container">
+              <div
+                className="slider"
+                css={css`
+                  width: 100%;
+                  margin-block-start: var(--size-600);
+                `}
+              >
+                <div
+                  css={css`
+                    display: grid;
+                    place-items: center;
+                    border: 1px solid var(--clr-neutral-200);
+                    border-radius: var(--border-radius-medium);
+                    aspect-ratio: 1;
+                    background-color: var(--clr-surface);
+                  `}
+                >
+                  Image
+                </div>
+              </div>
+            </section>
+            <section className="heading-container">
               <div
                 css={css`
-                  display: grid;
-                  place-items: center;
-                  border: 1px solid var(--clr-neutral-200);
-                  border-radius: var(--border-radius-medium);
-                  aspect-ratio: 1;
-                  background-color: var(--clr-surface);
+                  align-content: center;
+                  text-align: center;
+                  margin-block-start: var(--size-1000);
                 `}
               >
-                Image
+                <h1
+                  className="heading-large"
+                  css={css`
+                    margin-block-end: var(--size-200);
+                  `}
+                >
+                  Welcome to MyFye
+                </h1>
+                <p
+                  className="subtitle"
+                  css={css`
+                    color: var(--clr-text-neutral);
+                  `}
+                >
+                  Hold stocks, crypto, USD/EUR, and more
+                </p>
               </div>
-            </div>
-            <div
-              css={css`
-                align-content: center;
-                text-align: center;
-                margin-block-start: var(--size-1000);
-              `}
-            >
-              <h1
-                className="heading-large"
-                css={css`
-                  margin-block-end: var(--size-200);
-                `}
-              >
-                Welcome to MyFye
-              </h1>
-              <p
-                className="subtitle"
-                css={css`
-                  color: var(--clr-text-neutral);
-                `}
-              >
-                Hold stocks, crypto, USD/EUR, and more
-              </p>
-            </div>
+            </section>
           </main>
           <footer
             css={css`
-              padding: 0 var(--size-250) var(--size-250) var(--size-250);
+              padding: var(--size-250) var(--size-250) var(--size-250)
+                var(--size-250);
             `}
           >
             <Button
