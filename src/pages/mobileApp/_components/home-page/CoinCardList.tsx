@@ -12,6 +12,7 @@ const CoinCardList = ({ coins }) => {
         align-items: flex-start;
         justify-content: center;
         gap: var(--size-300);
+        padding: 0 var(--size-250);
       `}
     >
       {coins.map((coin, i) => (

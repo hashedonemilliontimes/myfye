@@ -131,7 +131,6 @@ const Tabs = () => {
       onSelectionChange={onSelectionChange}
       css={css`
         height: 100%;
-        padding-top: var(--size-250);
       `}
     >
       <div
@@ -186,7 +185,7 @@ const Tabs = () => {
         css={css`
           display: flex;
           margin-block-start: var(--size-400);
-          overflow: auto;
+          overflow-x: auto;
           scroll-snap-type: x mandatory;
         `}
       >
@@ -197,7 +196,7 @@ const Tabs = () => {
               css={css`
                 width: 100%;
                 flex-shrink: 0;
-                padding: 0 var(--size-250);
+                scroll-snap-align: start;
               `}
             >
               {tab?.panel()}

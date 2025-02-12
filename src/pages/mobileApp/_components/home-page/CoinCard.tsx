@@ -2,8 +2,11 @@
 import { css } from "@emotion/react";
 import CoinIcon from "./CoinIcon";
 import { useMemo } from "react";
+import { ButtonContext, useContextProps } from "react-aria-components";
+import { useButton } from "react-aria";
+import { motion } from "motion/react";
 
-const CoinCard = ({ title, currency, balance, img }) => {
+const CoinCard = ({ title, currency, balance, img, ref, ...restProps }) => {
   const formattedBalance = useMemo(
     () =>
       new Intl.NumberFormat("en-EN", {
@@ -14,8 +17,22 @@ const CoinCard = ({ title, currency, balance, img }) => {
       }).format(balance),
     [balance]
   );
+
+  const [restPropsButton, refButton] = useContextProps(
+    restProps,
+    ref,
+    ButtonContext
+  );
+
+  let { buttonProps, isPressed } = useButton(restPropsButton, refButton);
+
   return (
-    <button
+    <motion.button
+      {...buttonProps}
+      ref={ref}
+      animate={{
+        scale: isPressed ? 0.98 : 1,
+      }}
       className="coin-card"
       css={css`
         display: grid;
@@ -70,7 +87,7 @@ const CoinCard = ({ title, currency, balance, img }) => {
           {formattedBalance}
         </p>
       </div>
-    </button>
+    </motion.button>
   );
 };
 

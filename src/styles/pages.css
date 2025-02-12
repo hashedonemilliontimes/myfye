@@ -14,7 +14,7 @@
     grid-template-rows: 4rem 1fr 4.5rem;
     min-height: 100vh;
     min-height: 100dvh;
-    max-width: 480px;
+    max-width: 420px;
     margin-inline: auto;
   }
 }

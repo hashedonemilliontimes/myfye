@@ -28,7 +28,7 @@ const Button = ({
   ...restProps
 }: ButtonProps) => {
   const Icon = icon;
-  // Merge the local props and ref with the ones provided via context.
+
   const [restPropsButton, refButton] = useContextProps(
     restProps,
     ref,

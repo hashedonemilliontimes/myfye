@@ -45,7 +45,9 @@ const Tab = ({ icon, active, title, ref, ...restProps }: TabProps) => {
           css={css`
             margin: 0 auto;
           `}
-          color={active ? "var(--clr-accent)" : "var(--clr-text)"}
+          color={
+            active ? "var(--clr-accent)" : "var(--clr-text-neutral-strong)"
+          }
           weight={active ? "fill" : "regular"}
           size={"var(--size-400)"}
         />

@@ -394,23 +394,35 @@ function WebAppInner() {
       <div
         className="site-layout"
         css={css`
-          max-width: 480px;
+          max-width: 420px;
           margin-inline: auto;
+          background-color: var(--clr-green-100);
+          background-image: radial-gradient(
+              at 94% 90%,
+              hsla(141, 46%, 86%, 0.2) 0px,
+              transparent 50%
+            ),
+            radial-gradient(
+              at 0% 0%,
+              hsla(143, 44%, 67%, 0.2) 0px,
+              transparent 50%
+            );
         `}
       >
         <div
           css={css`
             display: grid;
-            grid-template-rows: var(--size-1000) 1fr auto;
+            grid-template-rows: 6rem 1fr auto;
           `}
           className="login-page | page"
         >
           <header
             css={css`
-              display: block;
+              display: grid;
+              place-items: center;
+              width: 100%;
               align-content: center;
-              margin: auto;
-              padding: 0 20px;
+              padding: 0 var(--size-250);
             `}
           >
             <img
@@ -424,39 +436,50 @@ function WebAppInner() {
           </header>
           <main
             css={css`
-              padding: 0 20px;
+              padding: 0 var(--size-250);
             `}
           >
-            <div className="slider">
+            <div
+              className="slider"
+              css={css`
+                margin-block-start: var(--size-600);
+              `}
+            >
               <div
                 css={css`
-                  background-color: red;
+                  display: grid;
+                  place-items: center;
+                  border: 1px solid var(--clr-neutral-200);
+                  border-radius: var(--border-radius-medium);
                   aspect-ratio: 1;
+                  background-color: var(--clr-surface);
                 `}
-              ></div>
+              >
+                Image
+              </div>
             </div>
             <div
               css={css`
                 align-content: center;
+                text-align: center;
+                margin-block-start: var(--size-1000);
               `}
             >
               <h1
-                className="heading-l"
+                className="heading-large"
                 css={css`
                   margin-block-end: var(--size-200);
                 `}
               >
                 Welcome to MyFye
               </h1>
-              <p className="subtitle">Hold stocks, crypto, USD/EUR, and more</p>
               <p
                 className="subtitle"
                 css={css`
-                  font-weight: var(--fw-active);
-                  margin-block-start: var(--size-100);
+                  color: var(--clr-text-neutral);
                 `}
               >
-                Swipe to learn more →
+                Hold stocks, crypto, USD/EUR, and more
               </p>
             </div>
           </main>

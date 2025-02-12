@@ -79,7 +79,7 @@ const QrReader = ({ onClose, ...restProps }) => {
         className="qr-video-wrapper"
         css={css`
           display: grid;
-          aspect-ratio: 1;
+          aspect-ratio: 0.9;
           border-radius: var(--border-radius-medium);
           color: var(--clr-white);
           overflow: hidden;
@@ -92,15 +92,17 @@ const QrReader = ({ onClose, ...restProps }) => {
             grid-area: 1/1;
             width: 100%;
             height: 100%;
-            background-color: red;
           `}
         ></video>
         <img
           src={qrScanOutline}
           alt=""
           css={css`
+            width: 100%;
+            height: 100%;
             grid-area: 1/1;
             pointer-events: none;
+            object-fit: contain;
           `}
         />
       </div>

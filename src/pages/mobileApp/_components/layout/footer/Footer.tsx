@@ -6,6 +6,9 @@ const Footer = ({ children }) => {
     <footer
       css={css`
         border-top: 1px solid var(--clr-border-divider);
+        position: relative;
+        z-index: var(--z-index-nav);
+        background-color: var(--clr-surface);
       `}
     >
       <div

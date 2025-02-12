@@ -1,5 +1,16 @@
+/** @jsxImportSource @emotion/react */
+import { css } from "@emotion/react";
+
 const Main = ({ children }) => {
-  return <main>{children}</main>;
+  return (
+    <main
+      css={css`
+        overflow-y: auto;
+      `}
+    >
+      {children}
+    </main>
+  );
 };
 
 export default Main;
