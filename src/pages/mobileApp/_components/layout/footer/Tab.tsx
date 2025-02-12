@@ -54,6 +54,7 @@ const Tab = ({ icon, active, title, ref, ...restProps }: TabProps) => {
             margin-top: var(--size-025);
             font-weight: var(--fw-active);
             font-size: var(--fs-small);
+            text-align: center;
             color: ${active ? "green" : "black"};
           `}
         >
