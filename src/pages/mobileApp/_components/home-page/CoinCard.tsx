@@ -1,8 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import CoinIcon from "./CoinIcon";
+import { useMemo } from "react";
 
 const CoinCard = ({ title, currency, balance, img }) => {
+  const formattedBalance = useMemo(
+    () =>
+      new Intl.NumberFormat("en-EN", {
+        style: "currency",
+        currency: `${
+          currency === "sol" || currency === "btc" ? "usd" : currency
+        }`,
+      }).format(balance),
+    [balance]
+  );
   return (
     <button
       className="coin-card"
@@ -56,7 +67,7 @@ const CoinCard = ({ title, currency, balance, img }) => {
             font-weight: var(--fw-active);
           `}
         >
-          {balance}
+          {formattedBalance}
         </p>
       </div>
     </button>

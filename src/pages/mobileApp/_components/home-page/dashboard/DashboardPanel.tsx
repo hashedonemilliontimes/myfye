@@ -9,32 +9,12 @@ import {
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import PieChart from "./PieChart";
+import BalanceTitle from "../BalanceTitle";
 
 const DashboardPanel = () => {
   return (
     <div className="dashboard-panel">
-      <hgroup
-        css={css`
-          text-align: start;
-        `}
-      >
-        <h1
-          css={css`
-            font-size: var(--fs-small);
-            color: var(--clr-text-neutral);
-          `}
-        >
-          Total Balance
-        </h1>
-        <p
-          className="heading-large"
-          css={css`
-            margin-block-start: var(--size-100);
-          `}
-        >
-          $3212.34
-        </p>
-      </hgroup>
+      <BalanceTitle balance={3218} />
       <menu
         className="no-scrollbar"
         css={css`
@@ -42,7 +22,6 @@ const DashboardPanel = () => {
           align-items: center;
           justify-content: flex-start;
           gap: var(--controls-gap-small);
-          margin-block-start: var(--size-300);
           width: 100%;
           overflow-x: auto;
         `}

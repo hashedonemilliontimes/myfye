@@ -1,6 +1,7 @@
 import CoinCardList from "../CoinCardList";
 import btcCoinIcon from "@/assets/svgs/coins/btc-coin.svg";
 import solCoinIcon from "@/assets/svgs/coins/sol-coin.svg";
+import BalanceTitle from "../BalanceTitle";
 
 const CryptoPanel = () => {
   const coins = [
@@ -22,6 +23,7 @@ const CryptoPanel = () => {
 
   return (
     <div className="crypto-panel">
+      <BalanceTitle balance={3218} />
       <CoinCardList coins={coins} />
     </div>
   );

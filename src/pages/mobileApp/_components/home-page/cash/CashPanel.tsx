@@ -2,6 +2,7 @@ import CoinCardList from "../CoinCardList";
 import usDollarCoinIcon from "@/assets/svgs/coins/usd-coin.svg";
 import euroCoinIcon from "@/assets/svgs/coins/eur-coin.svg";
 import usdyCoinIcon from "@/assets/svgs/coins/usdy-coin.svg";
+import BalanceTitle from "../BalanceTitle";
 
 const CashPanel = () => {
   const coins = [
@@ -30,6 +31,7 @@ const CashPanel = () => {
 
   return (
     <div className="cash-panel">
+      <BalanceTitle balance={3218} />
       <CoinCardList coins={coins} />
     </div>
   );
