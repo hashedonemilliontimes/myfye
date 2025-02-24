@@ -207,6 +207,7 @@ function SwapWithdraw() {
               console.log("Calling swap with input amount", convertToSmallestDenomination);
               console.log("Calling swap with input fee", feeAmountNativeSmallestDenomination);
               
+              
               const signWithdrawalSuccess = await swap(
                 wallet, 
                 publicKey, 
@@ -425,7 +426,10 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}
 
 {selectedLanguageCode === 'en' && `Fee: `}
 {selectedLanguageCode === 'es' && `Tarifa: `}
-<div>&nbsp;1%</div>
+&nbsp;&nbsp;
+<div style={{color: '#999999', textDecoration: 'line-through'}}>1%</div>
+<div>&nbsp;&nbsp;0%</div>
+
 { /* feeAmountInUSD > 0 ? (<>
           $ {(feeAmountInUSD.toFixed(6).split('.')[0].toLocaleString() + '.' + feeAmountInUSD.toFixed(6).split('.')[1]).replace(/\.?0+$/, '')}
           </>) : (<></>) */ }

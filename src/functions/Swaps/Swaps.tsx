@@ -42,7 +42,8 @@ export const swap = async (
 
   if (microPlatformFeeAmount > 0) {
     platformFeeAccountData = await getTokenAccountData(
-      'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn',
+      //'DR5s8mAdygzmHihziLzDBwjuux1R131ydAG2rjYhpAmn',
+      '688pzWEMqC52hiVgFviu45A24EzJ6ZfVoHiSzPSahJgh',
       inputMint,
       'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
     )
@@ -109,6 +110,7 @@ const swapTransaction = async (
   platformFeeAccountData: any
 ) => {
   
+
   // get the platform fee account 
   let platformFeeAccount: PublicKey | null = null;
   if (platformFeeAccountData?.pubkey) {
