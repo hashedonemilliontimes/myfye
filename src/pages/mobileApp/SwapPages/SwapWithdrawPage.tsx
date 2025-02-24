@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import backButton from '../../../assets/backButton3.png';
 import { getFunctions } from 'firebase/functions';
 import { setusdySolValue, setbtcSolValue, setusdcSolValue } from '../../../redux/userWalletData.tsx';
-import { swap } from '../../../functions/Swaps.tsx';
+import { swap } from '../../../functions/Swaps/Swaps.tsx';
 import LoadingAnimation from '../../../components/LoadingAnimation.tsx';
 import { setShowSwapWithdrawPage, 
     setSwapWithdrawTransactionStatus, 
@@ -92,7 +92,6 @@ function SwapWithdraw() {
 
           setcurrencySelected('');
         }
-        console.log(priceOfBTCinUSDC);
       }, [showMenu]);
     
       useEffect(() => {
@@ -204,7 +203,7 @@ function SwapWithdraw() {
               const outputCurrency: String = 'usdcSol';
 
               const wallet = wallets[0];
-
+              
               console.log("Calling swap with input amount", convertToSmallestDenomination);
               console.log("Calling swap with input fee", feeAmountNativeSmallestDenomination);
               

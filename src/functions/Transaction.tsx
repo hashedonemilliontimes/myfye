@@ -2,6 +2,7 @@ import { HELIUS_API_KEY } from '../env.ts';
 import { 
     createTransferInstruction, 
     TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { SERVER_PUBLIC_KEY } from '../env.ts';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 import { 
@@ -24,6 +25,7 @@ import {useSendTransaction} from '@privy-io/react-auth';
   const USDY_MINT_ADDRESS = 'A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6';
   const PYUSD_MINT_ADDRESS = '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo';
   const EURC_MINT_ADDRESS = 'HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr';
+
 
 export const tokenTransfer = async (
     payerPubKey: string, 
@@ -90,7 +92,6 @@ export const tokenTransfer = async (
         
           try {
             const result = newTokenAccount({
-              payerPubKey: payerPubKey,
               receiverPubKey: receiverPubKey,
               mintAddress: mintAddress!,
               programId: programId,
@@ -159,45 +160,41 @@ export const tokenTransfer = async (
 
         const blockhashInfo = await connection.getLatestBlockhash();
         
-        // Create the priority transaction
-        const transaction = new Transaction();
-        transaction.add(transferInstruction);
-        transaction.feePayer = senderPublicKey;
-        transaction.recentBlockhash = blockhashInfo.blockhash;
-        transaction.lastValidBlockHeight = blockhashInfo.lastValidBlockHeight;
-  
-        
+        const feePayerPublicKey = new PublicKey(SERVER_PUBLIC_KEY!);
+      
         // Create the priority transaction
         const txPriority = new Transaction();
         txPriority.add(transferInstruction);
         txPriority.add(PRIORITY_FEE_IX); // Add priority fee instruction
-        txPriority.feePayer = senderPublicKey;
         txPriority.recentBlockhash = blockhashInfo.blockhash;
         txPriority.lastValidBlockHeight = blockhashInfo.lastValidBlockHeight;
+        txPriority.feePayer = feePayerPublicKey;
 
       try {
         
-        /*
-        await wallet.signTransaction!(transaction, connection);
-        const transactionId = await wallet.sendTransaction!(transaction, connection);
-        */
+        const functions = getFunctions();
+        const signTransactionFn = httpsCallable(functions, "signTransaction");
 
-        /*
-        const signedTX = await wallet.signTransaction(
-          transaction
-        );*/
+        // Serialize the transaction (before signing)
+        const serializedTx = txPriority.serialize({ requireAllSignatures: false }).toString("base64");
 
-        const transactionId = await wallet.sendTransaction!(txPriority, connection);
+        // Send to Firebase for signing
+        const { data } = await signTransactionFn({ serializedTransaction: serializedTx }) as { data: { signedTransaction?: string; error?: string } };
+
+        if (data.error) {
+          console.error("Signing failed:", data.error);
+          return false;
+        }
+
+        if (!data.signedTransaction) {
+          console.error("Signing failed:", data.error);
+          return false;
+        }
+        // Deserialize the signed transaction
+        const signedTx = Transaction.from(Buffer.from(data.signedTransaction, "base64"));
+
+        const transactionId = await wallet.sendTransaction!(signedTx, connection);
         
-        
-        /*
-        const transactionId = await sendAndConfirmTransaction(
-          connection,
-          signedTX.serialize(),
-          [], //Signers
-        );
-        */
-
         if (transactionId) {
           let transactionConfirmed = false
           for (let attempt = 1; attempt <= 3 && !transactionConfirmed; attempt++) {

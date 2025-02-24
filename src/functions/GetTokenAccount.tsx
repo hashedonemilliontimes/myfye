@@ -25,7 +25,7 @@ async function getTokenAccountData(
         accountInfo.account.data.parsed.info.mint === mintAddress
     );
 
-    console.log("ownerAccountInfo", ownerAccountInfo)
+    console.log("ownerAccountInfo!! ", ownerAccountInfo)
 
     // Return the found or newly created token account info
     return ownerAccountInfo;

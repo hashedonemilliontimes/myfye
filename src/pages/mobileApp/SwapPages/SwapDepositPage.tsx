@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import menuIcon from '../../../assets/menuIcon.png';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { swap } from '../../../functions/Swaps.tsx';
+import { swap } from '../../../functions/Swaps/Swaps.tsx';
 import { useDispatch } from 'react-redux';
 import { setusdcSolValue, 
   setusdtSolValue,

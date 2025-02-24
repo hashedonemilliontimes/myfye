@@ -37,8 +37,6 @@ const HandleUserLogIn = async (
   priceOfBTCinUSDC: number,
   priceOfEURCinUSDC: number ): Promise<{ success: boolean;}> => {
 
-    console.log('user', user)
-
     // Set some user data
     dispatch(setcurrentUserEmail(user.email.address))
     dispatch(setWalletPubKey(user.wallet.address))
@@ -252,7 +250,6 @@ const getBTCPriceQuote = async (price: number, dispatch: Function): Promise<bool
       const quote = await getSwapQuote()
       const priceInUSD = quote.outAmount/1000000
       if (priceInUSD && priceInUSD>0.01) {
-          console.log("Setting BTC PRice", quote.outAmount/10000)
           dispatch(setPriceOfBTCinUSDC(quote.outAmount/10000))
       } else {
           dispatch(setPriceOfBTCinUSDC(100000)) // default to $100,000
@@ -282,7 +279,6 @@ const getEURCPriceQuote = async (price: number, dispatch: Function): Promise<boo
       const quote = await getSwapQuote()
       const priceInUSD = quote.outAmount/1000000
       if (priceInUSD && priceInUSD>0.01) {
-          console.log("Setting EURC PRice",priceInUSD )
           dispatch(setPriceOfEURCinUSDC(priceInUSD))
       } else {
           dispatch(setPriceOfEURCinUSDC(1.025)) // default to $100,000
@@ -339,7 +335,6 @@ export async function getUsers(dispatch: Function) {
       const users = mapToUsers(result);
       
       if (users) {
-        console.log("setting users", users)
         dispatch(setUsers(users))
       }
 

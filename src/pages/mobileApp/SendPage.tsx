@@ -62,7 +62,6 @@ function SendPage() {
 
 
     useEffect(() => {
-      console.log('users!', users)
      }, [users]);
 
     useEffect(() => {
