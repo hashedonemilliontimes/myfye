@@ -64,7 +64,7 @@ function LanguagePage() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-<img src={LanguageIcon} style={{width: '35px', height: '35px', opacity: '0.72'}}
+<img src={LanguageIcon} style={{width: '35px', height: '35px', opacity: '0.82'}}
 onClick={handleMenuClick}></img>
 
 { showMenu && (

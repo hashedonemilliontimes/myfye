@@ -155,7 +155,7 @@ function Support() {
     return (
         <div style={{ backgroundColor: 'white' }}>
 
-<img src={questionMarkImage} style={{width: '35px', height: '35px', opacity: '0.72'}}
+<img src={questionMarkImage} style={{width: '35px', height: '35px', opacity: '0.82'}}
 onClick={handleMenuClick}></img>
 
 { showMenu && (
@@ -188,7 +188,7 @@ onClick={handleMenuClick}></img>
         transition: 'top 0.5s ease' // Animate the left property
       }}>
 
-<div style={{marginTop: '0px', textAlign: 'center', fontSize: '35px', color: '#222222'}}>
+<div style={{marginTop: '0px', textAlign: 'center', fontSize: '35px', color: '#111111'}}>
 {selectedLanguageCode === 'en' && `Get Help`}
 {selectedLanguageCode === 'es' && `Consigue Ayuda`}
 </div>

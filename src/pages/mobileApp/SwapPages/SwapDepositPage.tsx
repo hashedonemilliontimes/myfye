@@ -37,9 +37,6 @@ function SwapDeposit() {
 
     const showMenu = useSelector((state: any) => state.userWalletData.showSwapDepositPage);
 
-    const primaryWallet = null; //to do get the wallet
-    const user = null; //to do get the user
-
     const [networkSelected, setNetworkSelected] = useState('solana'); 
     const [currencySelected, setcurrencySelected] = useState('');
     const [balanceSelectedInUSD, setbalanceSelectedInUSD] = useState(0);
@@ -713,16 +710,16 @@ function SwapDeposit() {
 
 <label htmlFor="deposit" style={{ fontSize: '20px', color: '#222222', 
 marginBottom: '15px', display: 'flex', alignItems: 'center', }}>
-$ <span style={{ fontSize: '35px' }}>
-    {currencySelected == 'usdcSol' && usdcSolBalance}
-    {currencySelected == 'usdtSol' && usdtSolBalance}
-    {currencySelected == 'pyusdSol' && pyusdSolBalance}
-    {currencySelected == 'eurcSol' && eurcSolBalance}
+<span style={{ fontSize: '35px' }}>
+  ${currencySelected === 'usdcSol' && usdcSolBalance?.toFixed(2)}
+  {currencySelected === 'usdtSol' && usdtSolBalance?.toFixed(2)}
+  {currencySelected === 'pyusdSol' && pyusdSolBalance?.toFixed(2)}
+  {currencySelected === 'eurcSol' && eurcSolBalance?.toFixed(2)}
 
-    {currencySelected == 'usdcEth' && usdcEthBalance}
-    {currencySelected == 'usdtEth' && usdtEthBalance}
-    {currencySelected == 'busdEth' && busdEthBalance}
-  </span>   
+  {currencySelected === 'usdcEth' && usdcEthBalance?.toFixed(2)}
+  {currencySelected === 'usdtEth' && usdtEthBalance?.toFixed(2)}
+  {currencySelected === 'busdEth' && busdEthBalance?.toFixed(2)}
+</span>
 
 <div style={{marginLeft: '5px'}}>
 {currencySelected == 'usdcSol' && (<>USDC</>)}
@@ -877,7 +874,7 @@ $ <span style={{ fontSize: '35px' }}>
                 </div>
 
                 <div id="usdcSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
-                  Add a Solana Wallet
+                {publicKey ? `${publicKey.slice(0, 3)}...${publicKey.slice(-3)}` : ''} Copied!
                 </div>
                 </div>
                 </>
@@ -915,7 +912,7 @@ $ <span style={{ fontSize: '35px' }}>
                       </div>
                       </div>
                   </div>) : (
-                      <div style = {{marginRight: '15px'}}>${usdcSolBalance}</div>)}
+                      <div style = {{marginRight: '15px'}}>${usdcSolBalance?.toFixed(2)}</div>)}
                 </div>
                 </div>
                 </>
@@ -946,7 +943,7 @@ $ <span style={{ fontSize: '35px' }}>
                 </div>
 
                 <div id="usdtSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
-                  Add a Solana Wallet
+                {publicKey ? `${publicKey.slice(0, 3)}...${publicKey.slice(-3)}` : ''} Copied!
                 </div>
                 </div>
                 </>
@@ -983,7 +980,7 @@ $ <span style={{ fontSize: '35px' }}>
                       </div>
                       </div>
                   </div>) : (
-                      <div style = {{marginRight: '15px'}}>${usdtSolBalance}</div>)}
+                      <div style = {{marginRight: '15px'}}>${usdtSolBalance.toFixed(2)}</div>)}
                 </div>
                 </div>
                 </>
@@ -1017,7 +1014,7 @@ $ <span style={{ fontSize: '35px' }}>
                 </div>
 
                 <div id="eurcSolLabel" style={{maxWidth: '100px', textAlign: 'center'}}>
-                  Add a Solana Wallet
+                {publicKey ? `${publicKey.slice(0, 3)}...${publicKey.slice(-3)}` : ''} Copied!
                 </div>
                 </div>
                 </>
@@ -1055,7 +1052,7 @@ $ <span style={{ fontSize: '35px' }}>
                       </div>
                       </div>
                   </div>) : (
-                      <div style = {{marginRight: '15px'}}>${eurcSolBalance}</div>)}
+                      <div style = {{marginRight: '15px'}}>${eurcSolBalance.toFixed(2)}</div>)}
                 </div>
                 </div>
                 </>

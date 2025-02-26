@@ -31,6 +31,7 @@ root.render(
         },
         embeddedWallets: {
           createOnLogin: 'off',
+          showWalletUIs: false,
         },
         solanaClusters: [
           {

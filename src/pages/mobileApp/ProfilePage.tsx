@@ -111,9 +111,11 @@ function ProfilePage() {
 
         <div style={{ fontSize: '16px'}}>{currentUserEmail}</div>
 
-      <div>Sol Address:</div>
-      <div style={{fontSize: '8px'}}>{currentUserPubKey}</div>
-      <div>Sol Value: {currentUserSolValue}</div>
+      <div style={{marginTop: '40px'}}>Stable Coin Address:</div>
+      <div style={{ fontSize: '16px' }}>
+        {currentUserPubKey ? `${currentUserPubKey.slice(0, 3)}...${currentUserPubKey.slice(-3)}` : ''}
+      </div>
+
 
         <div style={{marginTop: '50px'}}>
         </div>
