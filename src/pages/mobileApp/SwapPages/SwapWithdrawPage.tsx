@@ -275,7 +275,11 @@ function SwapWithdraw() {
       const updateUserBalance = () => {
         
         if (depositWithdrawProductType == 'Earn') {
-          const newUSDCBalance = usdcSolBalance + (usdyBalance/priceOfUSDYinUSDC);
+
+          console.log('usdcSolBalance', usdcSolBalance)
+          console.log('usdyBalance', usdyBalance)
+          console.log('priceOfUSDYinUSDC', priceOfUSDYinUSDC)
+          const newUSDCBalance = usdcSolBalance + (usdyBalance*priceOfUSDYinUSDC);
 
           console.log("Setting setusdySolValue to", 0)
           console.log("Setting susdcSolBalance to", newUSDCBalance)
@@ -285,7 +289,7 @@ function SwapWithdraw() {
 
         } else if (depositWithdrawProductType == 'Crypto') {
           
-          const newUSDCBalance = usdcSolBalance + (btcSolBalance/priceOfBTCinUSDC);
+          const newUSDCBalance = usdcSolBalance + (btcSolBalance*priceOfBTCinUSDC);
 
           console.log("Setting setbtcSolValue to", 0)
           console.log("Setting susdcSolBalance to", newUSDCBalance)
@@ -451,13 +455,13 @@ $ {(usdyBalance*priceOfUSDYinUSDC).toFixed(4).toLocaleString()}
 
       { depositWithdrawProductType === 'Crypto' && (
         <span>
-<div style={{ fontSize: '36px'}}>{((btcSolBalance * priceOfBTCinUSDC)-feeAmountInUSD).toFixed(4).toLocaleString()}</div>
+<div style={{ fontSize: '36px'}}>{((btcSolBalance * priceOfBTCinUSDC)).toFixed(4).toLocaleString()}</div>
         </span>
       )}
 
       { depositWithdrawProductType === 'Earn' && (
         <span>
-      <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)-feeAmountInUSD).toFixed(4).toLocaleString()}</div>
+      <div style={{ fontSize: '36px'}}>{((usdyBalance*priceOfUSDYinUSDC)).toFixed(4).toLocaleString()}</div>
         </span>
       )}
 
