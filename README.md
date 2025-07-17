@@ -2,28 +2,6 @@
 
 MyFye is a comprehensive Web3 financial platform that enables users to manage cryptocurrencies, stocks, and traditional financial assets in one unified application. The platform supports cross-chain transactions, on/off-ramp services, and integrates with multiple blockchain networks.
 
-## 🚀 Features
-
-### Core Functionality
-- **Multi-Asset Wallet**: Manage crypto, stocks, and cash in one place
-- **Cross-Chain Transactions**: Bridge between Solana and EVM chains
-- **On/Off-Ramp Services**: Convert between fiat and crypto
-- **Stock Trading**: Trade stocks through Dinari integration
-- **QR Code Payments**: Send and receive payments via QR codes
-- **Contact Management**: Store and manage payment contacts
-- **Transaction History**: Complete activity tracking
-
-### Blockchain Support
-- **Solana**: Native support with Helius RPC
-- **Ethereum/EVM**: Support for EVM-compatible chains
-- **Cross-Chain Bridge**: Seamless asset transfers between chains
-
-### Authentication & Security
-- **Privy Integration**: Web3-native authentication
-- **KYC Compliance**: User verification and compliance
-- **Rate Limiting**: API protection and security
-- **IP Geolocation**: Enhanced security monitoring
-
 ## 🏗️ Architecture
 
 ### Frontend (React + TypeScript)
