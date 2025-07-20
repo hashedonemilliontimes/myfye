@@ -112,8 +112,8 @@ const AssetInfoPopup: React.FC<AssetInfoPopupProps> = ({ isOpen, onOpenChange, a
     <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange}>
       {/* Top row: icon left, name/ticker right */}
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', marginBottom: 16 }}>
-        <div style={{ flex: '0 0 auto', marginRight: 16 }}>
-          <AssetIcon icon={asset.icon} width="64" />
+        <div style={{ flex: '0 0 auto', marginRight: 16, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <AssetIcon icon={asset.icon} width="56px" />
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'flex-start' }}>
           <div style={{ fontWeight: 600, fontSize: 20, color: '#222', lineHeight: 1, marginBottom: 4 }}>
