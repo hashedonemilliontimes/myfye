@@ -5,7 +5,6 @@ import KYCOverlay from "@/features/compliance/kycOverlay";
 // import Button from "@/shared/components/ui/button/Button";
 // import Menu from "@/shared/components/ui/menu/Menu";
 
-import AssetCardController from "./AssetCardController";
 import { formatBalance } from "../utils";
 import { AbstractedAsset, Asset } from "../types";
 import { useSelector } from "react-redux";
@@ -29,6 +28,7 @@ import { toggleModal as toggleSwapModal } from "@/features/swap/swapSlice";
 import { toggleModal as toggleSendModal } from "@/features/send/sendSlice";
 import { toggleModal as toggleReceiveModal } from "@/features/receive/receiveSlice";
 import { toggleModal as toggleKYCModal } from "@/features/compliance/kycSlice";
+import { RootState } from "@/redux/store";
 
 const AssetCard = ({
   id,
@@ -44,6 +44,7 @@ const AssetCard = ({
   showCurrencySymbol = true,
   radio,
   isSelected,
+  onPress, // <-- add onPress prop
   ...restProps
 }: {
   id: AbstractedAsset["id"];
@@ -52,13 +53,14 @@ const AssetCard = ({
   symbol: AbstractedAsset["symbol"];
   groupId: AbstractedAsset["groupId"];
   balance: number;
-  ref: RefObject<HTMLButtonElement>;
+  ref?: RefObject<HTMLButtonElement>;
   icon: AbstractedAsset["icon"];
   showOptions: boolean;
   showBalance: boolean;
   showCurrencySymbol?: boolean;
   radio?: boolean;
   isSelected?: boolean;
+  onPress?: () => void; // <-- add onPress type
 }) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
@@ -105,6 +107,7 @@ const AssetCard = ({
   return (
     <div
       className="asset-card"
+      onClick={() => { if (onPress) onPress(); }} // always trigger onPress on card click
       css={css`
         display: grid;
         grid-template-columns: ${showOptions ? "1fr auto" : "1fr"};
@@ -202,6 +205,7 @@ const AssetCard = ({
       {showOptions && (
         <MenuTrigger>
           <Button
+            onClick={e => e.stopPropagation()} // prevent card click when clicking options
             css={css`
               display: grid;
               place-items: center;
