@@ -1,10 +1,15 @@
 {
   "BTC": "Bitcoin (BTC) is a decentralized digital currency that enables peer-to-peer transactions on a secure blockchain network.",
-  "ETH": "Ethereum (ETH) is a decentralized platform that enables smart contracts and decentralized applications (dApps) to be built and run without any downtime.",
-  "USDT": "Tether (USDT) is a stablecoin pegged to the US Dollar, commonly used for trading and storing value in the crypto ecosystem.",
   "USD": "US Dollar (USD) is the official currency of the United States and is widely used as a global reserve currency.",
   "EUR": "Euro (EUR) is the official currency of the Eurozone, used by 19 of the 27 European Union countries.",
   "USDY": "US Dollar Yield (USDY) is a yield-bearing digital asset representing US Dollar deposits earning interest.",
   "SOL": "Solana (SOL) is a high-performance blockchain supporting fast and low-cost transactions for decentralized applications.",
-  "XRP": "Ripple (XRP) is a digital payment protocol and cryptocurrency designed for fast, low-cost international money transfers."
+  "XRP": "Ripple (XRP) is a digital payment protocol and cryptocurrency designed for fast, low-cost international money transfers.",
+  "DOGE": "Dogecoin (DOGE) is a meme-inspired cryptocurrency known for its active community and low transaction fees, often used for tipping and microtransactions.",
+  "SUI": "Sui (SUI) is a layer-1 blockchain designed for high scalability and low latency, enabling fast execution of smart contracts and digital asset ownership.",
+  "AAPL": "Apple Inc. (AAPL) is a leading technology company known for its consumer electronics, software, and digital services, including the iPhone and Mac.",
+  "NVDA": "NVIDIA Corporation (NVDA) is a global leader in graphics processing units (GPUs) and AI computing technologies used in gaming, data centers, and autonomous vehicles.",
+  "TSLA": "Tesla Inc. (TSLA) is an electric vehicle and clean energy company that designs and manufactures EVs, battery storage systems, and solar products.",
+  "SPY": "SPDR S&P 500 ETF Trust (SPY) is an exchange-traded fund that tracks the performance of the S&P 500 Index, representing large-cap U.S. equities.",
+  "COIN": "Coinbase Global Inc. (COIN) is a leading cryptocurrency exchange platform that enables users to buy, sell, and store a variety of digital assets."
 }
