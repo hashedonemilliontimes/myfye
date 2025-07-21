@@ -49,6 +49,7 @@ const { create_new_dinari_account } = require('./routes/dinari_shares/account');
 const { sign_nonce } = require('./routes/dinari_shares/sign_nonce');
 const { sign_order } = require('./routes/dinari_shares/sign_order.js');
 const { getWalletIdByAddress } = require('./routes/privy/getWallets');
+const priceHistoryRouter = require('./routes/priceHistory');
 
 app.set('trust proxy', true);
 
@@ -159,6 +160,7 @@ app.use(blockUnauthorizedIPs);
 
 // Add email service routes
 app.use('/api/email', emailService);
+app.use('/api', priceHistoryRouter);
 
 /* User management endpoints */
 // Apply stricter rate limiting to sensitive endpoints
