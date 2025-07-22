@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 import AssetIcon from "../AssetIcon";
 import { RefObject, useState } from "react";
+import AssetInfoPopup from "../AssetInfoPopup";
 import KYCOverlay from "@/features/compliance/kycOverlay";
 // import Button from "@/shared/components/ui/button/Button";
 // import Menu from "@/shared/components/ui/menu/Menu";
@@ -63,6 +64,7 @@ const AssetCard = ({
   onPress?: () => void; // <-- add onPress type
 }) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
 
   const dispatch = useDispatch();
@@ -301,10 +303,41 @@ const AssetCard = ({
                 />
                 Swap
               </MenuItem>
+              <MenuItem
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  border-radius: var(--border-radius-medium);
+                  padding: var(--size-150) var(--size-150);
+                  width: 100%;
+                  &[data-hovered="true"] {
+                    background-color: var(--clr-surface-raised);
+                  }
+                `}
+                onAction={() => setShowInfoPopup(true)}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 16,
+                    height: 16,
+                    marginRight: 8,
+                    borderRadius: 8,
+                    background: "#eee",
+                    textAlign: "center",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: "#888",
+                    lineHeight: "16px",
+                  }}
+                >i</span>
+                About
+              </MenuItem>
             </Menu>
           </Popover>
         </MenuTrigger>
       )}
+      <AssetInfoPopup isOpen={showInfoPopup} onOpenChange={setShowInfoPopup} assetId={id} />
     </div>
   );
 };

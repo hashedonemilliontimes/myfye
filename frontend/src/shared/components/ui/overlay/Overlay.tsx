@@ -45,84 +45,100 @@ const Overlay = ({
     <>
       <AnimatePresence>
         {isOpen && (
-          <MotionDialog
-            open
-            onClose={() => onOpenChange(false)}
-            css={css`
-              position: fixed;
-              inset: 0;
-              z-index: ${zIndex};
-              max-width: 420px;
-              margin-inline: auto;
-              isolation: isolate;
-            `}
-          >
-            <MotionDialogPanel
-              css={css`
-                background-color: var(--clr-surface);
-                position: absolute;
-                bottom: 0;
-                width: 100%;
-                will-change: transform;
-                height: 100lvh;
-                z-index: 1;
-              `}
-              initial={{ x: w }}
-              animate={{ x: 0 }}
-              exit={{ x: w }}
+          <>
+            {/* Smooth fading backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
               transition={staticTransition}
               style={{
-                x,
-                left: 0,
-                // Extra padding at the right to account for rubber band scrolling.
-                paddingRight: window.screen.width,
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.5)",
+                zIndex: zIndex - 1,
               }}
+              onClick={() => onOpenChange(false)}
+            />
+            <MotionDialog
+              open
+              onClose={() => onOpenChange(false)}
+              css={css`
+                position: fixed;
+                inset: 0;
+                z-index: ${zIndex};
+                max-width: 420px;
+                margin-inline: auto;
+                isolation: isolate;
+              `}
             >
-              <div
+              <MotionDialogPanel
                 css={css`
-                  display: grid;
-                  grid-template-rows: auto 1fr;
+                  background-color: var(--clr-surface);
+                  position: absolute;
+                  bottom: 0;
+                  width: 100%;
+                  will-change: transform;
                   height: 100lvh;
-                  max-width: var(--app-max-width);
-                  width: 100vw;
+                  z-index: 1;
                 `}
+                initial={{ x: w }}
+                animate={{ x: 0 }}
+                exit={{ x: w }}
+                transition={staticTransition}
+                style={{
+                  x,
+                  left: 0,
+                  // Extra padding at the right to account for rubber band scrolling.
+                  paddingRight: window.screen.width,
+                }}
               >
-                <Header>
-                  <Button
-                    iconOnly
-                    icon={CaretLeftIcon}
-                    onPress={() => onOpenChange(false)}
-                    variant="transparent"
-                  />
-                  {title && (
-                    <DialogTitle
-                      as="h1"
-                      css={css`
-                        font-weight: var(--fw-active);
-                        font-size: var(--fs-medium);
-                        line-height: var(--line-height-heading);
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                      `}
-                    >
-                      {title}
-                    </DialogTitle>
-                  )}
-                </Header>
-                <main
-                  className="overlay-scroll"
+                <div
                   css={css`
-                    overflow-y: auto;
-                    container: overlay-main / size;
+                    display: grid;
+                    grid-template-rows: auto 1fr;
+                    height: 100lvh;
+                    max-width: var(--app-max-width);
+                    width: 100vw;
                   `}
                 >
-                  {children}
-                </main>
-              </div>
-            </MotionDialogPanel>
-          </MotionDialog>
+                  <Header>
+                    <Button
+                      iconOnly
+                      icon={CaretLeftIcon}
+                      onPress={() => onOpenChange(false)}
+                      variant="transparent"
+                    />
+                    {title && (
+                      <DialogTitle
+                        as="h1"
+                        css={css`
+                          font-weight: var(--fw-active);
+                          font-size: var(--fs-medium);
+                          line-height: var(--line-height-heading);
+                          position: absolute;
+                          top: 50%;
+                          left: 50%;
+                          transform: translate(-50%, -50%);
+                        `}
+                      >
+                        {title}
+                      </DialogTitle>
+                    )}
+                  </Header>
+                  <main
+                    className="overlay-scroll"
+                    css={css`
+                      overflow-y: auto;
+                      container: overlay-main / size;
+                    `}
+                  >
+                    {children}
+                  </main>
+                </div>
+              </MotionDialogPanel>
+            </MotionDialog>
+          </>
         )}
       </AnimatePresence>
     </>
