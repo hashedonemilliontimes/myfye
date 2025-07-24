@@ -48,7 +48,8 @@ const { add_kyc_doc_to_entity } = require('./routes/dinari_shares/kyc_doc');
 const { create_new_dinari_account } = require('./routes/dinari_shares/account');
 const { sign_nonce } = require('./routes/dinari_shares/sign_nonce');
 const { sign_order } = require('./routes/dinari_shares/sign_order.js');
-const { getWalletByAddress } = require('./routes/privy/getWallets');
+const { getWalletIdByAddress } = require('./routes/privy/getWallets');
+const priceHistoryRouter = require('./routes/priceHistory');
 const { create_new_payout, get_payout_quote } = require('./routes/onOffRamp/payOut');
 
 app.set('trust proxy', true);
@@ -160,6 +161,7 @@ app.use(blockUnauthorizedIPs);
 
 // Add email service routes
 app.use('/api/email', emailService);
+app.use('/api', priceHistoryRouter);
 
 /* User management endpoints */
 // Apply stricter rate limiting to sensitive endpoints

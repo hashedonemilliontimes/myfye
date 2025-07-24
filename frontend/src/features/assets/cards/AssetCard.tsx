@@ -1,5 +1,11 @@
 import { css } from "@emotion/react";
 import AssetIcon from "../AssetIcon";
+import { RefObject, useState } from "react";
+import AssetInfoPopup from "../AssetInfoPopup";
+import KYCOverlay from "@/features/compliance/kycOverlay";
+// import Button from "@/shared/components/ui/button/Button";
+// import Menu from "@/shared/components/ui/menu/Menu";
+
 import { HTMLAttributes, RefObject, useState } from "react";
 
 import { formatBalance } from "../utils";
@@ -57,9 +63,28 @@ const AssetCard = ({
   showCurrencySymbol = true,
   radio,
   isSelected,
+  onPress, // <-- add onPress prop
   ...restProps
+}: {
+  id: AbstractedAsset["id"];
+  title: AbstractedAsset["label"];
+  fiatCurrency: Asset["fiatCurrency"];
+  symbol: AbstractedAsset["symbol"];
+  groupId: AbstractedAsset["groupId"];
+  balance: number;
+  ref?: RefObject<HTMLButtonElement>;
+  icon: AbstractedAsset["icon"];
+  showOptions: boolean;
+  showBalance: boolean;
+  showCurrencySymbol?: boolean;
+  radio?: boolean;
+  isSelected?: boolean;
+  onPress?: () => void; // <-- add onPress type
+}) => {
+
 }: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
 
   const dispatch = useDispatch();
@@ -105,6 +130,7 @@ const AssetCard = ({
   return (
     <div
       className="asset-card"
+      onClick={() => { if (onPress) onPress(); }} // always trigger onPress on card click
       css={css`
         display: grid;
         grid-template-columns: ${showOptions ? "1fr auto" : "1fr"};
@@ -203,6 +229,7 @@ const AssetCard = ({
       {showOptions && (
         <MenuTrigger>
           <Button
+            onClick={e => e.stopPropagation()} // prevent card click when clicking options
             css={css`
               display: grid;
               place-items: center;
@@ -298,10 +325,41 @@ const AssetCard = ({
                 />
                 Swap
               </MenuItem>
+              <MenuItem
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  border-radius: var(--border-radius-medium);
+                  padding: var(--size-150) var(--size-150);
+                  width: 100%;
+                  &[data-hovered="true"] {
+                    background-color: var(--clr-surface-raised);
+                  }
+                `}
+                onAction={() => setShowInfoPopup(true)}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 16,
+                    height: 16,
+                    marginRight: 8,
+                    borderRadius: 8,
+                    background: "#eee",
+                    textAlign: "center",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: "#888",
+                    lineHeight: "16px",
+                  }}
+                >i</span>
+                About
+              </MenuItem>
             </Menu>
           </Popover>
         </MenuTrigger>
       )}
+      <AssetInfoPopup isOpen={showInfoPopup} onOpenChange={setShowInfoPopup} assetId={id} />
     </div>
   );
 };
