@@ -6,6 +6,8 @@ import KYCOverlay from "@/features/compliance/kycOverlay";
 // import Button from "@/shared/components/ui/button/Button";
 // import Menu from "@/shared/components/ui/menu/Menu";
 
+import { HTMLAttributes, RefObject, useState } from "react";
+
 import { formatBalance } from "../utils";
 import { AbstractedAsset, Asset } from "../types";
 import { useSelector } from "react-redux";
@@ -30,6 +32,22 @@ import { toggleModal as toggleSendModal } from "@/features/send/sendSlice";
 import { toggleModal as toggleReceiveModal } from "@/features/receive/receiveSlice";
 import { toggleModal as toggleKYCModal } from "@/features/compliance/kycSlice";
 import { RootState } from "@/redux/store";
+
+interface AssetCardProps extends HTMLAttributes<HTMLDivElement> {
+  id: AbstractedAsset["id"];
+  title: AbstractedAsset["label"];
+  fiatCurrency: Asset["fiatCurrency"];
+  symbol: AbstractedAsset["symbol"];
+  groupId?: AbstractedAsset["groupId"];
+  balance: number;
+  ref?: RefObject<HTMLButtonElement>;
+  icon: AbstractedAsset["icon"];
+  showOptions?: boolean;
+  showBalance?: boolean;
+  showCurrencySymbol?: boolean;
+  radio?: boolean;
+  isSelected?: boolean;
+}
 
 const AssetCard = ({
   id,
@@ -63,12 +81,16 @@ const AssetCard = ({
   isSelected?: boolean;
   onPress?: () => void; // <-- add onPress type
 }) => {
+
+}: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
 
   const dispatch = useDispatch();
-  const currentUserKYCVerified = useSelector((state: RootState) => state.userWalletData.currentUserKYCVerified);
+  const currentUserKYCVerified = useSelector(
+    (state: RootState) => state.userWalletData.currentUserKYCVerified
+  );
 
   const handleSwapClick = () => {
     /*
@@ -93,7 +115,6 @@ const AssetCard = ({
         abstractedAssetId: id,
       })
     );
-    
   };
 
   const handleReceiveClick = () => {
@@ -136,6 +157,7 @@ const AssetCard = ({
           border-radius: var(--border-radius-medium);
         }
       `}
+      {...restProps}
     >
       <div
         css={css`

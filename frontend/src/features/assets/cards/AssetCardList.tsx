@@ -66,6 +66,35 @@ const AssetCardList = ({
             />
           </li>
         ))}
+        {assets
+          // @ts-ignore update types to include balanceUSD TODO
+          // Sort acscending -> descending
+          .sort((a, b) => b.balanceUSD - a.balanceUSD)
+          .map((asset: AbstractedAsset, i: number) => (
+            <li
+              key={`asset-card-${i}`}
+              className="coin-card-wrapper"
+              css={css`
+                width: 100%;
+              `}
+            >
+              <AssetCard
+                id={asset.id}
+                title={asset.label}
+                symbol={asset.symbol}
+                fiatCurrency={asset.fiatCurrency}
+                // @ts-ignore update types to include balanceUSD TODO
+                balance={showBalanceUSD ? asset.balanceUSD : asset.balance}
+                showCurrencySymbol={showCurrencySymbol}
+                icon={asset.icon}
+                groupId={asset.groupId}
+                // @ts-ignore need to check this one TODO
+                onPress={() => onAssetSelect && onAssetSelect(asset)}
+                showBalance={showBalance}
+                showOptions={showOptions}
+              />
+            </li>
+          ))}
       </ul>
       {selectedAssetId && (
         <AssetInfoPopup
