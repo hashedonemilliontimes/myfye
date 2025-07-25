@@ -20,6 +20,7 @@ import Footer from "../../shared/components/layout/nav/footer/Footer";
 import NavMenu from "../../shared/components/layout/nav/header/nav-menu/NavMenu";
 import Header from "../../shared/components/layout/nav/header/Header";
 import Wallet from "@/pages/app/wallet/Wallet";
+import Activity from "@/pages/app/activity/Activity";
 import { useDispatch } from "react-redux";
 import { setQRCodeModalOpen } from "@/redux/modalReducers";
 import Button from "../../shared/components/ui/button/Button";
@@ -114,50 +115,63 @@ const Router = () => {
         onSelectionChange={(key: Key) => setSelectedKey(key)}
         css={css`
           display: grid;
-          grid-template-rows: auto 1fr auto;
+          grid-template-rows: 1fr auto;
           height: 100cqh;
+          position: relative;
         `}
       >
-        <Header>
-          <NavMenu />
-          <Button
-            iconOnly
-            icon={ScanIcon}
-            onPress={() => dispatch(setQRCodeModalOpen(true))}
-            color="white"
-          />
-        </Header>
-        <main>
-          <AnimatePresence mode="wait">
-            {tabs.map((tab) => (
-              <MotionTabLabel
-                id={tab.id}
-                key={`tab-panel-${tab.id}`}
-                css={css`
-                  container: tab / size;
-                  min-height: 100%;
-                  height: 100%;
-                `}
-              >
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={variants}
-                  key={tab.id}
+        <div
+          css={css`
+            display: grid;
+            grid-template-rows: auto 1fr;
+          `}
+        >
+          <Header color="var(--clr-surface)">
+            <NavMenu />
+            <Button
+              iconOnly
+              icon={ScanIcon}
+              onPress={() => dispatch(setQRCodeModalOpen(true))}
+              color="white"
+            />
+          </Header>
+          <main
+            css={css`
+              position: relative;
+              z-index: 0;
+            `}
+          >
+            <AnimatePresence mode="wait">
+              {tabs.map((tab) => (
+                <MotionTabLabel
+                  id={tab.id}
+                  key={`tab-panel-${tab.id}`}
                   css={css`
-                    height: 100cqh;
+                    container: tab / size;
+                    min-height: 100%;
+                    height: 100%;
                   `}
                 >
-                  {tab.id === "home" && <Home />}
-                  {tab.id === "wallet" && <Wallet />}
-                  {tab.id === "pay" && <Pay />}
-                  {tab.id === "activity" && <div></div>}
-                </motion.div>
-              </MotionTabLabel>
-            ))}
-          </AnimatePresence>
-        </main>
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    variants={variants}
+                    key={tab.id}
+                    css={css`
+                      height: 100cqh;
+                    `}
+                  >
+                    {tab.id === "home" && <Home />}
+                    {tab.id === "wallet" && <Wallet />}
+                    {tab.id === "pay" && <Pay />}
+                    {tab.id === "activity" && <Activity />}
+                  </motion.div>
+                </MotionTabLabel>
+              ))}
+            </AnimatePresence>
+          </main>
+        </div>
         <Footer>
           <AriaTabList
             css={css`

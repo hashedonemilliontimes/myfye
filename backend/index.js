@@ -4,8 +4,9 @@ const cors = require("cors");
 const geoip = require('geoip-lite');
 const rateLimit = require('express-rate-limit');
 const app = express();
-const { create_new_on_ramp_path } = require('./routes/onOffRamp/newBlindPayReceiver');
+const { create_new_on_ramp_path, get_all_receivers, delete_blockchain_wallet, delete_receiver, delete_blockchain_wallet_and_receiver } = require('./routes/onOffRamp/receiver');
 const { create_new_payin, get_payin_quote } = require('./routes/onOffRamp/payIn');
+const { create_new_bank_account, get_bank_accounts, delete_bank_account, get_all_bank_accounts } = require('./routes/onOffRamp/bankAccount.js');
 const { bridge_swap } = require('./routes/bridge_swap/bridgeSwap');
 const { ensureTokenAccount } = require('./routes/sol_transaction/tokenAccount');
 const { signTransaction, signVersionedTransaction } = require('./routes/sol_transaction/solanaTransaction');
@@ -27,17 +28,28 @@ const {
     createSwapTransaction, 
     getSwapTransactionsByUserId,
     getAllSwapTransactions 
-} = require('./routes/swapTransactions');
+} = require('./routes/transactions/swapTransactions');
 const { 
     createPayTransaction,
     getAllPayTransactions 
-} = require('./routes/payTransactions');
+} = require('./routes/transactions/payTransactions');
+const { transactionHistory } = require('./routes/transactions/transactionHistory');
 const { 
     saveRecentlyUsedAddresses, 
     getRecentlyUsedAddresses 
 } = require('./routes/sol_transaction/recentlyUsedAddresses');
 const { emailService } = require('./routes/emailService');
-const { createUserKYC, getAllKYCUsers } = require('./routes/user_kyc');
+const { createUserKYC, getAllKYCUsers, deleteKYCUser } = require('./routes/user_kyc');
+const { create_new_dinari_user } = require('./routes/dinari_shares/entity');
+const { create_new_wallet } = require('./routes/dinari_shares/wallet');
+const { generate_nonce } = require('./routes/dinari_shares/generate_nonce');
+const { add_kyc_to_entity } = require('./routes/dinari_shares/kyc');
+const { add_kyc_doc_to_entity } = require('./routes/dinari_shares/kyc_doc');
+const { create_new_dinari_account } = require('./routes/dinari_shares/account');
+const { sign_nonce } = require('./routes/dinari_shares/sign_nonce');
+const { sign_order } = require('./routes/dinari_shares/sign_order.js');
+const { getWalletByAddress } = require('./routes/privy/getWallets');
+const { create_new_payout, get_payout_quote } = require('./routes/onOffRamp/payOut');
 
 app.set('trust proxy', true);
 
@@ -306,6 +318,27 @@ app.post("/get_all_pay_transactions", generalLimiter, async (req, res) => {
     }
 });
 
+/* Transaction History endpoint */
+app.post("/get_transaction_history", generalLimiter, async (req, res) => {
+    console.log("\n=== Get Transaction History Request Received ===");
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+    try {
+        const data = req.body;
+        const result = await transactionHistory(data);
+        console.log(`Retrieved transaction history for user: ${data.user_id}`);
+        res.json(result);
+    } catch (error) {
+        console.error("Error in /get_transaction_history endpoint:", error);
+        console.error("Error stack:", error.stack);
+        res.status(500).json({ 
+            error: error.message || "Failed to fetch transaction history",
+            details: error.toString(),
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
 /* Blind pay API */
 app.post("/new_on_ramp", async (req, res) => {
   console.log("\n=== New On-Ramp Request Received ===");
@@ -347,8 +380,92 @@ app.post("/new_payin", async (req, res) => {
     console.log("Pay-in result:", JSON.stringify(result, null, 2));
     res.json(result);
   } catch (error) {
-    console.error("Error in /get_payin endpoint:", error);
-    res.status(500).json({ error: error.message });
+    console.error("Error in /new_payin endpoint:", error);
+    
+    // Check if the error has a response with data containing a message
+    if (error.response && error.response.data && error.response.data.message) {
+      res.status(400).json({ error: error.response.data.message });
+    } else {
+      res.status(500).json({ error: error.message || "Failed to create payin" });
+    }
+  }
+});
+
+app.post("/add_bank_account", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Add Bank Account Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await create_new_bank_account(data);
+    console.log("Bank account creation result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /add_bank_account endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to create bank account",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/get_bank_accounts", generalLimiter, async (req, res) => {
+  console.log("\n=== Get Bank Accounts Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await get_bank_accounts(data);
+    console.log("Bank accounts retrieval result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /get_bank_accounts endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to get bank accounts",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/delete_bank_account", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Delete Bank Account Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await delete_bank_account(data);
+    console.log("Bank account deletion result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /delete_bank_account endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to delete bank account",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/get_all_bank_accounts", generalLimiter, async (req, res) => {
+  console.log("\n=== Get All Bank Accounts Request Received ===");
+
+  try {
+    const result = await get_all_bank_accounts();
+    console.log("All bank accounts retrieval result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /get_all_bank_accounts endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to get all bank accounts",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -655,6 +772,31 @@ app.post("/get_recently_used_addresses", generalLimiter, async (req, res) => {
     }
 });
 
+app.post("/get_wallet_by_address", generalLimiter, async (req, res) => {
+    console.log("\n=== Get Wallet ID by Address Request Received ===");
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+    try {
+        const { address } = req.body;
+        if (!address) {
+            return res.status(400).json({ 
+                error: 'Invalid request. address is required.' 
+            });
+        }
+
+        const result = await getWalletByAddress(address);
+        console.log("Get wallet ID result:", JSON.stringify(result, null, 2));
+        res.json(result);
+    } catch (error) {
+        console.error("Error in /get_wallet_id_by_address endpoint:", error);
+        console.error("Error stack:", error.stack);
+        res.status(500).json({ 
+            error: error.message || "Failed to get wallet ID",
+            details: error.toString(),
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
 
 app.post("/send_email", async (req, res) => {
   console.log("\n=== Send Email Request Received ===");
@@ -692,6 +834,366 @@ app.post("/get_all_kyc_users", generalLimiter, async (req, res) => {
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
+});
+
+app.post("/delete_kyc_user", sensitiveLimiter, async (req, res) => {
+    console.log("\n=== Delete KYC User Request Received ===");
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+    try {
+        const { user_id } = req.body;
+        if (!user_id) {
+            return res.status(400).json({ 
+                error: 'Invalid request. user_id is required.' 
+            });
+        }
+        const result = await deleteKYCUser(user_id);
+        console.log("KYC user deletion result:", JSON.stringify(result, null, 2));
+        res.json(result);
+    } catch (error) {
+        console.error("Error in /delete_kyc_user endpoint:", error);
+        console.error("Error stack:", error.stack);
+        res.status(500).json({ 
+            error: error.message || "Failed to delete KYC user",
+            details: error.toString(),
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
+app.get("/get_all_receivers", generalLimiter, async (req, res) => {
+  console.log("\n=== Get All Receivers Request Received ===");
+
+  try {
+    const result = await get_all_receivers();
+    console.log(`Retrieved ${result.length} receivers with their blockchain wallets`);
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /get_all_receivers endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to fetch receivers",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+/*
+app.post("/delete_blockchain_wallet", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Delete Blockchain Wallet Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { receiverId, walletId } = req.body;
+    if (!receiverId || !walletId) {
+      return res.status(400).json({ 
+        error: 'Invalid request. receiverId and walletId are required.' 
+      });
+    }
+    const result = await delete_blockchain_wallet(receiverId, walletId);
+    console.log("Blockchain wallet deletion result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /delete_blockchain_wallet endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to delete blockchain wallet",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/delete_receiver", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Delete Receiver Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { receiverId } = req.body;
+    if (!receiverId) {
+      return res.status(400).json({ 
+        error: 'Invalid request. receiverId is required.' 
+      });
+    }
+    const result = await delete_receiver(receiverId);
+    console.log("Receiver deletion result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /delete_receiver endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to delete receiver",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+*/
+
+app.post("/delete_blockchain_wallet_and_receiver", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Delete Blockchain Wallet and Receiver Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { receiverId, walletId } = req.body;
+    if (!receiverId || !walletId) {
+      return res.status(400).json({ 
+        error: 'Invalid request. receiverId and walletId are required.' 
+      });
+    }
+    const result = await delete_blockchain_wallet_and_receiver(receiverId, walletId);
+    console.log("Deletion result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /delete_blockchain_wallet_and_receiver endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to delete blockchain wallet and receiver",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/create_dinari_user", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Create Dinari User Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await create_new_dinari_user(data);
+    console.log("Dinari user creation result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /create_dinari_user endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to create Dinari user",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/link_dinari_wallet", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Link Dinari Wallet Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { user_id, account_id, signature, nonce, wallet_address } = req.body;
+    
+    if (!user_id || !account_id || !signature || !nonce || !wallet_address) {
+      return res.status(400).json({ 
+        error: 'Invalid request. user_id, account_id, signature, nonce, and wallet_address are required.' 
+      });
+    }
+
+    const result = await create_new_wallet({
+      user_id,
+      account_id,
+      signature,
+      nonce,
+      wallet_address
+    });
+
+    console.log("Wallet linking result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /link_dinari_wallet endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to link wallet",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/generate_dinari_nonce", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Generate Dinari Nonce Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { user_id, account_id, wallet_address } = req.body;
+    
+    if (!user_id || !account_id || !wallet_address) {
+      return res.status(400).json({ 
+        error: 'Invalid request. user_id, account_id, and wallet_address are required.' 
+      });
+    }
+
+    const result = await generate_nonce({
+      user_id,
+      account_id,
+      wallet_address
+    });
+
+    console.log("Nonce generation result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /generate_dinari_nonce endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to generate nonce",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/add_dinari_kyc", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Add Dinari KYC Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await add_kyc_to_entity(data);
+    console.log("KYC addition result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /add_dinari_kyc endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to add KYC",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/add_dinari_kyc_doc", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Add Dinari KYC Document Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const data = req.body;
+    const result = await add_kyc_doc_to_entity(data);
+    console.log("KYC document upload result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /add_dinari_kyc_doc endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to upload KYC document",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/create_dinari_account", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Create Dinari Account Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { entity_id } = req.body;
+    
+    if (!entity_id) {
+      return res.status(400).json({ 
+        error: 'Invalid request. entity_id is required.' 
+      });
+    }
+
+    const result = await create_new_dinari_account(entity_id);
+    console.log("Account creation result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /create_dinari_account endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to create account",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/sign_dinari_nonce", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Sign Dinari Nonce Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { nonce_message, message, nonce } = req.body;
+    
+    // Check if we have the Dinari nonce response structure or just a message
+    if (!nonce_message && (!message || !nonce)) {
+      return res.status(400).json({ 
+        error: 'Invalid request. Either nonce_message or both message and nonce are required.' 
+      });
+    }
+
+    const result = await sign_nonce(req.body);
+    console.log("Nonce signing result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /sign_dinari_nonce endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to sign nonce",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/sign_dinari_order", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Sign Dinari Order Request Received ===");
+
+  try {
+    const result = await sign_order();
+    console.log("Order execution result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /sign_dinari_order endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to execute order",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+app.post("/payout_quote", async (req, res) => {
+  console.log("\n=== New Payout Quote Request Received ===");
+  try {
+    const data = req.body;
+    const result = await get_payout_quote(data);
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /payout_quote endpoint:", error);
+    res.status(500).json({ error: error.message || "Failed to get payout quote" });
+  }
+});
+
+app.post("/get_wallet_id_by_address", sensitiveLimiter, async (req, res) => {
+  console.log("\n=== Get Wallet ID by Address Request Received ===");
+  console.log("Request body:", JSON.stringify(req.body, null, 2));
+
+  try {
+    const { address } = req.body;
+    
+    if (!address) {
+      return res.status(400).json({ 
+        error: 'Address parameter is required' 
+      });
+    }
+
+    const result = await getWalletByAddress(address);
+    console.log("Wallet ID lookup result:", JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error("Error in /get_wallet_id_by_address endpoint:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      error: error.message || "Failed to get wallet ID by address",
+      details: error.toString(),
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
 });
 
 /*

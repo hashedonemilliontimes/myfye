@@ -43,9 +43,13 @@ export interface UserWalletDataState {
   showSwapWithdrawPage: boolean;
   showSwapDepositPage: boolean;
   priceOfUSDYinUSDC: number;
+  priceOfAAPLinUSD: number;
   priceOfBTCinUSDC: number;
   priceOfEURCinUSDC: number;
   priceOfSOLinUSDC: number;
+  priceOfXRPinUSDC: number;
+  priceOfDOGEinUSDC: number;
+  priceOfSUIinUSDC: number;
   recentlyUsedSolanaAddresses: string[];
   showContactPopup: boolean;
   selectedLanguageCode: string;
@@ -98,9 +102,13 @@ const initialUserWalletData: UserWalletDataState = {
   showSwapWithdrawPage: false,
   showSwapDepositPage: false,
   priceOfUSDYinUSDC: 0, // Keep it at 0 because we will check it and update it once
+  priceOfAAPLinUSD: 0, // Keep it at 0 because we will check it and update it once
   priceOfBTCinUSDC: 0, // Keep it at 0 because we will check it and update it once
   priceOfEURCinUSDC: 0, // Keep it at 0 because we will check it and update it once
   priceOfSOLinUSDC: 0, // Keep it at 0 because we will check it and update it once
+  priceOfXRPinUSDC: 0, // Keep it at 0 because we will check it and update it once
+  priceOfDOGEinUSDC: 0, // Keep it at 0 because we will check it and update it once
+  priceOfSUIinUSDC: 0, // Keep it at 0 because we will check it and update it once
   recentlyUsedSolanaAddresses: [],
   showContactPopup: false,
   selectedLanguageCode: "",
@@ -251,6 +259,9 @@ export const userWalletDataSlice = createSlice({
     setPriceOfUSDYinUSDC: (state, action: PayloadAction<number>) => {
       state.priceOfUSDYinUSDC = action.payload;
     },
+    setPriceOfAAPLinUSD: (state, action: PayloadAction<number>) => {
+      state.priceOfAAPLinUSD = action.payload;
+    },
     setPriceOfBTCinUSDC: (state, action: PayloadAction<number>) => {
       state.priceOfBTCinUSDC = action.payload;
     },
@@ -259,6 +270,15 @@ export const userWalletDataSlice = createSlice({
     },
     setPriceOfSOLinUSDC: (state, action: PayloadAction<number>) => {
       state.priceOfSOLinUSDC = action.payload;
+    },
+    setPriceOfXRPinUSDC: (state, action: PayloadAction<number>) => {
+      state.priceOfXRPinUSDC = action.payload;
+    },
+    setPriceOfDOGEinUSDC: (state, action: PayloadAction<number>) => {
+      state.priceOfDOGEinUSDC = action.payload;
+    },
+    setPriceOfSUIinUSDC: (state, action: PayloadAction<number>) => {
+      state.priceOfSUIinUSDC = action.payload;
     },
     setRecentlyUsedSolanaAddresses: (
       state,
@@ -334,9 +354,13 @@ export const {
   setShowSwapDepositPage,
   setHotBalanceUSDY,
   setPriceOfUSDYinUSDC,
+  setPriceOfAAPLinUSD,
   setPriceOfBTCinUSDC,
   setPriceOfEURCinUSDC,
   setPriceOfSOLinUSDC,
+  setPriceOfXRPinUSDC,
+  setPriceOfDOGEinUSDC,
+  setPriceOfSUIinUSDC,
   setRecentlyUsedSolanaAddresses,
   setShowContactPopup,
   setSelectedLanguageCode,

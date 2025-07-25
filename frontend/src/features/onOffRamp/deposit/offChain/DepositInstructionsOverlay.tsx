@@ -57,7 +57,7 @@ const DepositInstructionsOverlay = ({
   };
 
   const handleAmountCopy = () => {
-    navigator.clipboard.writeText(amount.toString());
+    navigator.clipboard.writeText((payin?.sender_amount/100).toString());
     setCopiedField("amount");
     setTimeout(() => setCopiedField(null), 2000);
   };
@@ -75,6 +75,27 @@ const DepositInstructionsOverlay = ({
     if (addressToCopy) {
       navigator.clipboard.writeText(addressToCopy);
       setCopiedField("address");
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
+
+  const handleBankNameCopy = () => {
+    let addressToCopy = "";
+    if (payin?.currency === "MXN") {
+      addressToCopy = "Nvio";
+    } 
+    if (addressToCopy) {
+      navigator.clipboard.writeText(addressToCopy);
+      setCopiedField("bankName");
+      setTimeout(() => setCopiedField(null), 2000);
+    }
+  };
+
+  const handleBeneficiaryNameCopy = () => {
+    const beneficiaryName = payin?.blindpay_bank_details?.beneficiary?.name;
+    if (beneficiaryName) {
+      navigator.clipboard.writeText(beneficiaryName);
+      setCopiedField("beneficiaryName");
       setTimeout(() => setCopiedField(null), 2000);
     }
   };
@@ -138,7 +159,7 @@ const DepositInstructionsOverlay = ({
                   color: var(--clr-text);
                 `}
               >
-                Send
+                Amount
               </h2>
               <div
                 css={css`
@@ -148,7 +169,7 @@ const DepositInstructionsOverlay = ({
                   line-height: var(--line-height-tight);
                 `}
               >
-                <span>${amount}</span>
+                <span>${payin?.sender_amount/100}</span>
                 <Button
                   iconOnly
                   color="transparent"
@@ -158,6 +179,18 @@ const DepositInstructionsOverlay = ({
                 />
               </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+            {currency === "MXN" && (
             <div
               css={css`
                 display: flex;
@@ -172,7 +205,54 @@ const DepositInstructionsOverlay = ({
                   color: var(--clr-text);
                 `}
               >
-                To
+              Bank Name
+              </h2>
+              <div
+                css={css`
+                  display: inline-flex;
+                  align-items: center;
+                  font-size: var(--fs-medium);
+                  line-height: var(--line-height-tight);
+                `}
+              >
+                Nvio
+                <Button
+                  iconOnly
+                  color="transparent"
+                  size="small"
+                  icon={copiedField === "bankName" ? Check : Copy}
+                  onClick={handleBankNameCopy}
+                />
+              </div>
+            </div>
+            )}
+
+
+
+
+
+
+
+
+            
+            <div
+              css={css`
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-block-start: var(--size-200);
+              `}
+            >
+              <h2
+                className="heading-medium"
+                css={css`
+                  color: var(--clr-text);
+                `}
+              >
+            {currency === "MXN" ? "CLABE" : 
+             currency === "BRL" ? "PIX" :
+             currency === "USD" ? "ACH" : ""}
+
               </h2>
               <div
                 css={css`
@@ -201,6 +281,41 @@ const DepositInstructionsOverlay = ({
                 />
               </div>
             </div>
+
+            <div
+              css={css`
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-block-start: var(--size-200);
+              `}
+            >
+              <h2
+                className="heading-medium"
+                css={css`
+                  color: var(--clr-text);
+                `}
+              >
+                Beneficiary Name
+              </h2>
+              <div
+                css={css`
+                  display: inline-flex;
+                  align-items: center;
+                  font-size: var(--fs-medium);
+                  line-height: var(--line-height-tight);
+                `}
+              >
+                <span>{payin?.blindpay_bank_details?.beneficiary?.name || "Loading..."}</span>
+                <Button
+                  iconOnly
+                  color="transparent"
+                  size="small"
+                  icon={copiedField === "beneficiaryName" ? Check : Copy}
+                  onClick={handleBeneficiaryNameCopy}
+                />
+              </div>
+            </div>
           </div>
           <p
             className="caption"
@@ -210,10 +325,10 @@ const DepositInstructionsOverlay = ({
               text-align: center;
             `}
           >
-            Please go to your bank app to complete the deposit. Send ${amount} to this{" "}
+            Valid for 1 hour, Please go to your bank app to complete the deposit. Send ${payin?.sender_amount/100} to this{" "}
             {currency === "MXN" ? "CLABE" : 
              currency === "BRL" ? "PIX" :
-             currency === "USD" ? "ACH" : "payment"} number.
+             currency === "USD" ? "ACH" : "payment"} number. We will send you an email with these instructions too.
           </p>
           <section
             css={css`
@@ -222,6 +337,7 @@ const DepositInstructionsOverlay = ({
               text-align: center;
             `}
           >
+            <p>Beneficiary Name:</p> <br/>
             <p className="caption">
               {payin?.blindpay_bank_details?.beneficiary?.name}
             </p>
