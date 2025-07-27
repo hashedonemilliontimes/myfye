@@ -7,9 +7,10 @@ import {
   usePrivy,
   useLoginWithPasskey,
   useMfaEnrollment,
-  usePrivy,
+  getEmbeddedConnectedWallet,
   useWallets
 } from "@privy-io/react-auth";
+import { createWalletClient, custom } from 'viem';
 import { HandleUserLogIn } from "./features/authentication/LoginService.tsx";
 import logo from "@/assets/logo/myfye_logo_white.svg";
 import loginScreen from "@/assets/login/login_screen.webp";
@@ -35,6 +36,7 @@ import peopleOnMyfye from "@/assets/peopleOnMyfye.png";
 import { useNavigate } from "react-router-dom";
 import { checkIfMobileOrTablet } from "./shared/utils/mobileUtils.ts";
 import MFAOnboarding from "./pages/app/login/mfaOnboarding.tsx";
+import { setEmbeddedWallet, setWalletClient } from "./redux/userWalletData.tsx"; 
 
 function WebAppInner() {
   window.Buffer = Buffer;
@@ -79,6 +81,7 @@ function WebAppInner() {
 
         console.log('BRIDGING in AppRouter wallets:', wallets)
 
+
         try {
           console.log("calling HandleUserLogin"); 
           // TODO: calling this twice, we should call it once
@@ -87,6 +90,23 @@ function WebAppInner() {
             dispatch,
             wallets
           );
+
+          // Set embedded wallet
+          const wallet = getEmbeddedConnectedWallet(wallets);
+          if (wallet) {
+            const provider = await wallet.getEthereumProvider();
+            const client = createWalletClient({
+            account: wallet.address,
+            chain: wallet.chainId,
+            transport: custom(provider),
+          });
+          
+          dispatch(setWalletClient(client));
+          dispatch(setEmbeddedWallet(wallet));
+          }
+      
+
+
           setUserDataLoaded(true);
         } catch (error) {
           console.error("Error during login:", error);
