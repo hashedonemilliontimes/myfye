@@ -116,7 +116,13 @@ CREATE TABLE IF NOT EXISTS user_kyc (
   tax_id TEXT,
   id_doc_type TEXT,
   id_doc_front_file TEXT,
+  id_doc_back_file TEXT,
   id_doc_country TEXT
+);
+
+CREATE TABLE IF NOT EXISTS blind_pay_bank_accounts (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(uid)
 );
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;

@@ -5,10 +5,6 @@ import {
   setSolanaPubKey,
   setEvmPubKey,
   setMFAStatus,
-  setPriceOfUSDYinUSDC,
-  setPriceOfBTCinUSDC,
-  setPriceOfEURCinUSDC,
-  setPriceOfSOLinUSDC,
   setCurrentUserID,
   setPrivyUserId,
   setUsers,
@@ -25,7 +21,10 @@ import {
   HttpsCallableResult,
 } from "firebase/functions";
 import { HELIUS_API_KEY, MYFYE_BACKEND, MYFYE_BACKEND_KEY } from "../../env.ts";
-import { updateExchangeRateUSD } from "../assets/assetsSlice.ts";
+import { getUSDCBalanceOnBase } from '../../functions/checkForEVMDeposit.ts'
+import { bridgeFromBaseToSolana } from '../../functions/bridge.ts'
+import { getPriceQuotes } from '../../functions/priceQuotes.ts'
+import { updateExchangeRateUSD } from '../../features/assets/assetsSlice.ts'
 
 const userCreationInProgress = new Set();
 
@@ -114,12 +113,6 @@ export const updateUserEvmPubKey = async (
   privyUserId: string,
   evmPubKey: string
 ): Promise<any> => {
-  console.log(
-    "Updating EVM public key MYFYE_BACKEND",
-    MYFYE_BACKEND,
-    "MYFYE_BACKEND_KEY",
-    MYFYE_BACKEND_KEY
-  );
   try {
     const response = await fetch(`${MYFYE_BACKEND}/update_evm_pub_key`, {
       method: "POST",
@@ -136,7 +129,6 @@ export const updateUserEvmPubKey = async (
     });
 
     const result = await response.json();
-    console.log("Updated EVM public key:", result);
     return result;
   } catch (error) {
     console.error("Error updating EVM public key:", error);
@@ -162,7 +154,6 @@ export const updateUserSolanaPubKey = async (
     });
 
     const result = await response.json();
-    console.log("Updated Solana public key:", result);
     return result;
   } catch (error) {
     console.error("Error updating Solana public key:", error);
@@ -173,11 +164,11 @@ export const updateUserSolanaPubKey = async (
 const HandleUserLogIn = async (
   user: any,
   dispatch: Function,
-  priceOfUSDYinUSDC: number,
-  priceOfBTCinUSDC: number,
-  priceOfSOLinUSDC: number,
-  priceOfEURCinUSDC: number
+  wallets: any,
 ): Promise<{ success: boolean }> => {
+
+  
+
   dispatch(setcurrentUserEmail(user.email.address));
   dispatch(setPrivyUserId(user.id));
   if (user) {
@@ -189,7 +180,16 @@ const HandleUserLogIn = async (
         dispatch(setCurrentUserKYCVerified(dbUser.kyc_verified));
         dispatch(setBlindPayEvmWalletId(dbUser.blind_pay_evm_wallet_id));
         dispatch(setBlindPayReceiverId(dbUser.blind_pay_receiver_id));
+
+        //getUSDCBalanceOnBase(dbUser.evm_pub_key, dbUser.solana_pub_key);
+        console.log('BRIDGING USDC BASE AMOUNT to SOLANA AMOUNT evm and solana keys', dbUser.evm_pub_key, dbUser.solana_pub_key)
+        console.log('BRIDGING running bridgeFromBaseToSolana', wallets)
+
+        if (user.wallet && dbUser.solana_pub_key) {
+          bridgeFromBaseToSolana(0.01, dbUser.evm_pub_key, dbUser.solana_pub_key);
+        }
       }
+      
     } catch (error) {
       console.error("Error handling user:", error);
     }
@@ -208,18 +208,18 @@ const HandleUserLogIn = async (
 
   checkMFAState(user, dispatch);
 
+  // Get price quotes for all assets
   try {
-    await Promise.all([
-      getUSDYPriceQuote(priceOfUSDYinUSDC, dispatch),
-      getBTCPriceQuote(priceOfBTCinUSDC, dispatch),
-      getEURCPriceQuote(priceOfEURCinUSDC, dispatch),
-      getSOLPriceQuote(priceOfSOLinUSDC, dispatch),
-      getUserData(user.wallet.address, dispatch),
-      // need to update these
-      updateExchangeRateUSD({ assetId: "usdc_sol", exchangeRateUSD: 1 }),
-      updateExchangeRateUSD({ assetId: "usdt_sol", exchangeRateUSD: 1 }),
-      updateExchangeRateUSD({ assetId: "usdc_base", exchangeRateUSD: 1 }),
-    ]);
+
+    
+    updateExchangeRateUSD({ assetId: "usdc_sol", exchangeRateUSD: 1 })
+    updateExchangeRateUSD({ assetId: "usdt_sol", exchangeRateUSD: 1 })
+    updateExchangeRateUSD({ assetId: "usdc_base", exchangeRateUSD: 1 })
+
+    await getUserData(user.wallet.address, dispatch)
+    await getPriceQuotes(dispatch);
+
+
     return { success: true };
   } catch (e) {
     console.error("Error fetching user data or balances:", e);
@@ -274,165 +274,5 @@ export const getUserData = async (
   }
   return true;
 };
-
-const getUSDYPriceQuote = async (
-  price: number,
-  dispatch: Function
-): Promise<boolean> => {
-  if (price <= 0.01) {
-    const quote = await getSwapQuote();
-    const priceInUSD = quote.outAmount / 1000000;
-    if (priceInUSD && priceInUSD > 0.01) {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "usdy_sol",
-          exchangeRateUSD: quote.outAmount / 1000000,
-        })
-      );
-    } else {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "usdy_sol",
-          exchangeRateUSD: 1.09,
-        })
-      );
-    }
-  }
-
-  async function getSwapQuote() {
-    const outputMintAddress = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    const inputMintAddress = "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6"; // USDY
-
-    const quoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${
-        1 * 1000000
-      }&slippageBps=50`
-    ).then((response) => response.json());
-
-    return quoteResponse;
-  }
-
-  return true;
-};
-
-const getBTCPriceQuote = async (
-  price: number,
-  dispatch: Function
-): Promise<boolean> => {
-  if (price <= 0.01) {
-    const quote = await getSwapQuote();
-    const priceInUSD = quote.outAmount / 1000000;
-    if (priceInUSD && priceInUSD > 0.01) {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "btc_sol",
-          exchangeRateUSD: quote.outAmount / 10000,
-        })
-      );
-    } else {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "btc_sol",
-          exchangeRateUSD: 100000, // default to $100,000
-        })
-      );
-    }
-  }
-
-  async function getSwapQuote() {
-    const outputMintAddress = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    const inputMintAddress = "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij"; // BTC
-
-    const quoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${
-        1 * 1000000
-      }&slippageBps=50`
-    ).then((response) => response.json());
-
-    return quoteResponse;
-  }
-
-  return true;
-};
-
-const getEURCPriceQuote = async (
-  price: number,
-  dispatch: Function
-): Promise<boolean> => {
-  if (price <= 0.01) {
-    const quote = await getSwapQuote();
-    const priceInUSD = quote.outAmount / 1000000;
-    if (priceInUSD && priceInUSD > 0.01) {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "eurc_sol",
-          exchangeRateUSD: priceInUSD,
-        })
-      );
-    } else {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "eurc_sol",
-          exchangeRateUSD: 1.025,
-        })
-      );
-    }
-  }
-
-  async function getSwapQuote() {
-    const outputMintAddress = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    const inputMintAddress = "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr"; // EURC
-
-    const quoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${
-        1 * 1000000
-      }&slippageBps=50`
-    ).then((response) => response.json());
-
-    return quoteResponse;
-  }
-
-  return true;
-};
-
-const getSOLPriceQuote = async (
-  price: number,
-  dispatch: Function
-): Promise<boolean> => {
-  console.log("getting SOLANA price quote");
-  if (price <= 0.01) {
-    const quote = await getSwapQuote();
-    const priceInUSD = quote.outAmount / 1000000;
-    if (priceInUSD && priceInUSD > 0.01) {
-      console.log("SOLANA priceInUSD", priceInUSD);
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "sol",
-          exchangeRateUSD: priceInUSD,
-        })
-      );
-    } else {
-      dispatch(
-        updateExchangeRateUSD({
-          assetId: "sol",
-          exchangeRateUSD: 125,
-        })
-      );
-    }
-  }
-
-  async function getSwapQuote() {
-    const outputMintAddress = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    const inputMintAddress = "So11111111111111111111111111111111111111112"; // wSOL wrapped solana
-
-    const quoteResponse = await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${inputMintAddress}&outputMint=${outputMintAddress}&amount=${1_000_000_000}&slippageBps=50`
-    ).then((response) => response.json());
-    return quoteResponse;
-  }
-
-  return true;
-};
-
 
 export { HandleUserLogIn };

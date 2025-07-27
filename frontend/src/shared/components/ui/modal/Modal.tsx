@@ -1,13 +1,12 @@
 import {
   animate,
   AnimatePresence,
+  HTMLMotionProps,
   motion,
   useMotionTemplate,
   useMotionValue,
   useTransform,
 } from "motion/react";
-
-import { ReactNode, useId } from "react";
 
 import { css } from "@emotion/react";
 import Button from "@/shared/components/ui/button/Button";
@@ -18,6 +17,7 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
+import { ReactNode } from "react";
 
 // Wrap React Aria modal components so they support framer-motion values.
 const MotionDialogBackdrop = motion(DialogBackdrop);
@@ -36,6 +36,15 @@ const staticTransition = {
   ease: [0.32, 0.72, 0, 1],
 };
 
+interface ModalProps extends HTMLMotionProps<"div"> {
+  zIndex?: number;
+  title?: string;
+  height?: number;
+  onOpenChange: (isOpen: boolean) => void;
+  isOpen: boolean;
+  children: ReactNode;
+}
+
 const Modal = ({
   isOpen,
   onOpenChange,
@@ -44,16 +53,9 @@ const Modal = ({
   zIndex = 1000,
   children,
   ...restProps
-}: {
-  children: ReactNode;
-  zIndex: number;
-  title: string;
-  height: number;
-  onOpenChange: (isOpen: boolean) => void;
-  isOpen: boolean;
-}) => {
-  const h = Math.min(window.innerHeight - 40, height);
-  const top = window.innerHeight - h;
+}: ModalProps) => {
+  const top = window.innerHeight - height > 0 ? window.innerHeight - height : 0;
+  const h = Math.min(window.innerHeight, height);
   const y = useMotionValue(h);
   const bgOpacity = useTransform(y, [0, h], [0.4, 0]);
   const bg = useMotionTemplate`rgba(0, 0, 0, ${bgOpacity})`;
@@ -106,11 +108,19 @@ const Modal = ({
               style={{
                 y: y,
                 top: top,
-                paddingBottom: 0,
+                // Extra padding at the bottom to account for rubber band scrolling.
+                paddingBottom: window.screen.height,
               }}
               drag="y"
               dragConstraints={{ top: 0 }}
-              onDragEnd={(_, { offset, velocity }) => {
+              onDragStart={(e) => {
+                e.stopImmediatePropagation();
+              }}
+              onDrag={(e) => {
+                e.stopImmediatePropagation();
+              }}
+              onDragEnd={(e, { offset, velocity }) => {
+                e.stopImmediatePropagation();
                 if (offset.y > window.innerHeight * 0.75 || velocity.y > 10) {
                   onOpenChange(false);
                 } else {
