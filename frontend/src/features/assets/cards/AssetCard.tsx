@@ -1,6 +1,11 @@
 import { css } from "@emotion/react";
 import AssetIcon from "../AssetIcon";
-import { HTMLAttributes, RefObject, useState } from "react";
+import { RefObject, useState, useEffect } from "react";
+import AssetInfoPopup from "../AssetInfoPopup";
+import KYCOverlay from "@/features/compliance/kycOverlay";
+import MiniChart from "./MiniChart";
+import { getRealPriceData, formatPercentChange, type AssetPriceData } from "../priceDataService";
+import { HTMLAttributes } from "react";
 
 import { formatBalance } from "../utils";
 import { AbstractedAsset, Asset } from "../types";
@@ -41,6 +46,7 @@ interface AssetCardProps extends HTMLAttributes<HTMLDivElement> {
   showCurrencySymbol?: boolean;
   radio?: boolean;
   isSelected?: boolean;
+  onPress?: () => void;
 }
 
 const AssetCard = ({
@@ -57,10 +63,33 @@ const AssetCard = ({
   showCurrencySymbol = true,
   radio,
   isSelected,
+  onPress,
   ...restProps
 }: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [priceData, setPriceData] = useState<AssetPriceData | null>(null);
+  const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const formattedBalance = formatBalance(balance, fiatCurrency);
+
+  // Fetch real price data for this asset
+  useEffect(() => {
+    const fetchPriceData = async () => {
+      setIsLoadingPrice(true);
+      try {
+        const data = await getRealPriceData(id);
+        setPriceData(data);
+      } catch (error) {
+        console.error(`Failed to fetch price data for ${id}:`, error);
+        // Fallback data will be handled by the service
+        setPriceData(null);
+      } finally {
+        setIsLoadingPrice(false);
+      }
+    };
+
+    fetchPriceData();
+  }, [id]);
 
   const dispatch = useDispatch();
   const currentUserKYCVerified = useSelector(
@@ -105,6 +134,7 @@ const AssetCard = ({
   return (
     <div
       className="asset-card"
+      onClick={() => { if (onPress) onPress(); }} // always trigger onPress on card click
       css={css`
         display: grid;
         grid-template-columns: ${showOptions ? "1fr auto" : "1fr"};
@@ -136,7 +166,7 @@ const AssetCard = ({
       <div
         css={css`
           display: grid;
-          grid-template-columns: auto 1fr;
+          grid-template-columns: auto 1fr auto;
           column-gap: var(--size-150);
           line-height: var(--line-height-tight);
           width: 100%;
@@ -188,21 +218,88 @@ const AssetCard = ({
               </p>
             </div>
             {showBalance && (
-              <p
+              <div
                 css={css`
-                  font-weight: var(--fw-active);
-                  font-size: var(--fs-medium);
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-end;
                 `}
               >
-                {showCurrencySymbol ? formattedBalance : balance}
-              </p>
+                <p
+                  css={css`
+                    font-weight: var(--fw-active);
+                    font-size: var(--fs-medium);
+                  `}
+                >
+                  {showCurrencySymbol ? formattedBalance : balance}
+                </p>
+                {priceData && !isLoadingPrice && (
+                  <p
+                    css={css`
+                      font-size: var(--fs-small);
+                      color: ${priceData.isPositive ? '#22c55e' : '#ef4444'};
+                      margin-block-start: var(--size-025);
+                    `}
+                  >
+                    {formatPercentChange(priceData.percentChange)}
+                  </p>
+                )}
+                {isLoadingPrice && (
+                  <p
+                    css={css`
+                      font-size: var(--fs-small);
+                      color: var(--clr-text-neutral);
+                      margin-block-start: var(--size-025);
+                    `}
+                  >
+                    Loading...
+                  </p>
+                )}
+              </div>
             )}
           </div>
+        </div>
+        
+        {/* Mini chart */}
+        <div
+          css={css`
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 40px;
+          `}
+        >
+          {priceData && !isLoadingPrice ? (
+            <MiniChart 
+              data={priceData.priceHistory} 
+              isPositive={priceData.isPositive}
+              width={80}
+              height={40}
+            />
+          ) : (
+            <div
+              css={css`
+                width: 80px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--clr-neutral-100);
+                border-radius: var(--border-radius-small);
+                font-size: var(--fs-small);
+                color: var(--clr-text-neutral);
+              `}
+            >
+              {isLoadingPrice ? '...' : '—'}
+            </div>
+          )}
         </div>
       </div>
       {showOptions && (
         <MenuTrigger>
           <Button
+            onClick={e => e.stopPropagation()} // prevent card click when clicking options
             css={css`
               display: grid;
               place-items: center;
@@ -298,10 +395,41 @@ const AssetCard = ({
                 />
                 Swap
               </MenuItem>
+              <MenuItem
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  border-radius: var(--border-radius-medium);
+                  padding: var(--size-150) var(--size-150);
+                  width: 100%;
+                  &[data-hovered="true"] {
+                    background-color: var(--clr-surface-raised);
+                  }
+                `}
+                onAction={() => setShowInfoPopup(true)}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 16,
+                    height: 16,
+                    marginRight: 8,
+                    borderRadius: 8,
+                    background: "#eee",
+                    textAlign: "center",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: "#888",
+                    lineHeight: "16px",
+                  }}
+                >i</span>
+                About
+              </MenuItem>
             </Menu>
           </Popover>
         </MenuTrigger>
       )}
+      <AssetInfoPopup isOpen={showInfoPopup} onOpenChange={setShowInfoPopup} assetId={id} />
     </div>
   );
 };

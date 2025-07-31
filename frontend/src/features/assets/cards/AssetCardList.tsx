@@ -3,6 +3,8 @@ import AssetCard from "./AssetCard";
 import { css } from "@emotion/react";
 
 import { AbstractedAsset } from "../types";
+import AssetInfoPopup from "../AssetInfoPopup";
+import { useState } from "react";
 
 const AssetCardList = ({
   assets,
@@ -20,6 +22,15 @@ const AssetCardList = ({
   showCurrencySymbol?: boolean;
   radioGroup?: boolean;
 }) => {
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+
+  const handleAssetPress = (asset: AbstractedAsset) => {
+    setSelectedAssetId(asset.id);
+    setPopupOpen(true);
+    if (onAssetSelect) onAssetSelect(asset);
+  };
+
   return (
     <div className="asset-card-list-wrapper">
       <ul
@@ -32,6 +43,29 @@ const AssetCardList = ({
           gap: var(--size-150);
         `}
       >
+        {assets.map((asset: any, i: number) => (
+          <li
+            key={`asset-card-${i}`}
+            className="coin-card-wrapper"
+            css={css`
+              width: 100%;
+            `}
+          >
+            <AssetCard
+              id={asset.id}
+              title={asset.label}
+              symbol={asset.symbol}
+              fiatCurrency={asset.fiatCurrency}
+              balance={showBalanceUSD ? asset.balanceUSD : asset.balance}
+              showCurrencySymbol={showCurrencySymbol}
+              icon={asset.icon}
+              groupId={asset.groupId}
+              onPress={() => handleAssetPress(asset)}
+              showBalance={showBalance}
+              showOptions={showOptions}
+            />
+          </li>
+        ))}
         {assets
           // @ts-ignore update types to include balanceUSD TODO
           // Sort acscending -> descending
@@ -62,6 +96,13 @@ const AssetCardList = ({
             </li>
           ))}
       </ul>
+      {selectedAssetId && (
+        <AssetInfoPopup
+          isOpen={popupOpen}
+          onOpenChange={setPopupOpen}
+          assetId={selectedAssetId}
+        />
+      )}
     </div>
   );
 };

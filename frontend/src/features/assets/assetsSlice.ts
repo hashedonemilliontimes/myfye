@@ -2298,7 +2298,7 @@ const initialState: AssetsState = {
       id: "us_dollar_yield",
       label: "US Dollar Yield",
       assetIds: ["usdy_sol"],
-      symbol: "USD",
+      symbol: "USDY",
       dashboardId: "cash",
       fiatCurrency: "usd",
       groupId: "earn",
