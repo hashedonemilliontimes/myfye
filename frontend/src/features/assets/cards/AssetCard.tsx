@@ -3,10 +3,9 @@ import AssetIcon from "../AssetIcon";
 import { RefObject, useState } from "react";
 import AssetInfoPopup from "../AssetInfoPopup";
 import KYCOverlay from "@/features/compliance/kycOverlay";
-// import Button from "@/shared/components/ui/button/Button";
-// import Menu from "@/shared/components/ui/menu/Menu";
-
-import { HTMLAttributes, RefObject, useState } from "react";
+import MiniChart from "./MiniChart";
+import { generateMockPriceData, formatPercentChange } from "../mockPriceData";
+import { HTMLAttributes } from "react";
 
 import { formatBalance } from "../utils";
 import { AbstractedAsset, Asset } from "../types";
@@ -47,6 +46,7 @@ interface AssetCardProps extends HTMLAttributes<HTMLDivElement> {
   showCurrencySymbol?: boolean;
   radio?: boolean;
   isSelected?: boolean;
+  onPress?: () => void;
 }
 
 const AssetCard = ({
@@ -63,29 +63,15 @@ const AssetCard = ({
   showCurrencySymbol = true,
   radio,
   isSelected,
-  onPress, // <-- add onPress prop
+  onPress,
   ...restProps
-}: {
-  id: AbstractedAsset["id"];
-  title: AbstractedAsset["label"];
-  fiatCurrency: Asset["fiatCurrency"];
-  symbol: AbstractedAsset["symbol"];
-  groupId: AbstractedAsset["groupId"];
-  balance: number;
-  ref?: RefObject<HTMLButtonElement>;
-  icon: AbstractedAsset["icon"];
-  showOptions: boolean;
-  showBalance: boolean;
-  showCurrencySymbol?: boolean;
-  radio?: boolean;
-  isSelected?: boolean;
-  onPress?: () => void; // <-- add onPress type
-}) => {
-
 }: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
+  
+  // Generate mock price data for this asset
+  const priceData = generateMockPriceData(id);
 
   const dispatch = useDispatch();
   const currentUserKYCVerified = useSelector(
@@ -162,7 +148,7 @@ const AssetCard = ({
       <div
         css={css`
           display: grid;
-          grid-template-columns: auto 1fr;
+          grid-template-columns: auto 1fr auto;
           column-gap: var(--size-150);
           line-height: var(--line-height-tight);
           width: 100%;
@@ -214,16 +200,51 @@ const AssetCard = ({
               </p>
             </div>
             {showBalance && (
-              <p
+              <div
                 css={css`
-                  font-weight: var(--fw-active);
-                  font-size: var(--fs-medium);
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-end;
                 `}
               >
-                {showCurrencySymbol ? formattedBalance : balance}
-              </p>
+                <p
+                  css={css`
+                    font-weight: var(--fw-active);
+                    font-size: var(--fs-medium);
+                  `}
+                >
+                  {showCurrencySymbol ? formattedBalance : balance}
+                </p>
+                <p
+                  css={css`
+                    font-size: var(--fs-small);
+                    color: ${priceData.isPositive ? '#22c55e' : '#ef4444'};
+                    margin-block-start: var(--size-025);
+                  `}
+                >
+                  {formatPercentChange(priceData.percentChange)}
+                </p>
+              </div>
             )}
           </div>
+        </div>
+        
+        {/* Mini chart */}
+        <div
+          css={css`
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 40px;
+          `}
+        >
+          <MiniChart 
+            data={priceData.priceHistory} 
+            isPositive={priceData.isPositive}
+            width={80}
+            height={40}
+          />
         </div>
       </div>
       {showOptions && (
