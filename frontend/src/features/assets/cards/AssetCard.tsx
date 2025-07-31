@@ -1,10 +1,10 @@
 import { css } from "@emotion/react";
 import AssetIcon from "../AssetIcon";
-import { RefObject, useState } from "react";
+import { RefObject, useState, useEffect } from "react";
 import AssetInfoPopup from "../AssetInfoPopup";
 import KYCOverlay from "@/features/compliance/kycOverlay";
 import MiniChart from "./MiniChart";
-import { generateMockPriceData, formatPercentChange } from "../mockPriceData";
+import { getRealPriceData, formatPercentChange, type AssetPriceData } from "../priceDataService";
 import { HTMLAttributes } from "react";
 
 import { formatBalance } from "../utils";
@@ -68,10 +68,28 @@ const AssetCard = ({
 }: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
   const [showInfoPopup, setShowInfoPopup] = useState(false);
+  const [priceData, setPriceData] = useState<AssetPriceData | null>(null);
+  const [isLoadingPrice, setIsLoadingPrice] = useState(true);
   const formattedBalance = formatBalance(balance, fiatCurrency);
-  
-  // Generate mock price data for this asset
-  const priceData = generateMockPriceData(id);
+
+  // Fetch real price data for this asset
+  useEffect(() => {
+    const fetchPriceData = async () => {
+      setIsLoadingPrice(true);
+      try {
+        const data = await getRealPriceData(id);
+        setPriceData(data);
+      } catch (error) {
+        console.error(`Failed to fetch price data for ${id}:`, error);
+        // Fallback data will be handled by the service
+        setPriceData(null);
+      } finally {
+        setIsLoadingPrice(false);
+      }
+    };
+
+    fetchPriceData();
+  }, [id]);
 
   const dispatch = useDispatch();
   const currentUserKYCVerified = useSelector(
@@ -215,15 +233,28 @@ const AssetCard = ({
                 >
                   {showCurrencySymbol ? formattedBalance : balance}
                 </p>
-                <p
-                  css={css`
-                    font-size: var(--fs-small);
-                    color: ${priceData.isPositive ? '#22c55e' : '#ef4444'};
-                    margin-block-start: var(--size-025);
-                  `}
-                >
-                  {formatPercentChange(priceData.percentChange)}
-                </p>
+                {priceData && !isLoadingPrice && (
+                  <p
+                    css={css`
+                      font-size: var(--fs-small);
+                      color: ${priceData.isPositive ? '#22c55e' : '#ef4444'};
+                      margin-block-start: var(--size-025);
+                    `}
+                  >
+                    {formatPercentChange(priceData.percentChange)}
+                  </p>
+                )}
+                {isLoadingPrice && (
+                  <p
+                    css={css`
+                      font-size: var(--fs-small);
+                      color: var(--clr-text-neutral);
+                      margin-block-start: var(--size-025);
+                    `}
+                  >
+                    Loading...
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -239,12 +270,30 @@ const AssetCard = ({
             height: 40px;
           `}
         >
-          <MiniChart 
-            data={priceData.priceHistory} 
-            isPositive={priceData.isPositive}
-            width={80}
-            height={40}
-          />
+          {priceData && !isLoadingPrice ? (
+            <MiniChart 
+              data={priceData.priceHistory} 
+              isPositive={priceData.isPositive}
+              width={80}
+              height={40}
+            />
+          ) : (
+            <div
+              css={css`
+                width: 80px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--clr-neutral-100);
+                border-radius: var(--border-radius-small);
+                font-size: var(--fs-small);
+                color: var(--clr-text-neutral);
+              `}
+            >
+              {isLoadingPrice ? '...' : '—'}
+            </div>
+          )}
         </div>
       </div>
       {showOptions && (
