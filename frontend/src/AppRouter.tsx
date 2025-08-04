@@ -37,6 +37,15 @@ import { useNavigate } from "react-router-dom";
 import { checkIfMobileOrTablet } from "./shared/utils/mobileUtils.ts";
 import MFAOnboarding from "./pages/app/login/mfaOnboarding.tsx";
 import { setEmbeddedWallet, setWalletClient } from "./redux/userWalletData.tsx"; 
+import { useCrossChainTransfer } from "./functions/bridge/use-cross-chain-transfer.ts";
+import { getUSDCBalanceOnBase } from "./functions/checkForEVMDeposit.ts";
+import {
+  SupportedChainId,
+  SUPPORTED_CHAINS,
+  CHAIN_TO_CHAIN_NAME,
+} from "./functions/bridge/chains.ts";
+import { evmAddressToBytes32 } from "./functions/bridge/solana-utils.ts";
+import { base } from "viem/chains";
 
 function WebAppInner() {
   window.Buffer = Buffer;
@@ -55,8 +64,24 @@ function WebAppInner() {
   const KYCVerifired = useSelector(
     (state: RootState) => state.userWalletData.currentUserKYCVerified
   );
+  const evmPubKey = useSelector(
+    (state: RootState) => state.userWalletData.evmPubKey
+  );
+  const solanaPubKey = useSelector(
+    (state: RootState) => state.userWalletData.solanaPubKey
+  );
+  const embeddedWallet = useSelector(
+    (state: RootState) => state.userWalletData.embeddedWallet
+  );
+
+  const walletClient = useSelector(
+    (state: RootState) => state.userWalletData.walletClient
+  );
   const users = useSelector((state: RootState) => state.userWalletData.users);
   const dispatch = useDispatch();
+
+  // Move the hook call here at the component level
+  const { executeTransfer } = useCrossChainTransfer(embeddedWallet, walletClient);
 
   const [userDataLoaded, setUserDataLoaded] = useState(false); // To do: get user data
   const ANNOUNCMENT_MESSAGE = "";
@@ -79,8 +104,6 @@ function WebAppInner() {
     const handleLogin = async () => {
       if (authenticated && user) {
 
-        console.log('BRIDGING in AppRouter wallets:', wallets)
-
 
         try {
           console.log("calling HandleUserLogin"); 
@@ -96,13 +119,13 @@ function WebAppInner() {
           if (wallet) {
             const provider = await wallet.getEthereumProvider();
             const client = createWalletClient({
-            account: wallet.address,
-            chain: wallet.chainId,
-            transport: custom(provider),
-          });
-          
-          dispatch(setWalletClient(client));
-          dispatch(setEmbeddedWallet(wallet));
+              account: wallet.address,
+              chain: base, // Use the Base chain object
+              transport: custom(provider),
+            });
+            
+            dispatch(setWalletClient(client));
+            dispatch(setEmbeddedWallet(wallet));
           }
       
 
@@ -115,6 +138,30 @@ function WebAppInner() {
     };
     handleLogin();
   }, [authenticated, user]);
+
+  useEffect(() => {
+    const listenForUSDCBase = async () => {
+      const usdcBaseBalance = await getUSDCBalanceOnBase(evmPubKey, solanaPubKey);
+
+      console.log('BRIDGING uusdcBaseBalance', usdcBaseBalance)
+      console.log('BRIDGING executeTransfer', executeTransfer)
+
+      
+      if (solanaPubKey && walletClient && embeddedWallet) {
+        
+        await executeTransfer(
+          SupportedChainId.BASE,
+          SupportedChainId.SOLANA_MAINNET,
+          "0.05",
+          "fast",
+          solanaPubKey
+        );
+      } else {
+        console.log('BRIDGING no solana pub key found')
+      }
+      }
+      listenForUSDCBase();
+  }, [solanaPubKey, evmPubKey, walletClient, embeddedWallet]);
 
   if (authenticated) {
     if (userDataLoaded) {

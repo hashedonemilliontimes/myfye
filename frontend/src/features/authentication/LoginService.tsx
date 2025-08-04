@@ -23,13 +23,6 @@ import {
 import { HELIUS_API_KEY, MYFYE_BACKEND, MYFYE_BACKEND_KEY } from "../../env.ts";
 import { getUSDCBalanceOnBase } from '../../functions/checkForEVMDeposit.ts'
 import { bridgeFromBaseToSolana } from '../../functions/bridge.ts'
-import { useCrossChainTransfer } from "../../functions/bridge/use-cross-chain-transfer.ts"
-import {
-  SupportedChainId,
-  SUPPORTED_CHAINS,
-  CHAIN_TO_CHAIN_NAME,
-} from "../../functions/bridge/chains.ts";
-
 import { getPriceQuotes } from '../../functions/priceQuotes.ts'
 import { updateExchangeRateUSD } from '../../features/assets/assetsSlice.ts'
 
@@ -172,9 +165,8 @@ const HandleUserLogIn = async (
   user: any,
   dispatch: Function,
   wallets: any,
+  executeTransfer: Function, // Add executeTransfer as a parameter
 ): Promise<{ success: boolean }> => {
-
-  
 
   dispatch(setcurrentUserEmail(user.email.address));
   dispatch(setPrivyUserId(user.id));
@@ -188,14 +180,15 @@ const HandleUserLogIn = async (
         dispatch(setBlindPayEvmWalletId(dbUser.blind_pay_evm_wallet_id));
         dispatch(setBlindPayReceiverId(dbUser.blind_pay_receiver_id));
 
-        //getUSDCBalanceOnBase(dbUser.evm_pub_key, dbUser.solana_pub_key);
-        console.log('BRIDGING USDC BASE AMOUNT to SOLANA AMOUNT evm and solana keys', dbUser.evm_pub_key, dbUser.solana_pub_key)
-        console.log('BRIDGING running bridgeFromBaseToSolana', wallets)
-        const { executeTransfer } = useCrossChainTransfer();
+        /*
+        const usdcBaseBalance = await getUSDCBalanceOnBase(dbUser.evm_pub_key, dbUser.solana_pub_key);
 
-        if (user.wallet && dbUser.solana_pub_key) {
+        console.log('BRIDGING uusdcBaseBalance', usdcBaseBalance)
+        console.log('BRIDGING executeTransfer', executeTransfer)
+
+        if (dbUser.solana_pub_key) {
           //bridgeFromBaseToSolana(0.01, dbUser.evm_pub_key, dbUser.solana_pub_key);
-          
+          console.log('BRIDGING running executeTransfer', wallets)
           await executeTransfer(
             SupportedChainId.BASE_SEPOLIA,
             SupportedChainId.SOLANA_DEVNET,
@@ -203,7 +196,10 @@ const HandleUserLogIn = async (
             "fast",
             dbUser.solana_pub_key
           );
+        } else {
+          console.log('BRIDGING no solana pub key found')
         }
+        */
       }
       
     } catch (error) {

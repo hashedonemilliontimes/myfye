@@ -7,7 +7,7 @@ import {
   VersionedTransaction,
   SystemProgram,
 } from "@solana/web3.js";
-import { hexlify } from "ethers";
+import { toHex } from "viem";
 import bs58 from "bs58";
 import * as spl from "@solana/spl-token";
 import {
@@ -241,7 +241,7 @@ export const getReceiveMessagePdas = async (
 };
 
 export const solanaAddressToHex = (solanaAddress: string): string =>
-  hexlify(bs58.decode(solanaAddress));
+  toHex(bs58.decode(solanaAddress));
 
 export const evmAddressToSolana = (evmAddress: string): string =>
   bs58.encode(hexToBytes(evmAddress));
@@ -278,7 +278,7 @@ export const findProgramAddress = (
 
 // Fetches attestation from attestation service given the txHash
 export const getMessages = async (txHash: string) => {
-  console.log("Fetching messages for tx...", txHash);
+  console.log("BRIDGING Fetching messages for tx...", txHash);
   let attestationResponse: any = {};
   while (
     attestationResponse.error ||
