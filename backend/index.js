@@ -161,6 +161,10 @@ app.use(blockUnauthorizedIPs);
 // Add email service routes
 app.use('/api/email', emailService);
 
+// Add price history proxy route
+const priceHistoryRoute = require('./routes/priceHistory');
+app.use('/api', priceHistoryRoute);
+
 /* User management endpoints */
 // Apply stricter rate limiting to sensitive endpoints
 app.post('/create_user', sensitiveLimiter, async (req, res) => {

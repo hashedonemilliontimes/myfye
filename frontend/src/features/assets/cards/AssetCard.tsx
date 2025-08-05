@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import AssetIcon from "../AssetIcon";
 import { HTMLAttributes, RefObject, useState } from "react";
-
+import AssetInfoPopup from "./AssetInfoPopup";
 import { formatBalance } from "../utils";
 import { AbstractedAsset, Asset } from "../types";
 import { useSelector } from "react-redux";
@@ -41,6 +41,7 @@ interface AssetCardProps extends HTMLAttributes<HTMLDivElement> {
   showCurrencySymbol?: boolean;
   radio?: boolean;
   isSelected?: boolean;
+  onPress?: () => void; // <-- add onPress type
 }
 
 const AssetCard = ({
@@ -56,10 +57,12 @@ const AssetCard = ({
   showBalance,
   showCurrencySymbol = true,
   radio,
+  onPress,
   isSelected,
   ...restProps
 }: AssetCardProps) => {
   const [showKYCOverlay, setShowKYCOverlay] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
   const formattedBalance = formatBalance(balance, fiatCurrency);
 
   const dispatch = useDispatch();
@@ -105,6 +108,7 @@ const AssetCard = ({
   return (
     <div
       className="asset-card"
+      onClick={() => { if (onPress) onPress(); }} // always trigger onPress on card click
       css={css`
         display: grid;
         grid-template-columns: ${showOptions ? "1fr auto" : "1fr"};
@@ -288,20 +292,30 @@ const AssetCard = ({
                     background-color: var(--clr-surface-raised);
                   }
                 `}
-                onAction={handleSwapClick}
+                onAction={() => setShowInfoPopup(true)}
               >
-                <ArrowLineDown
-                  size={16}
-                  css={css`
-                    margin-inline-end: var(--size-100);
-                  `}
-                />
-                Swap
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 16,
+                    height: 16,
+                    marginRight: 8,
+                    borderRadius: 8,
+                    background: "#eee",
+                    textAlign: "center",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: "#888",
+                    lineHeight: "16px",
+                  }}
+                >i</span>
+                About
               </MenuItem>
             </Menu>
           </Popover>
         </MenuTrigger>
       )}
+      <AssetInfoPopup isOpen={showInfoPopup} onOpenChange={setShowInfoPopup} assetId={id} />
     </div>
   );
 };
