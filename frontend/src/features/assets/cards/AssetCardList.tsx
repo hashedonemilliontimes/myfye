@@ -1,6 +1,8 @@
 import AssetCard from "./AssetCard";
 
 import { css } from "@emotion/react";
+import AssetInfoPopup from "./AssetInfoPopup";
+import { useState } from "react";
 
 import { AbstractedAsset } from "../types";
 
@@ -20,6 +22,15 @@ const AssetCardList = ({
   showCurrencySymbol?: boolean;
   radioGroup?: boolean;
 }) => {
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+
+  const handleAssetPress = (asset: AbstractedAsset) => {
+    setSelectedAssetId(asset.id);
+    setPopupOpen(true);
+    if (onAssetSelect) onAssetSelect(asset);
+  };
+
   return (
     <div className="asset-card-list-wrapper">
       <ul
@@ -55,13 +66,20 @@ const AssetCardList = ({
                 icon={asset.icon}
                 groupId={asset.groupId}
                 // @ts-ignore need to check this one TODO
-                onPress={() => onAssetSelect && onAssetSelect(asset)}
+                onPress={() => handleAssetPress(asset)}
                 showBalance={showBalance}
                 showOptions={showOptions}
               />
             </li>
           ))}
       </ul>
+      {selectedAssetId && (
+        <AssetInfoPopup
+          isOpen={popupOpen}
+          onOpenChange={setPopupOpen}
+          assetId={selectedAssetId}
+        />
+      )}
     </div>
   );
 };
