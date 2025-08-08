@@ -14,13 +14,13 @@ const {
 const { createErrorLog } = require('../errorLog');
 
 
-//const BLIND_PAY_API_KEY = process.env.BLIND_PAY_API_KEY;
-//const BLIND_PAY_INSTANCE_ID = process.env.BLIND_PAY_INSTANCE_ID;
-//const NETWORK = 'base'
+const BLIND_PAY_API_KEY = process.env.BLIND_PAY_API_KEY;
+const BLIND_PAY_INSTANCE_ID = process.env.BLIND_PAY_INSTANCE_ID;
+const NETWORK = 'base'
 
-const BLIND_PAY_API_KEY = process.env.BLIND_PAY_DEV_API_KEY;
-const BLIND_PAY_INSTANCE_ID = process.env.BLIND_PAY_DEV_INSTANCE_ID;
-const NETWORK = 'sepolia'
+//const BLIND_PAY_API_KEY = process.env.BLIND_PAY_DEV_API_KEY;
+//const BLIND_PAY_INSTANCE_ID = process.env.BLIND_PAY_DEV_INSTANCE_ID;
+//const NETWORK = 'sepolia'
 
 async function create_new_on_ramp_path(data) {
   console.log("On-ramp called!");
@@ -260,8 +260,10 @@ async function delete_blockchain_wallet_and_receiver(receiverId, walletId) {
     console.log(`Starting deletion process for receiver ${receiverId} and wallet ${walletId}...`);
     
     // First delete the blockchain wallet
-    console.log(`Deleting blockchain wallet ${walletId}...`);
-    await delete_blockchain_wallet(receiverId, walletId);
+    if (walletId) {
+      console.log(`Deleting blockchain wallet ${walletId}...`);
+      await delete_blockchain_wallet(receiverId, walletId);
+    }
     
     // Then delete the receiver
     console.log(`Deleting receiver ${receiverId}...`);

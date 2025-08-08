@@ -26,6 +26,7 @@ import PullToRefreshIndicator from "@/features/pull-to-refresh/PullToRefreshIndi
 import { useSolanaWallets } from "@privy-io/react-auth";
 import { useDispatch } from "react-redux";
 import getSolanaBalances from "@/functions/GetSolanaBalances";
+import { useScrollDirectionLock } from "@/features/scroll/useScrollDirectionLock";
 
 const tabs = [
   { id: "dashboard", label: "Dashboard" },
@@ -41,16 +42,19 @@ const HomeTabs = () => {
   const tabPanelsRef = useRef<HTMLDivElement>(null!);
   const { wallets } = useSolanaWallets();
   const dispatch = useDispatch();
-  const solanaAddress = wallets[0].address;
 
-  const [isScrolling, setScrolling] = useState(false);
+  let solanaAddress = "";
+  if (wallets.length > 0) {
+    solanaAddress = wallets[0].address;
+  }
 
   const { spinnerParams, pullMargin } = usePullToRefresh({
     onRefresh: async () => {
-      await getSolanaBalances(solanaAddress, dispatch);
+      if (solanaAddress) {
+        await getSolanaBalances(solanaAddress, dispatch);
+      }
     },
-    ref: tabPanelsRef,
-    isScrolling,
+    container: tabPanelsRef,
   });
 
   // Track the scroll position of the tab panel container.
@@ -107,11 +111,6 @@ const HomeTabs = () => {
   // When the user scrolls, update the selected key
   // so that the correct tab panel becomes interactive.
   useMotionValueEvent(scrollXProgress, "change", (x) => {
-    if (x === 0 || x == 1 / 3 || x === 2 / 3 || x === 1) {
-      setScrolling(true);
-    } else {
-      setScrolling(false);
-    }
     setSelectedKey(tabs[getIndex(x)].id);
   });
 
@@ -147,7 +146,6 @@ const HomeTabs = () => {
         onComplete: () => {
           tabPanel.style.scrollSnapType = "";
           animationRef.current = null;
-          setScrolling(false);
         },
       }
     );
@@ -245,7 +243,6 @@ const HomeTabs = () => {
         >
           <PullToRefreshIndicator style={spinnerParams} />
           <motion.div
-            data-scrolling={isScrolling}
             ref={tabPanelsRef}
             className="no-scrollbar"
             css={css`
